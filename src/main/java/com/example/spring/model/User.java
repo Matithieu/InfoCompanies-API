@@ -22,23 +22,21 @@ public class User {
     private String address;
     @Column(name = "role", length = 45)
     private String role;
-    @Column(name = "stripe_api", length = 45)
-    private String stripe_api;
-    @Column(name = "session_id", length = 45)
-    private String session_id;
+    @Column(name = "verified", nullable = false)
+    private boolean verified;
 
     @OneToOne
     @JoinColumn(name = "stripe_api", referencedColumnName = "id")
-    private StripeUser stripeUser;
+    private StripeUser stripe_api;
 
     @OneToOne
     @JoinColumn(name = "session_id", referencedColumnName = "id")
-    private UserSession userSession;
+    private UserSession session_id;
 
     public User() {
     }
 
-    public User(String name, String email, String password, String phone, String city, String address, String role, String stripe_api, String session_id) {
+    public User(String name, String email, String password, String phone, String city, String address, String role, Boolean verified, StripeUser stripe_api, UserSession session_id) {
         super();
         this.name = name;
         this.email = email;
@@ -47,6 +45,7 @@ public class User {
         this.city = city;
         this.address = address;
         this.role = role;
+        this.verified = verified;
         this.stripe_api = stripe_api;
         this.session_id = session_id;
     }
@@ -115,19 +114,27 @@ public class User {
         this.role = role;
     }
 
-    public String getStripe_api() {
+    public boolean getVerified() {
+        return verified;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
+
+    public StripeUser getStripe_api() {
         return stripe_api;
     }
 
-    public void setStripe_api(String stripe_api) {
+    public void setStripe_api(StripeUser stripe_api) {
         this.stripe_api = stripe_api;
     }
 
-    public String getSession_id() {
+    public UserSession getSession_id() {
         return session_id;
     }
 
-    public void setSession_id(String session_id) {
+    public void setSession_id(UserSession session_id) {
         this.session_id = session_id;
     }
 }

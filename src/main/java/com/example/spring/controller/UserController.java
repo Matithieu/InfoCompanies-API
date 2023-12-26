@@ -39,8 +39,12 @@ public class UserController {
         return ResponseEntity.ok(User);
     }
 
-    // update User rest api
+    // get User by email rest api
+    public User getUserByEmail(String email) {
+        return UserRepository.findByEmail(email);
+    }
 
+    // update User rest api
     @PutMapping("/Users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User UserDetails){
         User User = UserRepository.findById(id)
@@ -53,6 +57,7 @@ public class UserController {
         User.setCity(UserDetails.getCity());
         User.setAddress(UserDetails.getAddress());
         User.setRole(UserDetails.getRole());
+        User.setVerified(UserDetails.getVerified());
         User.setStripe_api(UserDetails.getStripe_api());
         User.setSession_id(UserDetails.getSession_id());
 
