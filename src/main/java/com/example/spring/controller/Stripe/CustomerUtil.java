@@ -8,7 +8,10 @@ import com.stripe.model.CustomerSearchResult;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 
+import java.util.concurrent.Semaphore;
+
 public class CustomerUtil {
+    private static final Semaphore mutex = new Semaphore(1);
 
     public static Customer retrieveCustomer(String customerId) throws StripeException {
         return Customer.retrieve(customerId);
@@ -26,22 +29,42 @@ public class CustomerUtil {
         return !result.getData().isEmpty() ? result.getData().get(0) : null;
     }
 
-    public static Customer findOrCreateCustomer(User user) throws StripeException {
-        Customer result = retrieveCustomer(user.getStripe_api().getStripe_id());
-        Customer customer;
+    public static Customer findOrCreateCustomer(User user) throws Exception {
+        mutex.acquire();
+        try {
+            CustomerSearchParams params =
+                    CustomerSearchParams
+                            .builder()
+                            .setQuery("email:'" + user.getEmail() + "'")
+                            .build();
 
-        // If no existing customer was found, create a new record
-        if (result.getObject().isEmpty()) {
-            CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
-                    .setName(user.getName())
-                    .setEmail(user.getEmail())
-                    .build();
+            CustomerSearchResult result = Customer.search(params);
 
-            customer = Customer.create(customerCreateParams);
-        } else {
-            customer = result;
+            Customer customer;
+
+            // If no existing customer was found, create a new record
+            if (result.getData().isEmpty()) {
+
+                CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
+                        .setName(user.getName())
+                        .setEmail(user.getEmail())
+                        .setPhone(user.getPhone())
+                        .setAddress(
+                                CustomerCreateParams.Address.builder()
+                                        .setCity(user.getCity())
+                                        .setLine1(user.getAddress())
+                                        .build())
+                        .build();
+
+                customer = Customer.create(customerCreateParams);
+            } else {
+                customer = result.getData().get(0);
+            }
+            return customer;
+        } catch (StripeException e) {
+            throw new Exception("Error during the creation or the retrieve of the stripe account ", e);
+        } finally {
+            mutex.release();
         }
-
-        return customer;
     }
 }

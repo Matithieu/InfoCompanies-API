@@ -3,11 +3,14 @@ package com.example.spring.model;
 import com.stripe.model.Product;
 
 public class RequestDTO {
-    Product item;
+    String item;
     String customerName;
     String customerEmail;
 
-    public Product getItem() {
+    String subscriptionId;
+
+
+    public String getItem() {
         return item;
     }
 
@@ -17,5 +20,9 @@ public class RequestDTO {
 
     public String getCustomerEmail() {
         return customerEmail;
+    }
+
+    public String getSubscriptionId() {
+        return subscriptionId;
     }
 }
