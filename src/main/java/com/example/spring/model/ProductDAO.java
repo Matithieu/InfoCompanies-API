@@ -16,7 +16,7 @@ public class ProductDAO {
 
         sampleProduct.setName("Basic subscription");
         sampleProduct.setId("basic");
-        sampleProduct.setDescription("Basic subscription");
+        sampleProduct.setDescription("Simple subscription at 30€/month. Limited retrieval of data.");
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(3 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);
@@ -27,7 +27,7 @@ public class ProductDAO {
 
         sampleProduct.setName("Premium subscription");
         sampleProduct.setId("premium");
-        sampleProduct.setDescription("Premium subscription");
+        sampleProduct.setDescription("Augmented subscription at 50€/month. Filters added but limited retrieval of data.");
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(5 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);
@@ -38,7 +38,7 @@ public class ProductDAO {
 
         sampleProduct.setName("Enterprise subscription");
         sampleProduct.setId("enterprise");
-        sampleProduct.setDescription("Enterprise subscription");
+        sampleProduct.setDescription("Full subscription at 100€/month. Full retrieval of data. No limitations.");
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(10 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);

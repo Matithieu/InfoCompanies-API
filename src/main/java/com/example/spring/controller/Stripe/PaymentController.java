@@ -5,20 +5,21 @@ import com.example.spring.model.ProductDAO;
 import com.example.spring.model.RequestDTO;
 import com.example.spring.model.User;
 import com.stripe.Stripe;
+import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
+import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
 import com.stripe.param.SubscriptionItemListParams;
 import com.stripe.param.SubscriptionListParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -47,7 +48,7 @@ public class PaymentController {
 
         // Find the user record from the database
         User user = userController.getUserByEmail(requestDTO.getCustomerEmail());
-        
+
         try {
             mutex.acquire();
             if (user != null && !user.getVerified()) {
@@ -63,28 +64,49 @@ public class PaymentController {
                                 .setCustomer(customer.getId())
                                 .setSuccessUrl(clientBaseURL + "/completion?session_id={CHECKOUT_SESSION_ID}")
                                 .setCancelUrl(clientBaseURL + "/failure")
-                                .setClientReferenceId(user.getId().toString())
-                                // For trials, you need to set the trial period in the session creation request
-                                .setSubscriptionData(SessionCreateParams.SubscriptionData.builder().setTrialPeriodDays(3L).build());
+                                .setBillingAddressCollection(
+                                        SessionCreateParams.BillingAddressCollection.REQUIRED
+                                )
+                                .setClientReferenceId(user.getId().toString());
+
+                // For trials, you need to set the trial period in the session creation request
+                //.setSubscriptionData(SessionCreateParams.SubscriptionData.builder().setTrialPeriodDays(0L).build());
 
                 // Add the all the details to the session creation request
-                paramsBuilder.addLineItem(
-                        SessionCreateParams.LineItem.builder()
-                                .setQuantity(1L)
-                                .setPriceData(
-                                        PriceData.builder()
-                                                .setProductData(
-                                                        PriceData.ProductData.builder()
-                                                                .putMetadata("app_id", ProductDAO.getProduct(requestDTO.getItem()).getId())
-                                                                .setName(ProductDAO.getProduct(requestDTO.getItem()).getName())
-                                                                .setDescription(ProductDAO.getProduct(requestDTO.getItem()).getDescription())
-                                                                .build()
-                                                )
-                                                .setCurrency(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getCurrency())
-                                                .setUnitAmountDecimal(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getUnitAmountDecimal())
-                                                .setRecurring(PriceData.Recurring.builder().setInterval(PriceData.Recurring.Interval.MONTH).build())
-                                                .build())
-                                .build());
+                paramsBuilder
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setQuantity(1L)
+                                        .setPriceData(
+                                                PriceData.builder()
+                                                        .setProductData(
+                                                                PriceData.ProductData.builder()
+                                                                        .putMetadata("app_id", ProductDAO.getProduct(requestDTO.getItem()).getId())
+                                                                        .setName(ProductDAO.getProduct(requestDTO.getItem()).getName())
+                                                                        .setDescription(ProductDAO.getProduct(requestDTO.getItem()).getDescription())
+                                                                        .build()
+                                                        )
+                                                        .setCurrency(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getCurrency())
+                                                        .setUnitAmountDecimal(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getUnitAmountDecimal())
+                                                        .setRecurring(PriceData.Recurring.builder().setInterval(PriceData.Recurring.Interval.MONTH).build())
+                                                        .build())
+                                        .build()
+                        )
+                        .setPhoneNumberCollection(
+                                SessionCreateParams.PhoneNumberCollection.builder()
+                                        .setEnabled(true)
+                                        .build()
+                        )
+                        .setCustomText(
+                                SessionCreateParams.CustomText.builder()
+                                        .setSubmit(
+                                                SessionCreateParams.CustomText.Submit.builder()
+                                                        .setMessage("You can refund freely during 14 days.")
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                ;
 
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId().toString())
@@ -96,119 +118,41 @@ public class PaymentController {
 
             } else if (user != null && user.getVerified()) {
                 return "User is already verified";
-            }
-            else {
+            } else {
                 return "User not found";
             }
-        } 
-        catch (StripeException e) {
+        } catch (StripeException e) {
             throw new Exception("Error when fetching /subscriptions/trial ", e);
         } finally {
             mutex.release();
         }
     }
 
-    @PostMapping("/invoices/list")
-    List<Map<String, String>> listInvoices(@RequestBody RequestDTO requestDTO) throws Exception {
-
-        Stripe.apiKey = STRIPE_API_KEY;
-
-        // Verify that the user exists
-        User user = userController.getUserByEmail(requestDTO.getCustomerEmail());
-        Customer customer = CustomerUtil.findCustomerByEmail(user.getEmail());
+    @CrossOrigin
+    @PostMapping("/webhook")
+    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
+        // stripe listen --forward-to localhost:8080/webhook
+        String endpointSecret = "whsec_9552112da604d21f5b0bc4965a70031695a07006a6abcd374b60be44fd7faf99"; // Replace with your endpoint's secret
+        Event event = null;
 
         try {
-            // If no customer record was found, no subscriptions exist either, so return an empty list
-            if (customer == null) {
-                return new ArrayList<>();
-            }
-            
-            // Search for invoices for the current customer
-            Map<String, Object> invoiceSearchParams = new HashMap<>();
-            invoiceSearchParams.put("customer", customer.getId());
-            InvoiceCollection invoices =
-                    Invoice.list(invoiceSearchParams);
-
-            List<Map<String, String>> response = new ArrayList<>();
-
-            // For each invoice, extract its number, amount, and PDF URL to send to the client
-            for (Invoice invoice : invoices.getData()) {
-                HashMap<String, String> map = new HashMap<>();
-
-                map.put("number", invoice.getNumber());
-                map.put("amount", String.valueOf((invoice.getTotal() / 100f)));
-                map.put("url", invoice.getInvoicePdf());
-
-                response.add(map);
-            }
-
-            return response;
-            
-        }
-        catch (StripeException e) {
-            throw new Exception("Error when fetching /invoices/list ", e);
-        }
-    }
-
-    @PostMapping("/subscriptions/list")
-    List<Map<String, String>> viewSubscriptions(@RequestBody RequestDTO requestDTO) throws StripeException {
-
-        Stripe.apiKey = STRIPE_API_KEY;
-
-        // Start by finding existing customer record from Stripe
-        Customer customer = CustomerUtil.findCustomerByEmail(requestDTO.getCustomerEmail());
-
-        // If no customer record was found, no subscriptions exist either, so return an empty list
-        if (customer == null) {
-            return new ArrayList<>();
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+        } catch (SignatureVerificationException e) {
+            // Invalid signature
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
 
-        // Search for subscriptions for the current customer
-        SubscriptionCollection subscriptions = Subscription.list(
-                SubscriptionListParams.builder()
-                        .setCustomer(customer.getId())
-                        .build());
+        // Handle the event
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer().getObject().get();
 
-        List<Map<String, String>> response = new ArrayList<>();
-
-        // For each subscription record, query its item records and collect in a list of objects to send to the client
-        for (Subscription subscription : subscriptions.getData()) {
-            SubscriptionItemCollection currSubscriptionItems =
-                    SubscriptionItem.list(SubscriptionItemListParams.builder()
-                            .setSubscription(subscription.getId())
-                            .addExpand("data.price.product")
-                            .build());
-
-            for (SubscriptionItem item : currSubscriptionItems.getData()) {
-                HashMap<String, String> subscriptionData = new HashMap<>();
-                subscriptionData.put("appProductId", item.getPrice().getProductObject().getMetadata().get("app_id"));
-                subscriptionData.put("subscriptionId", subscription.getId());
-                subscriptionData.put("subscribedOn", new SimpleDateFormat("dd/MM/yyyy").format(new Date(subscription.getStartDate() * 1000)));
-                subscriptionData.put("nextPaymentDate", new SimpleDateFormat("dd/MM/yyyy").format(new Date(subscription.getCurrentPeriodEnd() * 1000)));
-                subscriptionData.put("price", item.getPrice().getUnitAmountDecimal().toString());
-
-                if (subscription.getTrialEnd() != null && new Date(subscription.getTrialEnd() * 1000).after(new Date()))
-                    subscriptionData.put("trialEndsOn", new SimpleDateFormat("dd/MM/yyyy").format(new Date(subscription.getTrialEnd() * 1000)));
-                response.add(subscriptionData);
-            }
-
+            // Fulfill the purchase...
+            System.out.println("Checkout session completed: " + session.getCustomerEmail());
+            System.out.println("Session ID: " + session.getClientReferenceId());
+            User user = userController.getUserByEmail(session.getCustomerEmail());
+            user.setVerified(true);
         }
 
-        return response;
-    }
-
-    @PostMapping("/subscriptions/cancel")
-    String cancelSubscription(@RequestBody RequestDTO requestDTO) throws StripeException {
-        Stripe.apiKey = STRIPE_API_KEY;
-
-        Subscription subscription =
-                Subscription.retrieve(
-                        requestDTO.getSubscriptionId()
-                );
-
-        Subscription deletedSubscription =
-                subscription.cancel();
-
-        return deletedSubscription.getStatus();
+        return ResponseEntity.ok("Received");
     }
 }

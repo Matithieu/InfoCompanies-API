@@ -5,10 +5,14 @@ import com.example.spring.model.User;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.CustomerSearchResult;
+import com.stripe.net.RequestOptions;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 
+import java.util.HashMap;
 import java.util.concurrent.Semaphore;
+
+import static javax.swing.UIManager.put;
 
 public class CustomerUtil {
     private static final Semaphore mutex = new Semaphore(1);
@@ -56,7 +60,13 @@ public class CustomerUtil {
                                         .build())
                         .build();
 
-                customer = Customer.create(customerCreateParams);
+                RequestOptions requestOptions = RequestOptions.builder()
+                        .setIdempotencyKey(user.getId().toString())
+                        .build();
+
+                // Sometimes, to debug remove the idempotency key
+                customer = Customer.create(customerCreateParams, requestOptions);
+                System.out.println("New customer created: " + customer.getId());
             } else {
                 customer = result.getData().get(0);
             }
