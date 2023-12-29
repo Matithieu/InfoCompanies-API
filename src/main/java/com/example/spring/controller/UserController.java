@@ -57,8 +57,8 @@ public class UserController {
         User.setAddress(UserDetails.getAddress());
         User.setRole(UserDetails.getRole());
         User.setVerified(UserDetails.isVerified());
-        User.setStripe_api(UserDetails.getStripe_api());
-        User.setSession_id(UserDetails.getSession_id());
+        User.setStripeId(UserDetails.getStripeId());
+        User.setSessionId(UserDetails.getSessionId());
 
         User updatedUser = userService.saveUser(User);
         return ResponseEntity.ok(updatedUser);

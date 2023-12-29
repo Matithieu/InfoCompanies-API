@@ -1,11 +1,9 @@
 package com.example.spring.service;
 
 import com.example.spring.model.User;
-import org.springframework.http.ResponseEntity;
+import com.example.spring.model.UserSession;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public interface UserService {
 
@@ -23,4 +21,5 @@ public interface UserService {
 
     User validEmailAndPassword(String email, String password);
 
+    void setSessionId(User user);
 }

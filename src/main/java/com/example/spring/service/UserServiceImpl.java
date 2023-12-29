@@ -1,6 +1,7 @@
 package com.example.spring.service;
 
 import com.example.spring.model.User;
+import com.example.spring.model.UserSession;
 import com.example.spring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,11 +52,17 @@ public class UserServiceImpl implements UserService {
     public User validEmailAndPassword(String email, String password) {
         System.out.println("loginRequest: " + email + " " + password);
         User user = userRepository.findByEmail(email);
+        System.out.println("user email: " + user.getEmail() + " password: " + user.getPassword());
         if (user != null) {
             if (passwordEncoder.matches(password, user.getPassword())) {
                 return user;
             }
+            System.out.println("password not match");
         }
         return null;
+    }
+
+    public void setSessionId(User user) {
+        userRepository.save(user);
     }
 }

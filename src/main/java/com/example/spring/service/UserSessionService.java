@@ -5,27 +5,32 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface UserSessionService {
 
         // get all UserSessions
-        public List<UserSession> getAllUserSessions();
+        List<UserSession> getAllUserSessions();
 
         // create UserSession rest api
-        public UserSession createUserSession(UserSession UserSession);
+        void saveUserSession(UserSession UserSession);
 
         // get UserSession by id rest api
-        public ResponseEntity<UserSession> getUserSessionById(Long id);
+        Optional<UserSession> getUserSessionById(Long id);
 
         // get UserSession by email rest api
-        public UserSession getUserSessionBySessionID(String sessionID);
+        UserSession getUserSessionBySessionID(String sessionID);
 
         // update UserSession rest api
-        public ResponseEntity<UserSession> updateUserSession(Long id, UserSession userSession);
+        ResponseEntity<UserSession> updateUserSession(Long id, UserSession userSession);
 
         // delete UserSession rest api
-        public ResponseEntity<Map<String, Boolean>> deleteUserSession(Long id);
+        void deleteUserSession(Long id);
 
         // delete all UserSessions rest api
-        public ResponseEntity<Map<String, Boolean>> deleteAllUserSessions();
+        ResponseEntity<Map<String, Boolean>> deleteAllUserSessions();
+
+        // check if session is valid
+        boolean isValidSession(String sessionID);
+
 }

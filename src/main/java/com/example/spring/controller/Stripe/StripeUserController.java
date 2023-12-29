@@ -46,7 +46,7 @@ public class StripeUserController {
         StripeUser StripeUser = StripeUserRepository.findById(id)
                 .orElseThrow(() -> new Exception.ResourceNotFoundException("StripeUser not exist with id :" + id));
 
-        StripeUser.setStripe_id(StripeUserDetails.getStripe_id());
+        StripeUser.setStripeId(StripeUserDetails.getStripeId());
 
         StripeUser updatedStripeUser = StripeUserRepository.save(StripeUser);
         return ResponseEntity.ok(updatedStripeUser);

@@ -4,12 +4,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Setter
 @Getter
 public class User {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,17 +41,17 @@ public class User {
     private boolean verified;
 
     @OneToOne
-    @JoinColumn(name = "stripe_api", referencedColumnName = "id")
-    private StripeUser stripe_api;
+    @JoinColumn(name = "stripeId", referencedColumnName = "id")
+    private StripeUser stripeId;
 
     @OneToOne
-    @JoinColumn(name = "session_id", referencedColumnName = "id")
-    private UserSession session_id;
+    @JoinColumn(name = "sessionId", referencedColumnName = "id")
+    private UserSession sessionId;
 
     public User() {
     }
 
-    public User(String name, String email, String password, String phone, String city, String address, String role, Boolean verified, StripeUser stripe_api, UserSession session_id) {
+    public User(String name, String email, String password, String phone, String city, String address, String role, Boolean verified, StripeUser stripeId, UserSession sessionId) {
         super();
         this.name = name;
         this.email = email;
@@ -60,7 +61,7 @@ public class User {
         this.address = address;
         this.role = role;
         this.verified = verified;
-        this.stripe_api = stripe_api;
-        this.session_id = session_id;
+        this.stripeId = stripeId;
+        this.sessionId = sessionId;
     }
 }

@@ -12,13 +12,13 @@ public class StripeUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "stripe_id")
-    private String stripe_id;
+    @Column(name = "stripeId")
+    private String stripeId;
 
     public StripeUser() {}
 
-    public StripeUser(String stripe_id ) {
+    public StripeUser(String stripeId ) {
         super();
-        this.stripe_id = stripe_id;
+        this.stripeId = stripeId;
     }
 }
