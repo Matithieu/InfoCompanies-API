@@ -1,7 +1,8 @@
-package com.example.spring.model;
+package com.example.spring.controller.DAO;
 
 import com.stripe.model.Price;
 import com.stripe.model.Product;
+import com.stripe.param.PriceCreateParams;
 
 import java.math.BigDecimal;
 
@@ -17,6 +18,7 @@ public class ProductDAO {
         sampleProduct.setName("Basic subscription");
         sampleProduct.setId("basic");
         sampleProduct.setDescription("Simple subscription at 30€/month. Limited retrieval of data.");
+        sampleProduct.setShippable(false);
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(3 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);
@@ -28,6 +30,7 @@ public class ProductDAO {
         sampleProduct.setName("Premium subscription");
         sampleProduct.setId("premium");
         sampleProduct.setDescription("Augmented subscription at 50€/month. Filters added but limited retrieval of data.");
+        sampleProduct.setShippable(false);
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(5 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);
@@ -39,6 +42,7 @@ public class ProductDAO {
         sampleProduct.setName("Enterprise subscription");
         sampleProduct.setId("enterprise");
         sampleProduct.setDescription("Full subscription at 100€/month. Full retrieval of data. No limitations.");
+        sampleProduct.setShippable(false);
         samplePrice.setUnitAmountDecimal(BigDecimal.valueOf(10 * 100 *10));
         samplePrice.setCurrency("eur");
         sampleProduct.setDefaultPriceObject(samplePrice);

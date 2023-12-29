@@ -57,11 +57,13 @@ public class CustomerUtil {
                                 CustomerCreateParams.Address.builder()
                                         .setCity(user.getCity())
                                         .setLine1(user.getAddress())
+                                        .setPostalCode("13100")
                                         .build())
+                        .setDescription("Customer for " + user.getEmail())
                         .build();
 
                 RequestOptions requestOptions = RequestOptions.builder()
-                        .setIdempotencyKey(user.getId().toString())
+                        .setIdempotencyKey(user.getId().toString() + "testa")
                         .build();
 
                 // Sometimes, to debug remove the idempotency key

@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.exception.Exception;
 import com.example.spring.model.User;
 import com.example.spring.repository.UserRepository;
+import com.example.spring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,40 +16,38 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/")
 public class UserController {
-    
+
     @Autowired
-    private UserRepository UserRepository;
+    private UserService userService;
 
     // get all Users
-    @GetMapping("/Users")
+    @GetMapping("/users")
     public List<User> getAllUsers(){
-        return UserRepository.findAll();
+        return userService.getAllUsers();
     }
 
     // create User rest api
-    @PostMapping("/Users")
+    @PostMapping("/user")
     public User createUser(@RequestBody User User) {
-        return UserRepository.save(User);
+        return userService.saveUser(User);
     }
 
     // get User by id rest api
-    @GetMapping("/Users/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        User User = UserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("User not exist with id :" + id));
+    @GetMapping("/user/{email}")
+    public ResponseEntity<User> getUserEmail(@PathVariable String email) {
+        User User = userService.getUserByEmail(email);
         return ResponseEntity.ok(User);
     }
 
     // get User by email rest api
     public User getUserByEmail(String email) {
-        return UserRepository.findByEmail(email);
+        return userService.getUserByEmail(email);
     }
 
     // update User rest api
-    @PutMapping("/Users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User UserDetails){
-        User User = UserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("User not exist with id :" + id));
+    @PutMapping("/user/{email}")
+    public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User UserDetails){
+        User User = userService.getUserByEmail(email);
 
         User.setName(UserDetails.getName());
         User.setEmail(UserDetails.getEmail());
@@ -57,21 +56,20 @@ public class UserController {
         User.setCity(UserDetails.getCity());
         User.setAddress(UserDetails.getAddress());
         User.setRole(UserDetails.getRole());
-        User.setVerified(UserDetails.getVerified());
+        User.setVerified(UserDetails.isVerified());
         User.setStripe_api(UserDetails.getStripe_api());
         User.setSession_id(UserDetails.getSession_id());
 
-        User updatedUser = UserRepository.save(User);
+        User updatedUser = userService.saveUser(User);
         return ResponseEntity.ok(updatedUser);
     }
 
     // delete User rest api
-    @DeleteMapping("/Users/{id}")
-    public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable Long id){
-        User User = UserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("User not exist with id :" + id));
+    @DeleteMapping("/user/{email}")
+    public ResponseEntity<Map<String, Boolean>> deleteUser(@PathVariable String email){
+        User User = userService.getUserByEmail(email);
 
-        UserRepository.delete(User);
+        userService.deleteUser(User);
         Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return ResponseEntity.ok(response);

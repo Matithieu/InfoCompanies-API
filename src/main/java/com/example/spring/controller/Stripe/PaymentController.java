@@ -1,9 +1,9 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.controller.UserController;
-import com.example.spring.model.ProductDAO;
-import com.example.spring.model.RequestDTO;
+import com.example.spring.controller.DAO.ProductDAO;
+import com.example.spring.controller.DTO.RequestDTO;
 import com.example.spring.model.User;
+import com.example.spring.service.UserService;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -11,9 +11,6 @@ import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.net.Webhook;
-import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.SubscriptionItemListParams;
-import com.stripe.param.SubscriptionListParams;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.concurrent.Semaphore;
 
 // https://kinsta.com/blog/stripe-java-api/
@@ -32,7 +27,7 @@ import java.util.concurrent.Semaphore;
 public class PaymentController {
 
     @Autowired
-    private UserController userController;
+    private UserService userService;
 
     private static final Semaphore mutex = new Semaphore(1);
 
@@ -47,11 +42,11 @@ public class PaymentController {
         String clientBaseURL = "http://localhost:5173";
 
         // Find the user record from the database
-        User user = userController.getUserByEmail(requestDTO.getCustomerEmail());
+        User user = userService.getUserByEmail(requestDTO.getCustomerEmail());
 
         try {
             mutex.acquire();
-            if (user != null && !user.getVerified()) {
+            if (user != null && !user.isVerified()) {
                 // Start by finding existing customer record from Stripe or creating a new one if needed
                 Customer customer = CustomerUtil.findOrCreateCustomer(user);
 
@@ -66,6 +61,11 @@ public class PaymentController {
                                 .setCancelUrl(clientBaseURL + "/failure")
                                 .setBillingAddressCollection(
                                         SessionCreateParams.BillingAddressCollection.REQUIRED
+                                )
+                                .setAutomaticTax(
+                                        SessionCreateParams.AutomaticTax.builder()
+                                                .setEnabled(true)
+                                                .build()
                                 )
                                 .setClientReferenceId(user.getId().toString());
 
@@ -116,7 +116,7 @@ public class PaymentController {
 
                 return session.getUrl();
 
-            } else if (user != null && user.getVerified()) {
+            } else if (user != null && user.isVerified()) {
                 return "User is already verified";
             } else {
                 return "User not found";
@@ -149,7 +149,7 @@ public class PaymentController {
             // Fulfill the purchase...
             System.out.println("Checkout session completed: " + session.getCustomerEmail());
             System.out.println("Session ID: " + session.getClientReferenceId());
-            User user = userController.getUserByEmail(session.getCustomerEmail());
+            User user = userService.getUserByEmail(session.getCustomerEmail());
             user.setVerified(true);
         }
 

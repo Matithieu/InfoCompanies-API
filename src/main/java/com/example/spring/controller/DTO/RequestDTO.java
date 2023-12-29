@@ -1,4 +1,4 @@
-package com.example.spring.model;
+package com.example.spring.controller.DTO;
 
 import com.stripe.model.Product;
 
