@@ -31,6 +31,6 @@ public interface UserSessionService {
         ResponseEntity<Map<String, Boolean>> deleteAllUserSessions();
 
         // check if session is valid
-        boolean isValidSession(String sessionID);
+        Optional<UserSession> isValidSession(String sessionID);
 
 }

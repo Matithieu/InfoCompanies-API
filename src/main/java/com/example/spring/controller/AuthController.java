@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.concurrent.Semaphore;
 
@@ -42,9 +44,10 @@ public class AuthController {
             if (user != null) {
 
                 if (user.getSessionId() != null) {
+                    Long id = user.getSessionId().getId();
                     user.setSessionId(null);
                     userService.setSessionId(user);
-                    //userSessionService.deleteUserSession(user.getSessionId().getId());
+                    userSessionService.deleteUserSession(id);
                 }
 
                 System.out.println("User connecting: " + user.getEmail());
@@ -56,8 +59,11 @@ public class AuthController {
                 user.setSessionId(userSession);
                 userService.setSessionId(user);
 
-                session.setAttribute("session_id", userSession.getId());
+
+                session.setAttribute("session_id", user.getSessionId().getId());
                 System.out.println("session_id: " + session.getAttribute("session_id"));
+
+                // Delete important information from the user object like password and session id
 
                 return ResponseEntity.ok(user);
             }

@@ -28,6 +28,11 @@ public class SecurityConfiguration {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
     @Autowired
     private SessionFilter sessionFilter;
 
@@ -36,7 +41,7 @@ public class SecurityConfiguration {
         return http
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionFixation().migrateSession()
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         .maximumSessions(1)
                         .expiredUrl(FRONTEND_URL + "/login")
                 )
@@ -63,10 +68,6 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public HttpSessionEventPublisher httpSessionEventPublisher() {
-        return new HttpSessionEventPublisher();
-    }
 
     public static final String ADMIN = "ADMIN";
     public static final String USER = "USER";

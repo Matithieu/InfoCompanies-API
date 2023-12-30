@@ -14,6 +14,7 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private String name;
     private String email;
+    private String sessionID;
     private Collection<? extends GrantedAuthority> authorities;
 
     @Override
