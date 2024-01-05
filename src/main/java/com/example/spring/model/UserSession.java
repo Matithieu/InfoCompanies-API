@@ -20,7 +20,8 @@ public class UserSession {
     @Column(name = "sessionID")
     private String sessionId;
 
-    public UserSession() {}
+    public UserSession() {
+    }
 
     public UserSession(Long id, String sessionId) {
         this.id = id;

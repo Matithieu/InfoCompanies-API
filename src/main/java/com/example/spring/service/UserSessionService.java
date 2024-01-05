@@ -9,28 +9,28 @@ import java.util.Optional;
 
 public interface UserSessionService {
 
-        // get all UserSessions
-        List<UserSession> getAllUserSessions();
+    // get all UserSessions
+    List<UserSession> getAllUserSessions();
 
-        // create UserSession rest api
-        void saveUserSession(UserSession UserSession);
+    // create UserSession rest api
+    void saveUserSession(UserSession UserSession);
 
-        // get UserSession by id rest api
-        Optional<UserSession> getUserSessionById(Long id);
+    // get UserSession by id rest api
+    Optional<UserSession> getUserSessionById(Long id);
 
-        // get UserSession by email rest api
-        UserSession getUserSessionBySessionID(String sessionID);
+    // get UserSession by email rest api
+    UserSession getUserSessionBySessionID(String sessionID);
 
-        // update UserSession rest api
-        ResponseEntity<UserSession> updateUserSession(Long id, UserSession userSession);
+    // update UserSession rest api
+    ResponseEntity<UserSession> updateUserSession(Long id, UserSession userSession);
 
-        // delete UserSession rest api
-        void deleteUserSession(Long id);
+    // delete UserSession rest api
+    void deleteUserSession(Long id);
 
-        // delete all UserSessions rest api
-        ResponseEntity<Map<String, Boolean>> deleteAllUserSessions();
+    // delete all UserSessions rest api
+    ResponseEntity<Map<String, Boolean>> deleteAllUserSessions();
 
-        // check if session is valid
-        Optional<UserSession> isValidSession(String sessionID);
+    // check if session is valid
+    Optional<UserSession> isValidSession(String sessionID);
 
 }

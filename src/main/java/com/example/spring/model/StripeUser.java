@@ -15,9 +15,10 @@ public class StripeUser {
     @Column(name = "stripeId")
     private String stripeId;
 
-    public StripeUser() {}
+    public StripeUser() {
+    }
 
-    public StripeUser(String stripeId ) {
+    public StripeUser(String stripeId) {
         super();
         this.stripeId = stripeId;
     }

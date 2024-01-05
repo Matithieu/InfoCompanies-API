@@ -1,6 +1,5 @@
 package com.example.spring.security.jwt;
 
-
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,10 +9,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.SignatureException;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;

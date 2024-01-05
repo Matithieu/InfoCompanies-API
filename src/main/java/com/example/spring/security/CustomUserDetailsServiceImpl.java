@@ -21,7 +21,6 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = userRepository.findByEmail(email);
-        return user;
+        return userRepository.findByEmail(email);
     }
 }

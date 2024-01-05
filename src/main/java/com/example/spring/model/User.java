@@ -31,8 +31,8 @@ public class User implements Serializable, UserDetails {
     private String phone;
     private String city;
     private String address;
-    @ManyToMany(fetch = FetchType.EAGER  , cascade = CascadeType.PERSIST)
-    List<Role> roles ;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    List<Role> roles;
     private boolean verified;
 
     @OneToOne
