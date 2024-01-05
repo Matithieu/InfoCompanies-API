@@ -4,11 +4,11 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class LoginRequest {
+public class LoginDTO {
 
     @NonNull
-    private String email;
+    public String email;
 
     @NonNull
-    private String password;
+    public String password;
 }

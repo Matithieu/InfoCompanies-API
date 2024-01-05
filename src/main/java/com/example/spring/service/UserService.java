@@ -1,7 +1,10 @@
 package com.example.spring.service;
 
+import com.example.spring.controller.DTO.LoginDTO;
+import com.example.spring.controller.DTO.RegisterDTO;
+import com.example.spring.model.Role;
 import com.example.spring.model.User;
-import com.example.spring.model.UserSession;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -13,13 +16,15 @@ public interface UserService {
 
     boolean hasUserAnEmail(String email);
 
-    User validateAndGetUserByEmail(String email);
-
     User saveUser(User user);
 
     void deleteUser(User user);
 
-    User validEmailAndPassword(String email, String password);
+    User findByEmail(String email);
 
-    void setSessionId(User user);
+    ResponseEntity<?> register(RegisterDTO registerDto);
+
+    ResponseEntity<?> authenticate(LoginDTO loginDto);
+
+    Role saveRole(Role role);
 }

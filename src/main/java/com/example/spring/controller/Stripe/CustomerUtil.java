@@ -1,6 +1,5 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.controller.UserController;
 import com.example.spring.model.User;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -9,10 +8,7 @@ import com.stripe.net.RequestOptions;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 
-import java.util.HashMap;
 import java.util.concurrent.Semaphore;
-
-import static javax.swing.UIManager.put;
 
 public class CustomerUtil {
     private static final Semaphore mutex = new Semaphore(1);

@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class SignUpRequest {
+public class RegisterDTO {
 
     @NonNull
     private String password;

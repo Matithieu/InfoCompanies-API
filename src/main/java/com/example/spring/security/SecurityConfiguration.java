@@ -1,5 +1,6 @@
 package com.example.spring.security;
 
+import com.example.spring.security.jwt.JwtAuthenticationFilter;
 import com.example.spring.service.UserSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,50 +17,37 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-    String FRONTEND_URL = "http://localhost:5173";
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public HttpSessionEventPublisher httpSessionEventPublisher() {
-        return new HttpSessionEventPublisher();
-    }
 
     @Autowired
-    private SessionFilter sessionFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private UserSessionService userSessionService;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .sessionManagement(sessionManagement -> sessionManagement
-                        .sessionFixation().migrateSession()
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                        .maximumSessions(1)
-                        .expiredUrl(FRONTEND_URL + "/login")
-                )
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users", "/api/v1/user/**").hasAnyAuthority(ADMIN, USER)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user/**").hasAnyAuthority(ADMIN, USER)
                         .requestMatchers(HttpMethod.POST, "/subscriptions/trial").hasAnyAuthority(ADMIN, USER)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority(ADMIN)
 
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user/**").hasAuthority(ADMIN)
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/user/**").hasAuthority(ADMIN)
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/user/**").hasAuthority(ADMIN)
-
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                        .requestMatchers("/auth/authenticate", "/auth/register").permitAll()
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated())
-
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(sessionManagement -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .logout(AbstractHttpConfigurer::disable)
                 .build();
     }
 
@@ -69,6 +57,20 @@ public class SecurityConfiguration {
     }
 
 
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
     public static final String ADMIN = "ADMIN";
     public static final String USER = "USER";
+    public static final String FRONTEND_URL = "http://localhost:5173";
+    public static final String LOGIN_URI = "/login";
+    public static final String LOGOUT_URI = "/logout";
+    public static final String USER_SUCCESS_URL = FRONTEND_URL + "/dashboard";
+    public static final String ADMIN_SUCCESS_URL = FRONTEND_URL + "/admin";
 }

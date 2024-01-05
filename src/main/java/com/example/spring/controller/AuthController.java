@@ -1,26 +1,15 @@
 package com.example.spring.controller;
 
-import com.example.spring.controller.DTO.SignUpRequest;
-import com.example.spring.exception.DuplicatedUserInfoException;
-import com.example.spring.controller.DTO.LoginRequest;
-import com.example.spring.model.User;
-import com.example.spring.model.UserSession;
-import com.example.spring.security.SecurityConfiguration;
+import com.example.spring.controller.DTO.LoginDTO;
+import com.example.spring.controller.DTO.RegisterDTO;
 import com.example.spring.service.UserService;
-import com.example.spring.service.UserSessionService;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.concurrent.Semaphore;
-
-// https://github.com/ivangfr/springboot-react-basic-auth/
 
 @CrossOrigin
 @RequiredArgsConstructor
@@ -28,89 +17,23 @@ import java.util.concurrent.Semaphore;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private static final Semaphore mutex = new Semaphore(1);
+    private static final Semaphore mutex = new Semaphore(1  );
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserSessionService userSessionService;
-
-    @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
-        try {
-            mutex.acquire();
-            User user = userService.validEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
-            if (user != null) {
-
-                if (user.getSessionId() != null) {
-                    Long id = user.getSessionId().getId();
-                    user.setSessionId(null);
-                    userService.setSessionId(user);
-                    userSessionService.deleteUserSession(id);
-                }
-
-                System.out.println("User connecting: " + user.getEmail());
-                UserSession userSession = new UserSession();
-                userSession.setId(userSession.createId());
-                userSession.setSessionId(userSession.createSessionId());
-                userSessionService.saveUserSession(userSession);
-
-                user.setSessionId(userSession);
-                userService.setSessionId(user);
-
-
-                session.setAttribute("session_id", user.getSessionId().getId());
-                System.out.println("session_id: " + session.getAttribute("session_id"));
-
-                // Delete important information from the user object like password and session id
-
-                return ResponseEntity.ok(user);
-            }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (InterruptedException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } finally {
-            mutex.release();
-        }
+    @PostMapping("/authenticate")
+    public ResponseEntity<?> authenticate(@RequestBody LoginDTO loginDto) {
+        return userService.authenticate(loginDto);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register")
-    public User signUp(@RequestBody SignUpRequest signUpRequest, HttpSession session) throws Exception {
+    public ResponseEntity<?> signUp(@RequestBody RegisterDTO registerDto) throws Exception {
         try {
             mutex.acquire();
-            if (userService.hasUserAnEmail(signUpRequest.getEmail())) {
-                throw new DuplicatedUserInfoException(String.format("Email %s is already been used", signUpRequest.getEmail()));
-            }
-
-            User user = createUser(signUpRequest);
-
-            UserSession userSession = new UserSession();
-            userSession.setId(userSession.createId());
-            userSession.setSessionId(userSession.createSessionId());
-            userSessionService.saveUserSession(userSession);
-
-            user.setSessionId(userSession);
-            userService.saveUser(user);
-
-            session.setAttribute("session_id", userSession.getId());
-
-            return userService.getUserByEmail(signUpRequest.getEmail());
-        } catch (InterruptedException e) {
-            throw new Exception("Error when creating the user ", e);
+            return userService.register(registerDto);
         } finally {
             mutex.release();
         }
-    }
-
-    private User createUser(SignUpRequest signUpRequest) {
-        User user = new User();
-        user.setEmail(signUpRequest.getEmail());
-        user.setPassword(signUpRequest.getPassword());
-        user.setName(signUpRequest.getName());
-        user.setRole(SecurityConfiguration.USER);
-
-        return user;
     }
 }
