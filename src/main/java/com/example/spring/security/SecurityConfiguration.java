@@ -1,7 +1,7 @@
 package com.example.spring.security;
 
 import com.example.spring.security.jwt.JwtAuthenticationFilter;
-import com.example.spring.service.UserSessionService;
+import com.example.spring.service.userSession.UserSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +28,13 @@ public class SecurityConfiguration {
     @Autowired
     private UserSessionService userSessionService;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers(HttpMethod.GET, "/api/v1/user/**").hasAnyAuthority(ADMIN, USER)
                         .requestMatchers(HttpMethod.POST, "/subscriptions/trial").hasAnyAuthority(ADMIN, USER)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/search").hasAnyAuthority(ADMIN, USER)
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority(ADMIN)
 
                         .requestMatchers("/auth/authenticate", "/auth/register").permitAll()

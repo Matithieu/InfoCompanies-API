@@ -22,7 +22,6 @@ import java.util.function.Function;
 @Component
 public class JwtUtilities {
 
-
     @Value("${jwt.secret}")
     private String secret;
 
@@ -68,6 +67,10 @@ public class JwtUtilities {
         return Jwts.builder().subject(email).claim("role", roles).issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(Date.from(Instant.now().plus(jwtExpiration, ChronoUnit.MILLIS)))
                 .signWith(getSigningKey()).compact();
+    }
+
+    public HttpServletRequest getHttpServletRequest() {
+        return (HttpServletRequest) org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes().resolveReference("request");
     }
 
     public boolean validateToken(String token) {

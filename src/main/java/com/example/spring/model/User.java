@@ -36,6 +36,10 @@ public class User implements Serializable, UserDetails {
     private boolean verified;
 
     @OneToOne
+    @JoinColumn(name = "userQuotaId", referencedColumnName = "id")
+    private UserQuota userQuotaId;
+
+    @OneToOne
     @JoinColumn(name = "stripeId", referencedColumnName = "id")
     private StripeUser stripeId;
 
@@ -43,7 +47,7 @@ public class User implements Serializable, UserDetails {
     @JoinColumn(name = "sessionId", referencedColumnName = "id")
     private UserSession sessionId;
 
-    public User(String name, String email, String password, String phone, String city, String address, List<Role> roles, Boolean verified, StripeUser stripeId, UserSession sessionId) {
+    public User(String name, String email, String password, String phone, String city, String address, List<Role> roles, Boolean verified, UserQuota userQuota, StripeUser stripeId, UserSession sessionId) {
         super();
         this.name = name;
         this.email = email;
@@ -53,6 +57,7 @@ public class User implements Serializable, UserDetails {
         this.address = address;
         this.roles = roles;
         this.verified = verified;
+        this.userQuotaId = userQuota;
         this.stripeId = stripeId;
         this.sessionId = sessionId;
     }

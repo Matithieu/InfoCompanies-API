@@ -16,6 +16,7 @@ import java.util.UUID;
 @Table(name = "userssessions")
 public class UserSession {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "sessionID")
     private String sessionId;

@@ -1,16 +1,12 @@
 package com.example.spring.controller;
 
-import com.example.spring.exception.Exception;
 import com.example.spring.model.User;
-import com.example.spring.repository.UserRepository;
-import com.example.spring.service.UserService;
+import com.example.spring.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin
 @RestController

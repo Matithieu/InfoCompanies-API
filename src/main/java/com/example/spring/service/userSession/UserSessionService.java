@@ -1,4 +1,4 @@
-package com.example.spring.service;
+package com.example.spring.service.userSession;
 
 import com.example.spring.model.UserSession;
 import org.springframework.http.ResponseEntity;

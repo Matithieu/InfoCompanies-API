@@ -1,4 +1,4 @@
-package com.example.spring.service;
+package com.example.spring.service.user;
 
 import com.example.spring.controller.DTO.LoginDTO;
 import com.example.spring.controller.DTO.RegisterDTO;

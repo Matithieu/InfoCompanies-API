@@ -2,7 +2,7 @@ package com.example.spring.controller;
 
 import com.example.spring.controller.DTO.LoginDTO;
 import com.example.spring.controller.DTO.RegisterDTO;
-import com.example.spring.service.UserService;
+import com.example.spring.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

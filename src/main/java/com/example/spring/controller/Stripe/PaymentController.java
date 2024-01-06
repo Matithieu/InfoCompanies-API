@@ -3,7 +3,7 @@ package com.example.spring.controller.Stripe;
 import com.example.spring.controller.DAO.ProductDAO;
 import com.example.spring.controller.DTO.RequestDTO;
 import com.example.spring.model.User;
-import com.example.spring.service.UserService;
+import com.example.spring.service.user.UserService;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;

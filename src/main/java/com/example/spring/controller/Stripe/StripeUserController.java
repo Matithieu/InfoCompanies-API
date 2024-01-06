@@ -1,6 +1,6 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.exception.Exception;
+import com.example.spring.exception.GlobalException;
 import com.example.spring.model.StripeUser;
 import com.example.spring.repository.StripeUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class StripeUserController {
     @GetMapping("/StripeUsers/{id}")
     public ResponseEntity<StripeUser> getStripeUserById(@PathVariable Long id) {
         StripeUser StripeUser = StripeUserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("StripeUser not exist with id :" + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("StripeUser not exist with id :" + id));
         return ResponseEntity.ok(StripeUser);
     }
 
@@ -44,7 +44,7 @@ public class StripeUserController {
     @PutMapping("/StripeUsers/{id}")
     public ResponseEntity<StripeUser> updateStripeUser(@PathVariable Long id, @RequestBody StripeUser StripeUserDetails){
         StripeUser StripeUser = StripeUserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("StripeUser not exist with id :" + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("StripeUser not exist with id :" + id));
 
         StripeUser.setStripeId(StripeUserDetails.getStripeId());
 
@@ -56,7 +56,7 @@ public class StripeUserController {
     @DeleteMapping("/StripeUsers/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteStripeUser(@PathVariable Long id){
         StripeUser StripeUser = StripeUserRepository.findById(id)
-                .orElseThrow(() -> new Exception.ResourceNotFoundException("StripeUser not exist with id :" + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("StripeUser not exist with id :" + id));
 
         StripeUserRepository.delete(StripeUser);
         Map<String, Boolean> response = new HashMap<>();
