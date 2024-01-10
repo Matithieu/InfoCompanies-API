@@ -1,6 +1,7 @@
 package com.example.spring.service.company;
 
 import com.example.spring.model.Company;
+import com.example.spring.model.CompanyDetails;
 import com.example.spring.repository.CompanyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,7 +42,17 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Page<Company> searchCompanies(String name, Pageable pageable) {
-        return companyRepository.findByDenominationContaining(name, pageable);
+    public Page<CompanyDetails> searchCompanies(String name, Pageable pageable) {
+        return companyRepository.findCompanyDetailsByDenomination(name, pageable);
+    }
+
+    @Override
+    public Page<Company> getCompaniesBySecteurActiviteAndRegion(String secteurActivite, String region, Pageable pageable) {
+        return companyRepository.findBySecteurActiviteContainingAndRegionContaining(secteurActivite, region, pageable);
+    }
+
+    @Override
+    public Page<Company> findRandomCompanies(Pageable pageable) {
+        return companyRepository.findRandomCompanies(pageable);
     }
 }

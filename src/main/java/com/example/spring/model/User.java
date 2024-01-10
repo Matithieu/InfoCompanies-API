@@ -1,5 +1,6 @@
 package com.example.spring.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -36,31 +37,22 @@ public class User implements Serializable, UserDetails {
     private boolean verified;
 
     @OneToOne
-    @JoinColumn(name = "userQuotaId", referencedColumnName = "id")
-    private UserQuota userQuotaId;
+    private CompanySeen companySeen;
 
-    @OneToOne
-    @JoinColumn(name = "stripeId", referencedColumnName = "id")
-    private StripeUser stripeId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_quota_id", referencedColumnName = "id")
+    @JsonIgnore
+    private UserQuota userQuota;
 
-    @OneToOne
-    @JoinColumn(name = "sessionId", referencedColumnName = "id")
-    private UserSession sessionId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "stripe_user_id", referencedColumnName = "id")
+    @JsonIgnore
+    private StripeUser stripe;
 
-    public User(String name, String email, String password, String phone, String city, String address, List<Role> roles, Boolean verified, UserQuota userQuota, StripeUser stripeId, UserSession sessionId) {
-        super();
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.city = city;
-        this.address = address;
-        this.roles = roles;
-        this.verified = verified;
-        this.userQuotaId = userQuota;
-        this.stripeId = stripeId;
-        this.sessionId = sessionId;
-    }
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_session_id", referencedColumnName = "id")
+    @JsonIgnore
+    private UserSession session;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();

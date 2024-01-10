@@ -32,10 +32,16 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(HttpMethod.GET, "/api/v1/user/**").hasAnyAuthority(ADMIN, USER)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user/**", "/api/v1/company/**").hasAnyAuthority(ADMIN, USER)
                         .requestMatchers(HttpMethod.POST, "/subscriptions/trial").hasAnyAuthority(ADMIN, USER)
                         .requestMatchers(HttpMethod.POST, "/api/v1/search").hasAnyAuthority(ADMIN, USER)
+
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority(ADMIN)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies").hasAuthority(USER)
+                        // For testing
+                        .requestMatchers(HttpMethod.GET, "/api/v1/random-companies").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies-seen").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/update-company-ids/**").permitAll()
 
                         .requestMatchers("/auth/authenticate", "/auth/register").permitAll()
                         .requestMatchers("/", "/error").permitAll()

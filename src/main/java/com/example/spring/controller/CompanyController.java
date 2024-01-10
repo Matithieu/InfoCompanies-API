@@ -1,11 +1,18 @@
 package com.example.spring.controller;
 
 import com.example.spring.model.Company;
+import com.example.spring.model.CompanyDetails;
 import com.example.spring.service.company.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -18,8 +25,29 @@ public class CompanyController {
 
     // http://127.0.0.1:8080/api/v1/search?name=Maison&page=0
     @GetMapping("/search")
-    public Page<Company> searchCompanies(@RequestParam String name, int page) {
-        Pageable pageable = Pageable.ofSize(10).withPage(page);
+    public Page<CompanyDetails> searchCompanies(@RequestParam String name, int page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending());
         return companyService.searchCompanies(name, pageable);
+    }
+
+    // http://127.0.0.1:8080/api/v1/recherche?secteurActivite=&region=Bretagne&page=0
+    @GetMapping("/companies")
+    public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, int page) {
+        Pageable pageable = Pageable.ofSize(10).withPage(page);
+        Page<Company> result = companyService.getCompaniesBySecteurActiviteAndRegion(secteurActivite, region, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+   @GetMapping("/random-companies")
+    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam int page) {
+        Pageable pageable = Pageable.ofSize(10).withPage(page);
+        Page<Company> result = companyService.findRandomCompanies(pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/company/{id}")
+    public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
+        Company company = companyService.getCompanyById(id);
+        return new ResponseEntity<>(company, HttpStatus.OK);
     }
 }

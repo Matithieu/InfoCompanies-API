@@ -12,16 +12,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "userquotas")
 public class UserQuota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "userQuotaId")
-    private Long userQuotaId;
 
     private int remainingSearches;
     private int totalSearchesAllowed;
+
+    @OneToOne(mappedBy = "userQuota")
+    private User user;
 }
 
 

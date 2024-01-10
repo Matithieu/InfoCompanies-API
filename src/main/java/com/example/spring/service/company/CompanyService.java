@@ -1,6 +1,7 @@
 package com.example.spring.service.company;
 
 import com.example.spring.model.Company;
+import com.example.spring.model.CompanyDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,5 +19,9 @@ public interface CompanyService {
 
     List<Company> getAmountOfCompanies(int amount);
 
-    Page<Company> searchCompanies(String name, Pageable pageable);
+    Page<CompanyDetails> searchCompanies(String name, Pageable pageable);
+
+    Page<Company> getCompaniesBySecteurActiviteAndRegion(String secteurActivite, String region, Pageable pageable);
+
+    Page<Company> findRandomCompanies(Pageable pageable);
 }

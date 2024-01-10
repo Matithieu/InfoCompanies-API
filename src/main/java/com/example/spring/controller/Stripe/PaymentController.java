@@ -67,10 +67,14 @@ public class PaymentController {
                                                 .setEnabled(true)
                                                 .build()
                                 )
+                                // Develop this section to lower the score
+                                .setSubscriptionData(
+                                        SessionCreateParams.SubscriptionData.builder()
+                                                .setTrialPeriodDays(3L)
+                                                .setDescription("Subscription to " + ProductDAO.getProduct(requestDTO.getItem()).getName() + " for " + user.getEmail() + " with a trial period of 3 days.")
+                                                .build()
+                                )
                                 .setClientReferenceId(user.getId().toString());
-
-                // For trials, you need to set the trial period in the session creation request
-                //.setSubscriptionData(SessionCreateParams.SubscriptionData.builder().setTrialPeriodDays(0L).build());
 
                 // Add the all the details to the session creation request
                 paramsBuilder

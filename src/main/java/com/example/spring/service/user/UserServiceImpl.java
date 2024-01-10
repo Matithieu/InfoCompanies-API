@@ -86,8 +86,8 @@ public class UserServiceImpl implements UserService {
             UserQuota userQuota = new UserQuota();
             Role role = roleRepository.findByRoleName(RoleName.USER);
 
-            userQuota.setRemainingSearches(10);
-            userQuota.setTotalSearchesAllowed(100);
+            userQuota.setRemainingSearches(1000);
+            userQuota.setTotalSearchesAllowed(1000);
 
             userQuotaService.saveUserQuota(userQuota);
 
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
             user.setName(registerDto.getName());
             user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
             user.setRoles(Collections.singletonList(role));
-            user.setUserQuotaId(userQuota);
+            user.setUserQuota(userQuota);
             userRepository.save(user);
 
             String token = jwtUtilities.generateToken(registerDto.getEmail(), Collections.singletonList(role.getRoleName()));

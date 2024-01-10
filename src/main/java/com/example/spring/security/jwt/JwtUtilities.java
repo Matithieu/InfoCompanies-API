@@ -1,9 +1,12 @@
 package com.example.spring.security.jwt;
 
+import com.example.spring.model.User;
+import com.example.spring.service.user.UserService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -71,6 +74,11 @@ public class JwtUtilities {
 
     public HttpServletRequest getHttpServletRequest() {
         return (HttpServletRequest) org.springframework.web.context.request.RequestContextHolder.currentRequestAttributes().resolveReference("request");
+    }
+
+    public String getEmailOfRequester() {
+        String jwt = getToken(getHttpServletRequest());
+        return extractUsername(jwt);
     }
 
     public boolean validateToken(String token) {

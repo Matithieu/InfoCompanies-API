@@ -1,7 +1,9 @@
 package com.example.spring.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -13,21 +15,17 @@ import java.util.UUID;
 @Component
 @Scope("session")
 @Entity
-@Table(name = "userssessions")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "sessionID")
+
     private String sessionId;
 
-    public UserSession() {
-    }
-
-    public UserSession(Long id, String sessionId) {
-        this.id = id;
-        this.sessionId = sessionId;
-    }
+    @OneToOne(mappedBy = "session")
+    private User user;
 
     public Long createId() {
         return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
