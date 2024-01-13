@@ -32,14 +32,14 @@ public class CompanyController {
 
     // http://127.0.0.1:8080/api/v1/recherche?secteurActivite=&region=Bretagne&page=0
     @GetMapping("/companies")
-    public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, int page) {
+    public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
         Page<Company> result = companyService.getCompaniesBySecteurActiviteAndRegion(secteurActivite, region, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
    @GetMapping("/random-companies")
-    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam int page) {
+    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
         Page<Company> result = companyService.findRandomCompanies(pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
