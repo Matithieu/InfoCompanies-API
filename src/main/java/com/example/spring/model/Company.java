@@ -21,6 +21,7 @@ public class Company {
     private String siren;
     private String nic;
     private String formeJuridique;
+    @Column(name = "code_ape")
     private String codeAPE;
     private String adresse;
     private String codePostal;
@@ -34,93 +35,115 @@ public class Company {
     private LocalDate dateRadiation;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1_2019;
-    private Long CA1_2019;
-    private Long resultat1_2019;
+    private LocalDate dateClotureExercice_1_2018;
+    private Double CA_1_2018;
+    private Double resultat_1_2018;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2_2019;
-    private Long CA2_2019;
-    private Long resultat2_2019;
+    private LocalDate dateClotureExercice_2_2018;
+    private Double CA_2_2018;
+    private Double resultat_2_2018;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3_2019;
-    private Long CA3_2019;
-    private Long resultat3_2019;
+    private LocalDate dateClotureExercice_3_2018;
+    private Double CA_3_2018;
+    private Double resultat_3_2018;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1_2020;
-    private Long CA1_2020;
-    private Long resultat1_2020;
+    private LocalDate dateClotureExercice_1_2019;
+    private Double CA_1_2019;
+    private Double resultat_1_2019;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2_2020;
-    private Long CA2_2020;
-    private Long resultat2_2020;
+    private LocalDate dateClotureExercice_2_2019;
+    private Double CA_2_2019;
+    private Double resultat_2_2019;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3_2020;
-    private Long CA3_2020;
-    private Long resultat3_2020;
+    private LocalDate dateClotureExercice_3_2019;
+    private Double CA_3_2019;
+    private Double resultat_3_2019;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1_2021;
-    private Long CA1_2021;
-    private Long resultat1_2021;
+    private LocalDate dateClotureExercice_1_2020;
+    private Double CA_1_2020;
+    private Double resultat_1_2020;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2_2021;
-    private Long CA2_2021;
-    private Long resultat2_2021;
+    private LocalDate dateClotureExercice_2_2020;
+    private Double CA_2_2020;
+    private Double resultat_2_2020;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3_2021;
-    private Long CA3_2021;
-    private Long resultat3_2021;
+    private LocalDate dateClotureExercice_3_2020;
+    private Double CA_3_2020;
+    private Double resultat_3_2020;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1_2022;
-    private Long CA1_2022;
-    private Long resultat1_2022;
+    private LocalDate dateClotureExercice_1_2021;
+    private Double CA_1_2021;
+    private Double resultat_1_2021;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2_2022;
-    private Long CA2_2022;
-    private Long resultat2_2022;
+    private LocalDate dateClotureExercice_2_2021;
+    private Double CA_2_2021;
+    private Double resultat_2_2021;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3_2022;
-    private Long CA3_2022;
-    private Long resultat3_2022;
+    private LocalDate dateClotureExercice_3_2021;
+    private Double CA_3_2021;
+    private Double resultat_3_2021;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1_2023;
-    private Long CA1_2023;
-    private Long resultat1_2023;
+    private LocalDate dateClotureExercice_1_2022;
+    private Double CA_1_2022;
+    private Double resultat_1_2022;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2_2023;
-    private Long CA2_2023;
-    private Long resultat2_2023;
+    private LocalDate dateClotureExercice_2_2022;
+    private Double CA_2_2022;
+    private Double resultat_2_2022;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3_2023;
-    private Long CA3_2023;
-    private Long resultat3_2023;
+    private LocalDate dateClotureExercice_3_2022;
+    private Double CA_3_2022;
+    private Double resultat_3_2022;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice1;
-    private Long CA1;
-    private Long resultat1;
+    private LocalDate dateClotureExercice_1_2023;
+    private Double CA_1_2023;
+    private Double resultat_1_2023;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice2;
-    private Long CA2;
-    private Long resultat2;
+    private LocalDate dateClotureExercice_2_2023;
+    private Double CA_2_2023;
+    private Double resultat_2_2023;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice3;
-    private Long CA3;
-    private Long resultat3;
+    private LocalDate dateClotureExercice_3_2023;
+    private Double CA_3_2023;
+    private Double resultat_3_2023;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateClotureExercice_1;
+    private Double CA_1;
+    private Double resultat_1;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateClotureExercice_2;
+    private Double CA_2;
+    private Double resultat_2;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateClotureExercice_3;
+    private Double CA_3;
+    private Double resultat_3;
 
     private String secteurActivite;
     private String phone;
+    @Column(length = 3000)
     private String website;
+    @Column(length = 10000)
     private String reviews;
+    @Column(length = 10000)
     private String schedule;
+    @Column(length = 3000)
     private String instagram;
+    @Column(length = 3000)
     private String facebook;
+    @Column(length = 3000)
     private String twitter;
+    @Column(length = 3000)
     private String linkedin;
+    @Column(length = 3000)
     private String youtube;
+    @Column(length = 3000)
     private String email;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
