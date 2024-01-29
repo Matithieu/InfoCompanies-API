@@ -55,4 +55,9 @@ public class CompanyServiceImpl implements CompanyService {
     public Page<Company> findRandomCompanies(Pageable pageable) {
         return companyRepository.findRandomCompanies(pageable);
     }
+
+    @Override
+    public Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable) {
+        return companyRepository.findAllByIdIn(ids, pageable);
+    }
 }

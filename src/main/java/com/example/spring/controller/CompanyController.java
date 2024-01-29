@@ -38,6 +38,7 @@ public class CompanyController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // http://127.0.0.1:8080/api/v1/random-companies?page=0
    @GetMapping("/random-companies")
     public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
@@ -45,9 +46,17 @@ public class CompanyController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // http://127.0.0.1:8080/api/v1/company/1
     @GetMapping("/company/{id}")
     public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
         Company company = companyService.getCompanyById(id);
         return new ResponseEntity<>(company, HttpStatus.OK);
+    }
+
+    @GetMapping("/companies-by-ids")
+    public ResponseEntity<Page<Company>> getCompaniesByAListOfIds(@RequestParam List<Long> ids, Integer page) {
+        Pageable pageable = Pageable.ofSize(10).withPage(page);
+        Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

@@ -24,4 +24,6 @@ public interface CompanyService {
     Page<Company> getCompaniesBySecteurActiviteAndRegion(String secteurActivite, String region, Pageable pageable);
 
     Page<Company> findRandomCompanies(Pageable pageable);
+
+    Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable);
 }

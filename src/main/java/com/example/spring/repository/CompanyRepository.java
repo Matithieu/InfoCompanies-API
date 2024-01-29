@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
@@ -24,4 +25,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query(value = "SELECT * FROM Companies WHERE phone IS NOT NULL ORDER BY RANDOM()",
             countQuery = "SELECT COUNT(*) FROM Companies WHERE phone IS NOT NULL", nativeQuery = true)
     Page<Company> findRandomCompanies(Pageable pageable);
+
+    Page<Company> findAllByIdIn(List<Long> ids, Pageable pageable);
 }

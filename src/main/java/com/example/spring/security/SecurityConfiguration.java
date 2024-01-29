@@ -39,6 +39,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority(ADMIN)
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies").hasAuthority(USER)
                         // For testing
+                        .requestMatchers(HttpMethod.GET, "/api/v1/companies-by-ids").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/random-companies").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/companies-seen").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/v1/update-company-ids/**").permitAll()
