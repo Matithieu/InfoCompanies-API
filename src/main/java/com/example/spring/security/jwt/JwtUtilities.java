@@ -1,5 +1,6 @@
 package com.example.spring.security.jwt;
 
+import com.example.spring.exception.JwtAuthenticationException;
 import com.example.spring.model.User;
 import com.example.spring.service.user.UserService;
 import io.jsonwebtoken.*;
@@ -86,19 +87,18 @@ public class JwtUtilities {
             Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
             return true;
         } catch (MalformedJwtException e) {
-            log.info("Invalid JWT token.", e);
-            log.trace("Invalid JWT token trace: ", e);
+            log.error("Invalid JWT token.", e);
+            throw new JwtAuthenticationException("Invalid JWT token");
         } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token.", e);
-            log.trace("Expired JWT token trace: ", e);
+            log.error("Expired JWT token.", e);
+            throw new JwtAuthenticationException("Expired JWT token");
         } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token.", e);
-            log.trace("Unsupported JWT token trace: ", e);
+            log.error("Unsupported JWT token.", e);
+            throw new JwtAuthenticationException("Unsupported JWT token");
         } catch (IllegalArgumentException e) {
-            log.info("JWT token compact of handler are invalid.", e);
-            log.trace("JWT token compact of handler are invalid trace: ", e);
+            log.error("JWT token compact of handler is invalid.", e);
+            throw new JwtAuthenticationException("Invalid JWT token compact of handler");
         }
-        return false;
     }
 
     public String getToken(HttpServletRequest httpServletRequest) {
