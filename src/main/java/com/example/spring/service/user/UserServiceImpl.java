@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService {
             user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
             user.setRoles(Collections.singletonList(role));
             user.setUserQuota(userQuota);
+            user.setVerified(true);
             userRepository.save(user);
 
             String token = jwtUtilities.generateToken(registerDto.getEmail(), Collections.singletonList(role.getRoleName()));
