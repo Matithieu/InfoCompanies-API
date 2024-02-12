@@ -31,7 +31,7 @@ public class PaymentController {
 
     private static final Semaphore mutex = new Semaphore(1);
 
-    String STRIPE_API_KEY = "sk_test_51OMa7QKjCboMtBPji8gnW9Us60F7iDnMTh50lQoRXsMN5Fm19kF3sXOxB5uXNPEe250MAmnfgLLc5oOYtlRNfYpe00ukE5BD1d";
+    String STRIPE_API_KEY = "";
     //String STRIPE_API_KEY = System.getenv().get("STRIPE_API_KEY");
 
     @PostMapping("/subscriptions/trial")
