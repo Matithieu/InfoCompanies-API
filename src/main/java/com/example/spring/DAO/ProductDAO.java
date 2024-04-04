@@ -1,4 +1,4 @@
-package com.example.spring.controller.DAO;
+package com.example.spring.DAO;
 
 import com.stripe.model.Price;
 import com.stripe.model.Product;

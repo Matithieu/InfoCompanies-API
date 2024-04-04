@@ -1,10 +1,7 @@
 package com.example.spring.service.companySeen;
 
 import com.example.spring.model.CompanySeen;
-import com.example.spring.model.User;
 import com.example.spring.repository.CompanySeenRepository;
-import com.example.spring.security.jwt.JwtUtilities;
-import com.example.spring.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +14,10 @@ public class CompanySeenServiceImpl implements CompanySeenService {
     @Autowired
     private CompanySeenRepository companySeenRepository;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtUtilities jwtUtilities;
-
     @Override
     public Optional<CompanySeen> getAllCompaniesSeen() {
-        String email = jwtUtilities.getEmailOfRequester();
-        Long userId = userService.getUserByEmail(email).getId();
+        String email = "email";
+        Long userId = 1L;
         return companySeenRepository.findById(userId);
     }
 
@@ -35,10 +26,10 @@ public class CompanySeenServiceImpl implements CompanySeenService {
         return companySeenRepository.findById(id).orElseThrow(() -> new RuntimeException("CompanySeen not exist with id: " + id));
     }
 
-    @Override
+/*    @Override
     public void updateCompanyIds(Long companyId, List<Long> newCompanyIds) {
-        String email = jwtUtilities.getEmailOfRequester();
-        User user = userService.getUserByEmail(email);
+        String email = "email";
+        User user = new User();
         CompanySeen companySeen;
 
         // If the user has not seen any company yet
@@ -51,6 +42,7 @@ public class CompanySeenServiceImpl implements CompanySeenService {
         }
         companySeenRepository.updateCompanyIds(companyId, newCompanyIds);
     }
+ */
 
     @Override
     public CompanySeen saveCompanySeen(CompanySeen companySeen) {
