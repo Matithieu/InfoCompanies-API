@@ -3,7 +3,6 @@ package com.example.spring.controller;
 import com.example.spring.model.Company;
 import com.example.spring.model.CompanyDetails;
 import com.example.spring.service.company.CompanyService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,13 +10,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/company")
-@SecurityRequirement(name = "Keycloak")
 public class CompanyController {
 
     @Autowired
@@ -31,6 +31,7 @@ public class CompanyController {
     }
 
     @GetMapping("/test")
+    @PreAuthorize("hasRole('verified')")
     public String test() {
         return "Test";
     }

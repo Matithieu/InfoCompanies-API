@@ -1,7 +1,8 @@
-package com.example.spring.keycloakclient;
+package com.example.spring.keycloakClient;
 
 import java.util.*;
 
+import com.example.spring.DTO.QuotaUser;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -9,13 +10,8 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.spring.DTO.User;
 import com.example.spring.DTO.Role;
@@ -23,6 +19,7 @@ import com.example.spring.security.KeycloakSecurityUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.ws.rs.core.Response;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/keycloak")
 @SecurityRequirement(name = "Keycloak")
@@ -36,6 +33,7 @@ public class UserResource {
 	
 	@GetMapping
 	@RequestMapping("/users")
+	@PreAuthorize("hasRole('admin')")
 	public List<User> getUsers() {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		List<UserRepresentation> userRepresentations = keycloak.realm(realm).users().list();
@@ -48,14 +46,10 @@ public class UserResource {
 		return mapUser(keycloak.realm(realm).users().get(id).toRepresentation());
 	}
 
-	@GetMapping(value = "/users/{email}")
-	public User getUserByEmail(@PathVariable("email") String email) {
+	public User getUserByEmail(String email) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
-		List<UserRepresentation> userRepresentations = keycloak.realm(realm).users().search(email);
-		if(CollectionUtil.isNotEmpty(userRepresentations)) {
-			return mapUser(userRepresentations.get(0));
-		}
-		return null;
+		UserRepresentation userRepresentation = keycloak.realm(realm).users().searchByEmail(email, true).getFirst();
+		return mapUser(userRepresentation);
 	}
 	
 	@PostMapping(value = "/user")
@@ -121,6 +115,7 @@ public class UserResource {
 		user.setRegion(getAttributeValue(userRep.getAttributes(), "region"));
 		user.setPostalCode(getAttributeValue(userRep.getAttributes(), "postalCode"));
 		user.setCountry(getAttributeValue(userRep.getAttributes(), "country"));
+		user.setTier(getQuotaBasedOnTier(getAttributeValue(userRep.getAttributes(), "tier")));
 		user.setVerified(convertStringToBoolean(getAttributeValue(userRep.getAttributes(), "isVerified")));
 		return user;
 	}
@@ -139,6 +134,7 @@ public class UserResource {
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "region", user.getRegion()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "postalCode", user.getPostalCode()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "country", user.getCountry()));
+		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "tier", user.getTier().toString()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "isVerified", convertBooleanToString(user.isVerified())));
 		userRep.setEnabled(true);
 		userRep.setEmailVerified(true);
@@ -171,9 +167,21 @@ public class UserResource {
 		if(attributes != null) {
 			List<String> values = attributes.get(key);
 			if(CollectionUtil.isNotEmpty(values)) {
-				return values.get(0);
+				return values.getFirst();
 			}
 		}
 		return null;
+	}
+
+	private QuotaUser getQuotaBasedOnTier(String tier) {
+		return switch (tier) {
+            case "TIER1" -> QuotaUser.TIER1;
+			case "TIER2" -> QuotaUser.TIER2;
+			case "TIER3" -> QuotaUser.TIER3;
+			case "ENTERPRISE" -> QuotaUser.ENTERPRISE;
+			case "UNLIMITED" -> QuotaUser.UNLIMITED;
+
+            case null, default -> QuotaUser.FREE;
+        };
 	}
 }

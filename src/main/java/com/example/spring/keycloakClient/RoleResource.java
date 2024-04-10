@@ -1,4 +1,4 @@
-package com.example.spring.keycloakclient;
+package com.example.spring.keycloakClient;
 
 import java.util.ArrayList;
 import java.util.List;
