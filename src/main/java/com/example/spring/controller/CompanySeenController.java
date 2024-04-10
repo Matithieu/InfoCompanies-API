@@ -19,7 +19,7 @@ public class CompanySeenController {
 
     @PutMapping("/update-company-ids/{companyId}")
     public void updateCompanyIds(@PathVariable Long companyId, @RequestBody List<Long> newCompanyIds) {
-        companySeenService.updateCompanyIds(companyId, newCompanyIds);
+        return ;
     }
 
     @GetMapping("/companies-seen")

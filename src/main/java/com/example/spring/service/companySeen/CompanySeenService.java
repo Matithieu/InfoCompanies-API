@@ -11,7 +11,7 @@ public interface CompanySeenService {
 
     CompanySeen getCompanySeenById(Long id);
 
-    void updateCompanyIds(Long companyId, List<Long> newCompanyIds);
+//    void updateCompanyIds(Long companyId, List<Long> newCompanyIds);
 
     CompanySeen saveCompanySeen(CompanySeen companySeen);
 

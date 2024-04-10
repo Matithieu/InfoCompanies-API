@@ -1,9 +1,9 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.controller.DAO.ProductDAO;
-import com.example.spring.controller.DTO.RequestDTO;
-import com.example.spring.model.User;
-import com.example.spring.service.user.UserService;
+import com.example.spring.DAO.ProductDAO;
+import com.example.spring.DTO.RequestDTO;
+import com.example.spring.DTO.User;
+import com.example.spring.keycloakClient.UserResource;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -14,6 +14,7 @@ import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
 import com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,16 @@ import java.util.concurrent.Semaphore;
 public class PaymentController {
 
     @Autowired
-    private UserService userService;
+    private UserResource userResource;
 
     private static final Semaphore mutex = new Semaphore(1);
 
-    String STRIPE_API_KEY = "";
+    @Value("${STRIPE_API_KEY}")
+    private String STRIPE_API_KEY;
     //String STRIPE_API_KEY = System.getenv().get("STRIPE_API_KEY");
+
+    @Value("${STRIPE_WEBHOOK_SECRET}")
+    private String STRIPE_WEBHOOK_SECRET;
 
     @PostMapping("/subscriptions/trial")
     String newSubscriptionWithTrial(@RequestBody RequestDTO requestDTO) throws Exception {
@@ -42,7 +47,7 @@ public class PaymentController {
         String clientBaseURL = "http://localhost:5173";
 
         // Find the user record from the database
-        User user = userService.getUserByEmail(requestDTO.getCustomerEmail());
+        User user = userResource.getUserByEmail(requestDTO.getCustomerEmail());
 
         try {
             mutex.acquire();
@@ -74,7 +79,7 @@ public class PaymentController {
                                                 .setDescription("Subscription to " + ProductDAO.getProduct(requestDTO.getItem()).getName() + " for " + user.getEmail() + " with a trial period of 3 days.")
                                                 .build()
                                 )
-                                .setClientReferenceId(user.getId().toString());
+                                .setClientReferenceId(user.getId());
 
                 // Add the all the details to the session creation request
                 paramsBuilder
@@ -113,7 +118,7 @@ public class PaymentController {
                 ;
 
                 RequestOptions requestOptions = RequestOptions.builder()
-                        .setIdempotencyKey(user.getId().toString())
+                        .setIdempotencyKey(user.getId())
                         .build();
 
                 Session session = Session.create(paramsBuilder.build());
@@ -136,11 +141,10 @@ public class PaymentController {
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
         // stripe listen --forward-to localhost:8080/webhook
-        String endpointSecret = "whsec_9552112da604d21f5b0bc4965a70031695a07006a6abcd374b60be44fd7faf99"; // Replace with your endpoint's secret
         Event event = null;
 
         try {
-            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+            event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
         } catch (SignatureVerificationException e) {
             // Invalid signature
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
@@ -152,8 +156,8 @@ public class PaymentController {
 
             // Fulfill the purchase...
             System.out.println("Checkout session completed: " + session.getCustomerEmail());
-            System.out.println("Session ID: " + session.getClientReferenceId());
-            User user = userService.getUserByEmail(session.getCustomerEmail());
+            System.out.println("Session ID:" + session.getClientReferenceId());
+            User user = userResource.getUserByEmail(session.getCustomerEmail());
             user.setVerified(true);
         }
 

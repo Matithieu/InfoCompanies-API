@@ -1,4 +1,4 @@
-package com.example.spring.controller.DTO;
+package com.example.spring.DTO;
 
 import com.stripe.model.Product;
 import lombok.Getter;

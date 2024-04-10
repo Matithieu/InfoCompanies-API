@@ -1,9 +1,8 @@
 package com.example.spring.aspect;
 
+import com.example.spring.DTO.User;
 import com.example.spring.exception.QuotaExceededException;
-import com.example.spring.security.jwt.JwtUtilities;
-import com.example.spring.service.user.UserService;
-import com.example.spring.service.userQuota.UserQuotaService;
+import com.example.spring.keycloakClient.UserResource;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,35 +10,34 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.example.spring.security.JwtUtils.getClaimFromJwt;
+
 @Aspect
 @Component
 public class QuotaAspect {
 
     @Autowired
-    private UserQuotaService userQuotaService;
+    UserResource userResource;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtUtilities jwtUtilities;
-
-    @Pointcut("execution(* com.example.spring.service.company.CompanyService.searchCompanies(..))")
+    //@Pointcut("execution(* com.example.spring.service.company.CompanyService.searchCompanies(..))")
+    @Pointcut("execution(* com.example.spring.controller.CompanyController.test())")
     public void searchCompaniesMethod() {}
 
     @Around("searchCompaniesMethod()")
     public Object checkQuota(ProceedingJoinPoint joinPoint) throws Throwable {
-        // Récupérer l'ID de l'utilisateur
-        String email = jwtUtilities.getEmailOfRequester();
-        Long userId = userService.getUserByEmail(email).getId();
-        // Vérifier le quota de recherche
-        if (userQuotaService.hasRemainingSearches(userId)) {
-            // Décrémenter le quota et permettre la recherche
-            userQuotaService.decrementRemainingSearches(userId);
+        String email = getClaimFromJwt("email");
+        User user = userResource.getUserByEmail(email);
+        int quota = Integer.parseInt(user.getQuota());
+        if (quota > 0) {
+            user.setQuota(String.valueOf(quota - 1));
+            try {
+                userResource.updateUser(user);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to update user quota");
+            }
             return joinPoint.proceed();
         } else {
-            // Refuser la recherche en raison d'un quota dépassé
-            throw new QuotaExceededException("Quota de recherche dépassé pour cet utilisateur.");
+            throw new QuotaExceededException("Quota exceeded for user");
         }
     }
 }

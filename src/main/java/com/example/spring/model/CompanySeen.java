@@ -20,11 +20,7 @@ public class CompanySeen {
 
     @ElementCollection
     private List<Long> companyIds = List.of();
-
-    @ManyToOne
-    @JoinColumn
-    private User user;
-
+    
     public void addCompanyId(Long newCompanyId) {
         if (companyIds == null) {
             companyIds = new ArrayList<>();

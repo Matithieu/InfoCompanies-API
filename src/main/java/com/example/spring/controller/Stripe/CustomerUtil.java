@@ -1,6 +1,6 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.model.User;
+import com.example.spring.DTO.User;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.CustomerSearchResult;
@@ -46,25 +46,25 @@ public class CustomerUtil {
             if (result.getData().isEmpty()) {
 
                 CustomerCreateParams customerCreateParams = CustomerCreateParams.builder()
-                        .setName(user.getName())
+                        .setName(user.getFirstName() + " " + user.getLastName())
                         .setEmail(user.getEmail())
                         .setPhone(user.getPhone())
                         .setAddress(
                                 CustomerCreateParams.Address.builder()
-                                        .setCity(user.getCity())
-                                        .setLine1(user.getAddress())
-                                        .setPostalCode("13100")
+                                        .setCity(user.getLocality())
+                                        .setLine1(user.getStreet())
+                                        .setPostalCode(user.getPostalCode())
                                         .build())
                         .setDescription("Customer for " + user.getEmail())
                         .build();
 
                 RequestOptions requestOptions = RequestOptions.builder()
-                        .setIdempotencyKey(user.getId().toString() + "testa")
+                        .setIdempotencyKey(user.getId())
                         .build();
 
                 // Sometimes, to debug remove the idempotency key
                 customer = Customer.create(customerCreateParams, requestOptions);
-                System.out.println("New customer created: " + customer.getId());
+                System.out.println("Customer created: " + customer.getId());
             } else {
                 customer = result.getData().get(0);
             }
