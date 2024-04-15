@@ -6,10 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
-@ToString
-@NoArgsConstructor
-@Getter
+@Data
 @Entity
 @Table(name = "Companies")
 public class Company {
@@ -17,123 +14,110 @@ public class Company {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String denomination;
-    private String siren;
-    private String nic;
-    private String formeJuridique;
-    @Column(name = "code_ape")
-    private String codeAPE;
-    private String adresse;
-    private String codePostal;
-    private String ville;
+    private String companyName;
+    private String sirenNumber;
+    private String nicNumber;
+    private String legalForm;
+    @Column(name = "ape_code")
+    private String apeCode;
+    private String address;
+    private String postalCode;
+    private String city;
     private String region;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateImmatriculation;
+    private LocalDate registrationDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateRadiation;
+    private LocalDate deregistrationDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2018;
-    private Double CA_1_2018;
-    private Double resultat_1_2018;
+    private LocalDate closingDate_2018_1;
+    private Double revenue_2018_1;
+    private Double turnover_2018_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2018;
-    private Double CA_2_2018;
-    private Double resultat_2_2018;
+    private LocalDate closingDate_2018_2;
+    private Double revenue_2018_2;
+    private Double turnover_2018_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2018;
-    private Double CA_3_2018;
-    private Double resultat_3_2018;
+    private LocalDate closingDate_2018_3;
+    private Double revenue_2018_3;
+    private Double turnover_2018_3;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2019;
-    private Double CA_1_2019;
-    private Double resultat_1_2019;
+    private LocalDate closingDate_2019_1;
+    private Double revenue_2019_1;
+    private Double turnover_2019_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2019;
-    private Double CA_2_2019;
-    private Double resultat_2_2019;
+    private LocalDate closingDate_2019_2;
+    private Double revenue_2019_2;
+    private Double turnover_2019_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2019;
-    private Double CA_3_2019;
-    private Double resultat_3_2019;
+    private LocalDate closingDate_2019_3;
+    private Double revenue_2019_3;
+    private Double turnover_2019_3;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2020;
-    private Double CA_1_2020;
-    private Double resultat_1_2020;
+    private LocalDate closingDate_2020_1;
+    private Double revenue_2020_1;
+    private Double turnover_2020_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2020;
-    private Double CA_2_2020;
-    private Double resultat_2_2020;
+    private LocalDate closingDate_2020_2;
+    private Double revenue_2020_2;
+    private Double turnover_2020_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2020;
-    private Double CA_3_2020;
-    private Double resultat_3_2020;
+    private LocalDate closingDate_2020_3;
+    private Double revenue_2020_3;
+    private Double turnover_2020_3;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2021;
-    private Double CA_1_2021;
-    private Double resultat_1_2021;
+    private LocalDate closingDate_2021_1;
+    private Double revenue_2021_1;
+    private Double turnover_2021_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2021;
-    private Double CA_2_2021;
-    private Double resultat_2_2021;
+    private LocalDate closingDate_2021_2;
+    private Double revenue_2021_2;
+    private Double turnover_2021_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2021;
-    private Double CA_3_2021;
-    private Double resultat_3_2021;
+    private LocalDate closingDate_2021_3;
+    private Double revenue_2021_3;
+    private Double turnover_2021_3;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2022;
-    private Double CA_1_2022;
-    private Double resultat_1_2022;
+    private LocalDate closingDate_2022_1;
+    private Double revenue_2022_1;
+    private Double turnover_2022_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2022;
-    private Double CA_2_2022;
-    private Double resultat_2_2022;
+    private LocalDate closingDate_2022_2;
+    private Double revenue_2022_2;
+    private Double turnover_2022_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2022;
-    private Double CA_3_2022;
-    private Double resultat_3_2022;
+    private LocalDate closingDate_2022_3;
+    private Double revenue_2022_3;
+    private Double turnover_2022_3;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1_2023;
-    private Double CA_1_2023;
-    private Double resultat_1_2023;
+    private LocalDate closingDate_2023_1;
+    private Double revenue_2023_1;
+    private Double turnover_2023_1;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2_2023;
-    private Double CA_2_2023;
-    private Double resultat_2_2023;
+    private LocalDate closingDate_2023_2;
+    private Double revenue_2023_2;
+    private Double turnover_2023_2;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3_2023;
-    private Double CA_3_2023;
-    private Double resultat_3_2023;
+    private LocalDate closingDate_2023_3;
+    private Double revenue_2023_3;
+    private Double turnover_2023_3;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_1;
-    private Double CA_1;
-    private Double resultat_1;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_2;
-    private Double CA_2;
-    private Double resultat_2;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateClotureExercice_3;
-    private Double CA_3;
-    private Double resultat_3;
-
-    private String secteurActivite;
-    private String phone;
-    @Column(length = 3000)
+    private String industrySector;
+    private String phoneNumber;
+    @Column(length = 300)
     private String website;
     @Column(length = 10000)
     private String reviews;
-    @Column(length = 10000)
+    @Column(length = 100000)
     private String schedule;
-    @Column(length = 3000)
+    @Column(length = 10000)
     private String instagram;
     @Column(length = 3000)
     private String facebook;
@@ -147,5 +131,5 @@ public class Company {
     private String email;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateOfScrapping;
+    private LocalDate scrapingDate;
 }

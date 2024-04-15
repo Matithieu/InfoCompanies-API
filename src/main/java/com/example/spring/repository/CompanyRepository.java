@@ -9,21 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Map;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
-    Company findByDenomination(String denomination);
+    Company findByCompanyName(String denomination);
 
-    Page<Company> findByDenominationContaining(String nom, Pageable pageable);
+    Page<Company> findByCompanyName(String nom, Pageable pageable);
 
-    @Query("SELECT new com.example.spring.model.CompanyDetails(c.id, c.denomination, c.secteurActivite, c.ville, c.region) " +
-            "FROM Company c WHERE LOWER(c.denomination) LIKE LOWER(CONCAT('%', :denomination, '%'))")
+    @Query("SELECT new com.example.spring.model.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
+            "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT('%', :denomination, '%'))")
     Page<CompanyDetails> findCompanyDetailsByDenomination(@Param("denomination") String denomination, Pageable pageable);
-    Page<Company> findBySecteurActiviteContainingAndRegionContaining(String secteurActivite, String region, Pageable pageable);
+    Page<Company> findByIndustrySectorContainingAndRegionContaining(String industrySector, String region, Pageable pageable);
 
-    @Query(value = "SELECT * FROM Companies WHERE phone IS NOT NULL ORDER BY RANDOM()",
-            countQuery = "SELECT COUNT(*) FROM Companies WHERE phone IS NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM Company WHERE phone IS NOT NULL ORDER BY RANDOM()",
+            countQuery = "SELECT COUNT(*) FROM Company WHERE phone IS NOT NULL", nativeQuery = true)
     Page<Company> findRandomCompanies(Pageable pageable);
 
     Page<Company> findAllByIdIn(List<Long> ids, Pageable pageable);

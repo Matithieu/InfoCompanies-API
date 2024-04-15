@@ -23,7 +23,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Company getCompanyByName(String name) {
-        return companyRepository.findByDenomination(name);
+        return companyRepository.findByCompanyName(name);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Page<Company> getCompaniesBySecteurActiviteAndRegion(String secteurActivite, String region, Pageable pageable) {
-        return companyRepository.findBySecteurActiviteContainingAndRegionContaining(secteurActivite, region, pageable);
+    public Page<Company> getCompaniesByIndustrySectorAndRegion(String industrySector, String region, Pageable pageable) {
+        return companyRepository.findByIndustrySectorContainingAndRegionContaining(industrySector, region, pageable);
     }
 
     @Override

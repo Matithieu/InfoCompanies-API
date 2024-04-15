@@ -17,7 +17,7 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/company")
+@RequestMapping("/api/v1/company")
 public class CompanyController {
 
     @Autowired
@@ -40,12 +40,13 @@ public class CompanyController {
     @GetMapping("/companies")
     public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
-        Page<Company> result = companyService.getCompaniesBySecteurActiviteAndRegion(secteurActivite, region, pageable);
+        Page<Company> result = companyService.getCompaniesByIndustrySectorAndRegion(secteurActivite, region, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     // http://127.0.0.1:8080/api/v1/company/random-companies?page=0
    @GetMapping("/random-companies")
+   @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
         Page<Company> result = companyService.findRandomCompanies(pageable);
