@@ -54,6 +54,9 @@ public class UserResource {
 	
 	@PostMapping(value = "/user")
 	public Response createUser(User user) {
+		user.setQuota("10");
+		user.setTier(QuotaUser.FREE);
+		user.setVerified(true); // To change
 		UserRepresentation userRep = mapUserRep(user);
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		Response res = keycloak.realm(realm).users().create(userRep);
