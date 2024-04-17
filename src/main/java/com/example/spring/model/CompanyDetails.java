@@ -12,8 +12,8 @@ import lombok.Setter;
 public class CompanyDetails {
 
     private Long id;
-    private String denomination;
-    private String secteurActivite;
-    private String ville;
+    private String companyName;
+    private String industrySector;
+    private String city;
     private String region;
 }

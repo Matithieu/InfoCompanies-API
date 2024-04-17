@@ -11,7 +11,7 @@ public interface CompanyService {
 
     Company getCompanyById(Long id);
 
-    Company getCompanyByName(String name);
+    Company getCompanyByCompanyName(String companyName);
 
     Company saveCompany(Company company);
 

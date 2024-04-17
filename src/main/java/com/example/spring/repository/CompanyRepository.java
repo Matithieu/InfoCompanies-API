@@ -17,12 +17,12 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     Page<Company> findByCompanyName(String nom, Pageable pageable);
 
     @Query("SELECT new com.example.spring.model.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
-            "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT('%', :denomination, '%'))")
-    Page<CompanyDetails> findCompanyDetailsByDenomination(@Param("denomination") String denomination, Pageable pageable);
+            "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT('%', :companyName, '%'))")
+    Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
     Page<Company> findByIndustrySectorContainingAndRegionContaining(String industrySector, String region, Pageable pageable);
 
-    @Query(value = "SELECT * FROM Company WHERE phone IS NOT NULL ORDER BY RANDOM()",
-            countQuery = "SELECT COUNT(*) FROM Company WHERE phone IS NOT NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM companies WHERE companies.phone_number IS NOT NULL ORDER BY RANDOM()",
+            countQuery = "SELECT COUNT(*) FROM companies WHERE companies.phone_number IS NOT NULL", nativeQuery = true)
     Page<Company> findRandomCompanies(Pageable pageable);
 
     Page<Company> findAllByIdIn(List<Long> ids, Pageable pageable);

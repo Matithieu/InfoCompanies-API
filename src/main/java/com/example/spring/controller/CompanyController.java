@@ -23,11 +23,12 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-    // http://127.0.0.1:8080/api/v1/company/search?name=Maison&page=0
+    // http://localhost:8080/api/v1/company/search?companyName=Maison&page=0
     @GetMapping("/search")
-    public Page<CompanyDetails> searchCompanies(@RequestParam String name, int page) {
+    @PreAuthorize("hasRole('verified')")
+    public Page<CompanyDetails> searchCompanies(@RequestParam String companyName, int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending());
-        return companyService.searchCompanies(name, pageable);
+        return companyService.searchCompanies(companyName, pageable);
     }
 
     @GetMapping("/test")
@@ -38,6 +39,7 @@ public class CompanyController {
 
     // http://127.0.0.1:8080/api/v1/company/recherche?secteurActivite=&region=Bretagne&page=0
     @GetMapping("/companies")
+    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
         Page<Company> result = companyService.getCompaniesByIndustrySectorAndRegion(secteurActivite, region, pageable);
@@ -55,12 +57,14 @@ public class CompanyController {
 
     // http://127.0.0.1:8080/api/v1/company/1
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
         Company company = companyService.getCompanyById(id);
         return new ResponseEntity<>(company, HttpStatus.OK);
     }
 
     @GetMapping("/companies-by-ids")
+    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getCompaniesByAListOfIds(@RequestParam List<Long> ids, Integer page) {
         Pageable pageable = Pageable.ofSize(10).withPage(page);
         Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);

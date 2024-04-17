@@ -22,8 +22,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Company getCompanyByName(String name) {
-        return companyRepository.findByCompanyName(name);
+    public Company getCompanyByCompanyName(String companyName) {
+        return companyRepository.findByCompanyName(companyName);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Page<CompanyDetails> searchCompanies(String name, Pageable pageable) {
-        return companyRepository.findCompanyDetailsByDenomination(name, pageable);
+    public Page<CompanyDetails> searchCompanies(String companyName, Pageable pageable) {
+        return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
 
     @Override
