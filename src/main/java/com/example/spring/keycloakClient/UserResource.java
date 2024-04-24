@@ -137,7 +137,7 @@ public class UserResource {
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "region", user.getRegion()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "postalCode", user.getPostalCode()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "country", user.getCountry()));
-		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "tier", user.getTier().toString()));
+		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "tier", String.valueOf(user.getTier())));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "isVerified", convertBooleanToString(user.isVerified())));
 		userRep.setEnabled(true);
 		userRep.setEmailVerified(true);
