@@ -23,50 +23,53 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-    // http://localhost:8080/api/v1/company/search?companyName=Maison&page=0
-    @GetMapping("/search")
+    // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
+    @GetMapping("/search-by-name")
     @PreAuthorize("hasRole('verified')")
-    public Page<CompanyDetails> searchCompanies(@RequestParam String companyName, int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending());
+    public Page<CompanyDetails> searchCompaniesByName(@RequestParam("companyName") String companyName,
+                                                      @RequestParam(defaultValue = "0") int page,
+                                                      @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return companyService.searchCompanies(companyName, pageable);
     }
 
-    @GetMapping("/test")
+    // Example: http://localhost:8080/api/v1/company/get-by-id/123
+    @GetMapping("/get-by-id/{id}")
     @PreAuthorize("hasRole('verified')")
-    public String test() {
-        return "Test";
-    }
-
-    // http://127.0.0.1:8080/api/v1/company/recherche?secteurActivite=&region=Bretagne&page=0
-    @GetMapping("/companies")
-    @PreAuthorize("hasRole('verified')")
-    public ResponseEntity<Page<Company>> getCompanyByParams(@RequestParam String secteurActivite, @RequestParam String region, Integer page) {
-        Pageable pageable = Pageable.ofSize(10).withPage(page);
-        Page<Company> result = companyService.getCompaniesByIndustrySectorAndRegion(secteurActivite, region, pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    // http://127.0.0.1:8080/api/v1/company/random-companies?page=0
-   @GetMapping("/random-companies")
-   @PreAuthorize("hasRole('verified')")
-    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam Integer page) {
-        Pageable pageable = Pageable.ofSize(10).withPage(page);
-        Page<Company> result = companyService.findRandomCompanies(pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
-    }
-
-    // http://127.0.0.1:8080/api/v1/company/1
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('verified')")
-    public ResponseEntity<Company> getCompanyById(@PathVariable Long id) {
+    public ResponseEntity<Company> getCompanyById(@PathVariable("id") Long id) {
         Company company = companyService.getCompanyById(id);
         return new ResponseEntity<>(company, HttpStatus.OK);
     }
 
-    @GetMapping("/companies-by-ids")
+    // Example: http://localhost:8080/api/v1/company/filter-by-parameters?sector=Technology&region=California&page=0
+    @GetMapping("/filter-by-parameters")
     @PreAuthorize("hasRole('verified')")
-    public ResponseEntity<Page<Company>> getCompaniesByAListOfIds(@RequestParam List<Long> ids, Integer page) {
-        Pageable pageable = Pageable.ofSize(10).withPage(page);
+    public ResponseEntity<Page<Company>> getCompaniesByParameters(@RequestParam(value = "sector", required = false) String sector,
+                                                                  @RequestParam(value = "region", required = false) String region,
+                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Company> result = companyService.getCompaniesByIndustrySectorAndRegion(sector, region, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Example: http://localhost:8080/api/v1/company/random?page=0
+    @GetMapping("/random")
+    @PreAuthorize("hasRole('verified')")
+    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam(defaultValue = "0") int page,
+                                                            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Company> result = companyService.findRandomCompanies(pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Example: http://localhost:8080/api/v1/company/get-by-ids?ids=1,2,3&page=0
+    @GetMapping("/get-by-ids")
+    @PreAuthorize("hasRole('verified')")
+    public ResponseEntity<Page<Company>> getCompaniesByIds(@RequestParam List<Long> ids,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
