@@ -12,7 +12,7 @@ import static com.example.spring.security.JwtUtils.getClaimFromJwt;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/v1/")
 
 public class UserController {
 
