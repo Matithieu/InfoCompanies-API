@@ -18,12 +18,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.ws.rs.core.Response;
 
 @RestController
 @RequestMapping("/keycloak")
-@SecurityRequirement(name = "Keycloak")
 public class RoleResource {
 
 	@Autowired

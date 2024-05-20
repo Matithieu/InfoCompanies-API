@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
-import static com.example.spring.security.JwtUtils.getClaimFromJwt;
+import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
 
 @CrossOrigin
 @RestController
@@ -21,14 +21,14 @@ public class UserController {
 
     @GetMapping("/user")
     public User getUser() {
-        String email = getClaimFromJwt("email");
+        String email = parseEmailFromHeader();
         return userResource.getUserByEmail(email);
     }
 
     @PutMapping("/update-user")
     public void updateUser(@RequestBody User user) {
         if(user.getEmail() != null) {
-            String email = getClaimFromJwt("email");
+            String email = parseEmailFromHeader();
             if(Objects.equals(user.getEmail(), email)) {
                 userResource.updateUser(user);
             }

@@ -3,14 +3,19 @@ package com.example.spring.aspect;
 import com.example.spring.DTO.User;
 import com.example.spring.exception.QuotaExceededException;
 import com.example.spring.keycloakClient.UserResource;
+import com.example.spring.security.utils.SecurityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-import static com.example.spring.security.JwtUtils.getClaimFromJwt;
+import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
+import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
 
 @Aspect
 @Component
@@ -19,13 +24,13 @@ public class QuotaAspect {
     @Autowired
     UserResource userResource;
 
-    //@Pointcut("execution(* com.example.spring.service.company.CompanyService.searchCompanies(..))")
-    @Pointcut("execution(* com.example.spring.controller.CompanyController.test())")
-    public void searchCompaniesMethod() {}
+    @Pointcut("execution(* com.example.spring.controller.CompanyController.getRandomCompanies())")
+    public void getRandomCompaniesMethod() {}
 
-    @Around("searchCompaniesMethod()")
+    @Around("getRandomCompaniesMethod()")
     public Object checkQuota(ProceedingJoinPoint joinPoint) throws Throwable {
-        String email = getClaimFromJwt("email");
+        System.out.println("TEST " + parseUserFromHeader());
+        String email = parseEmailFromHeader();
         User user = userResource.getUserByEmail(email);
         int quota = Integer.parseInt(user.getQuota());
         if (quota > 0) {
