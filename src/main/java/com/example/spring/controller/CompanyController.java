@@ -25,7 +25,6 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
     @GetMapping("/search-by-name")
-    @PreAuthorize("hasRole('verified')")
     public Page<CompanyDetails> searchCompaniesByName(@RequestParam("companyName") String companyName,
                                                       @RequestParam(defaultValue = "0") int page,
                                                       @RequestParam(defaultValue = "10") int size) {
@@ -35,7 +34,6 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Company> getCompanyById(@PathVariable("id") Long id) {
         Company company = companyService.getCompanyById(id);
         return new ResponseEntity<>(company, HttpStatus.OK);
@@ -43,7 +41,6 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?sector=Technology&region=California&page=0
     @GetMapping("/filter-by-parameters")
-    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getCompaniesByParameters(@RequestParam(value = "sector", required = false) String sector,
                                                                   @RequestParam(value = "region", required = false) String region,
                                                                   @RequestParam(defaultValue = "0") int page,
@@ -55,7 +52,6 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
     @GetMapping("/random")
-    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam(defaultValue = "0") int page,
                                                             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -65,7 +61,6 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/get-by-ids?ids=1,2,3&page=0
     @GetMapping("/get-by-ids")
-    @PreAuthorize("hasRole('verified')")
     public ResponseEntity<Page<Company>> getCompaniesByIds(@RequestParam List<Long> ids,
                                                            @RequestParam(defaultValue = "0") int page,
                                                            @RequestParam(defaultValue = "10") int size) {

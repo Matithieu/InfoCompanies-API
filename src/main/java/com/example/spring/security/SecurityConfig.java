@@ -22,29 +22,10 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                         //.requestMatchers(HttpMethod.GET, "api/v1/company/test").permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())
                 .cors(Customizer.withDefaults())
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
-    }
-
-    @Bean
-    public DefaultMethodSecurityExpressionHandler msecurity() {
-        DefaultMethodSecurityExpressionHandler defaultMethodSecurityExpressionHandler =
-                new DefaultMethodSecurityExpressionHandler();
-        defaultMethodSecurityExpressionHandler.setDefaultRolePrefix("");
-        return defaultMethodSecurityExpressionHandler;
-    }
-
-    @Bean
-    public JwtAuthenticationConverter con() {
-        JwtAuthenticationConverter c = new JwtAuthenticationConverter();
-        JwtGrantedAuthoritiesConverter cv = new JwtGrantedAuthoritiesConverter();
-        cv.setAuthorityPrefix(""); // Default "SCOPE_"
-        cv.setAuthoritiesClaimName("roles"); // Default "scope" or "scp"
-        c.setJwtGrantedAuthoritiesConverter(cv);
-        return c;
     }
 }

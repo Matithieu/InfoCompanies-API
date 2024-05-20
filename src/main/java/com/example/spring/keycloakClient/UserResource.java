@@ -16,13 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import com.example.spring.DTO.User;
 import com.example.spring.DTO.Role;
 import com.example.spring.security.KeycloakSecurityUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.ws.rs.core.Response;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/keycloak")
-@SecurityRequirement(name = "Keycloak")
 public class UserResource {
 	
 	@Autowired
