@@ -3,16 +3,12 @@ package com.example.spring.aspect;
 import com.example.spring.DTO.User;
 import com.example.spring.exception.QuotaExceededException;
 import com.example.spring.keycloakClient.UserResource;
-import com.example.spring.security.utils.SecurityUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
 import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
