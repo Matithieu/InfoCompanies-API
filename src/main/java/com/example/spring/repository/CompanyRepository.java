@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
 
+    Company findCompanyById(Long id);
+
     Company findByCompanyName(String denomination);
 
     Page<Company> findByCompanyName(String nom, Pageable pageable);

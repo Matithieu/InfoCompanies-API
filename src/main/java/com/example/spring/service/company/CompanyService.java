@@ -13,7 +13,7 @@ public interface CompanyService {
 
     Company getCompanyByCompanyName(String companyName);
 
-    Company saveCompany(Company company);
+    void saveCompany(Company company);
 
     void deleteCompanyById(Long id);
 
@@ -26,4 +26,6 @@ public interface CompanyService {
     Page<Company> findRandomCompanies(Pageable pageable);
 
     Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable);
+
+    Company scrapCompany(String companyName, String address);
 }

@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.model.Company;
 import com.example.spring.model.CompanyDetails;
 import com.example.spring.service.company.CompanyService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+
 
 @CrossOrigin
 @RestController
@@ -66,5 +69,46 @@ public class CompanyController {
         Pageable pageable = PageRequest.of(page, size);
         Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    // Make a request to the scrap API
+    // Example: http://localhost:8080/api/v1/company/scrap?companyId=1
+    @GetMapping("/scrap")
+    public ResponseEntity<?> scrapCompany(@RequestParam Long companyId) {
+        try {
+            Company company = companyService.getCompanyById(companyId);
+
+            System.out.println("Company" + company.getScrapingDate());
+            System.out.println("Date now" + LocalDate.now().minusDays(1));
+
+            // If the scrapping date is older than 1 day, then scrap the company again
+            if((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
+                Company companyScraped = companyService.scrapCompany(company.getCompanyName(), company.getAddress());
+
+                company.setCompanyName(companyScraped.getCompanyName());
+                company.setPhoneNumber(companyScraped.getPhoneNumber());
+                company.setWebsite(companyScraped.getWebsite());
+                company.setInstagram(companyScraped.getInstagram());
+                company.setFacebook(companyScraped.getFacebook());
+                company.setTwitter(companyScraped.getTwitter());
+                company.setLinkedin(companyScraped.getLinkedin());
+                company.setYoutube(companyScraped.getYoutube());
+                company.setEmail(companyScraped.getEmail());
+                company.setScrapingDate(companyScraped.getScrapingDate());
+                company.setReviews(companyScraped.getReviews());
+                company.setSchedule(companyScraped.getSchedule());
+
+                companyService.saveCompany(company);
+
+                return new ResponseEntity<>(company, HttpStatus.OK);
+            }
+
+            else {
+                return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.OK);
+            }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
