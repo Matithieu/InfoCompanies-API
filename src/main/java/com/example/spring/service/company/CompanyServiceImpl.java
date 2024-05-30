@@ -18,6 +18,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -70,6 +71,12 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.findAllByIdIn(ids, pageable);
     }
 
+    private void setIfNotEmpty(JsonNode jsonNode, String fieldName, Consumer<String> setter) {
+        if (jsonNode.hasNonNull(fieldName) && !jsonNode.get(fieldName).asText().isEmpty()) {
+            setter.accept(jsonNode.get(fieldName).asText());
+        }
+    }
+
     // Make a request to the scrap API
     @Override
     public Company scrapCompany(String companyName, String address) {
@@ -95,18 +102,19 @@ public class CompanyServiceImpl implements CompanyService {
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
             Company company = new Company();
-            company.setCompanyName(jsonNode.get("companyName").asText());
-            company.setPhoneNumber(jsonNode.get("phoneNumber").asText());
-            company.setWebsite(jsonNode.get("website").asText());
-            company.setInstagram(jsonNode.get("instagram").asText(""));
-            company.setFacebook(jsonNode.get("facebook").asText(""));
-            company.setTwitter(jsonNode.get("twitter").asText(""));
-            company.setLinkedin(jsonNode.get("linkedin").asText(""));
-            company.setYoutube(jsonNode.get("youtube").asText(""));
-            company.setEmail(jsonNode.get("email").asText(""));
-            company.setScrapingDate(LocalDate.parse(jsonNode.get("scrapingDate").asText()));
-            company.setReviews(jsonNode.get("reviews").asText());
-            company.setSchedule(jsonNode.get("schedule").asText());
+
+            setIfNotEmpty(jsonNode, "companyName", company::setCompanyName);
+            setIfNotEmpty(jsonNode, "phoneNumber", company::setPhoneNumber);
+            setIfNotEmpty(jsonNode, "website", company::setWebsite);
+            setIfNotEmpty(jsonNode, "instagram", company::setInstagram);
+            setIfNotEmpty(jsonNode, "facebook", company::setFacebook);
+            setIfNotEmpty(jsonNode, "twitter", company::setTwitter);
+            setIfNotEmpty(jsonNode, "linkedin", company::setLinkedin);
+            setIfNotEmpty(jsonNode, "youtube", company::setYoutube);
+            setIfNotEmpty(jsonNode, "email", company::setEmail);
+            setIfNotEmpty(jsonNode, "scrapingDate", (value) -> company.setScrapingDate(LocalDate.parse(value)));
+            setIfNotEmpty(jsonNode, "reviews", company::setReviews);
+            setIfNotEmpty(jsonNode, "schedule", company::setSchedule);
 
             return company;
 
