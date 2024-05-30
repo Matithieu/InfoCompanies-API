@@ -83,7 +83,7 @@ public class CompanyController {
 
             // If the scrapping date is older than 1 day, then scrap the company again
             if((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
-                Company companyScraped = companyService.scrapCompany(company.getCompanyName(), company.getAddress());
+                Company companyScraped = companyService.scrapCompany(company.getCompanyName(), company.getCity());
 
                 company.setCompanyName(companyScraped.getCompanyName());
                 company.setPhoneNumber(companyScraped.getPhoneNumber());
