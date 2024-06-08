@@ -33,7 +33,7 @@ public class UserQuotaService {
                 .orElseGet(() -> {
                     UserQuota newUserQuota = new UserQuota();
                     newUserQuota.setUserId(userId);
-                    newUserQuota.setQuotaAllocated(3); // Default quota allocation
+                    newUserQuota.setQuotaAllocated(100); // Default quota allocation
                     newUserQuota.setQuotaUsed(0);
                     userQuotaRepository.save(newUserQuota);
                     return newUserQuota;
