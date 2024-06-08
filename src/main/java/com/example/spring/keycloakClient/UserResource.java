@@ -3,6 +3,7 @@ package com.example.spring.keycloakClient;
 import java.util.*;
 
 import com.example.spring.DTO.QuotaUser;
+import com.example.spring.service.quota.UserQuotaService;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -25,6 +26,9 @@ public class UserResource {
 	
 	@Autowired
 	KeycloakSecurityUtil keycloakUtil;
+
+	@Autowired
+	UserQuotaService userQuotaService;
 	
 	@Value("${realm}")
 	private String realm;
@@ -52,7 +56,6 @@ public class UserResource {
 	
 	@PostMapping(value = "/user")
 	public Response createUser(User user) {
-		user.setQuota("10");
 		user.setTier(QuotaUser.FREE);
 		user.setVerified(true); // To change
 		UserRepresentation userRep = mapUserRep(user);
@@ -110,7 +113,6 @@ public class UserResource {
 		user.setEmail(userRep.getEmail());
 		user.setUserName(userRep.getUsername());
 		user.setPhone(getAttributeValue(userRep.getAttributes(), "phone"));
-		user.setQuota(getAttributeValue(userRep.getAttributes(), "quota"));
 		user.setStreet(getAttributeValue(userRep.getAttributes(), "street"));
 		user.setLocality(getAttributeValue(userRep.getAttributes(), "locality"));
 		user.setRegion(getAttributeValue(userRep.getAttributes(), "region"));
@@ -128,7 +130,6 @@ public class UserResource {
 		userRep.setFirstName(user.getFirstName());
 		userRep.setLastName(user.getLastName());
 		userRep.setEmail(user.getEmail());
-		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "quota", user.getQuota()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "phone", user.getPhone()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "street", user.getStreet()));
 		userRep.setAttributes(updateAttributes(userRep.getAttributes(), "locality", user.getLocality()));

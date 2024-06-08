@@ -21,8 +21,6 @@ public class User {
 	
 	private String password;
 
-	private String quota;
-
 	private String phone;
 
 	private String street;
