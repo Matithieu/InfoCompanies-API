@@ -1,9 +1,8 @@
 package com.example.spring.aspect;
 
-import com.example.spring.exception.QuotaExceededException;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.model.UserQuota;
-import com.example.spring.service.quota.UserQuotaService;
+import com.example.spring.service.UserQuotaService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
 import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
 
 @Aspect

@@ -3,7 +3,7 @@ package com.example.spring.keycloakClient;
 import java.util.*;
 
 import com.example.spring.DTO.QuotaUser;
-import com.example.spring.service.quota.UserQuotaService;
+import com.example.spring.service.UserQuotaService;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -49,8 +49,18 @@ public class UserResource {
 	}
 
 	public User getUserByEmail(String email) {
+		if (email == null || email.isEmpty()) {
+			throw new IllegalArgumentException("Email cannot be null or empty");
+		}
+
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		UserRepresentation userRepresentation = keycloak.realm(realm).users().searchByEmail(email, true).getFirst();
+
+		// Additional check to ensure the exact email match
+		if (!email.equalsIgnoreCase(userRepresentation.getEmail())) {
+			return null; // Or throw an exception if preferred
+		}
+
 		return mapUser(userRepresentation);
 	}
 	

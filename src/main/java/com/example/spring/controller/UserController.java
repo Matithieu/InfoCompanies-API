@@ -2,6 +2,7 @@ package com.example.spring.controller;
 
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.UserResource;
+import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,12 +26,15 @@ public class UserController {
     }
 
     @PutMapping("/update-user")
-    public void updateUser(@RequestBody User user) {
+    public Response updateUser(@RequestBody User user) {
         if(user.getEmail() != null) {
             String email = parseEmailFromHeader();
             if(Objects.equals(user.getEmail(), email)) {
                 userResource.updateUser(user);
+                return Response.ok().build();
             }
         }
+
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }
