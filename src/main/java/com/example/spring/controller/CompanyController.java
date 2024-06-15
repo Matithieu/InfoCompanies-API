@@ -2,8 +2,7 @@ package com.example.spring.controller;
 
 import com.example.spring.model.Company;
 import com.example.spring.model.CompanyDetails;
-import com.example.spring.service.company.CompanyService;
-import org.apache.commons.lang3.ArrayUtils;
+import com.example.spring.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
+
 
 @CrossOrigin
 @RestController
@@ -25,6 +26,24 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
+    // Example: http://localhost:8080/api/v1/company/get-by-id/123
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<Company> getCompanyById(@PathVariable("id") Long id) {
+        Company company = companyService.getCompanyById(id);
+        return new ResponseEntity<>(company, HttpStatus.OK);
+    }
+
+    // Example: http://localhost:8080/api/v1/company/get-by-ids?ids=1,2,3&page=0
+    // For the To-Do
+    @GetMapping("/get-by-ids")
+    public ResponseEntity<Page<Company>> getCompaniesByIds(@RequestParam List<Long> ids,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
     @GetMapping("/search-by-name")
     public Page<CompanyDetails> searchCompaniesByName(@RequestParam("companyName") String companyName,
@@ -32,13 +51,6 @@ public class CompanyController {
                                                       @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         return companyService.searchCompanies(companyName, pageable);
-    }
-
-    // Example: http://localhost:8080/api/v1/company/get-by-id/123
-    @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<Company> getCompanyById(@PathVariable("id") Long id) {
-        Company company = companyService.getCompanyById(id);
-        return new ResponseEntity<>(company, HttpStatus.OK);
     }
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?sector=Technology&region=California&page=0
@@ -61,13 +73,13 @@ public class CompanyController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    // Example: http://localhost:8080/api/v1/company/get-by-ids?ids=1,2,3&page=0
-    @GetMapping("/get-by-ids")
-    public ResponseEntity<Page<Company>> getCompaniesByIds(@RequestParam List<Long> ids,
-                                                           @RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size) {
+    // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
+    @GetMapping("/random-unseen")
+    public ResponseEntity<Page<Company>> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
+                                                                  @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
+        String userId = parseUserFromHeader();
+        Page<Company> result = companyService.findRandomUnseenCompanies(userId, pageable);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

@@ -1,4 +1,4 @@
-package com.example.spring.service.company;
+package com.example.spring.service;
 
 import com.example.spring.model.Company;
 import com.example.spring.model.CompanyDetails;
@@ -21,54 +21,37 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Service
-public class CompanyServiceImpl implements CompanyService {
+public class CompanyService {
 
     @Autowired
     private CompanyRepository companyRepository;
 
-    @Override
     public Company getCompanyById(Long id) {
         return companyRepository.findCompanyById(id);
     }
 
-    @Override
-    public Company getCompanyByCompanyName(String companyName) {
-        return companyRepository.findByCompanyName(companyName);
+    public Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable) {
+        return companyRepository.findAllByIdIn(ids, pageable);
     }
 
-    @Override
     public void saveCompany(Company company) {
         companyRepository.save(company);
     }
 
-    @Override
-    public void deleteCompanyById(Long id) {
-        companyRepository.deleteById(id);
-    }
-
-    @Override
-    public List<Company> getAmountOfCompanies(int amount) {
-        return companyRepository.findAll().subList(0, amount);
-    }
-
-    @Override
     public Page<CompanyDetails> searchCompanies(String companyName, Pageable pageable) {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
 
-    @Override
     public Page<Company> getCompaniesByIndustrySectorAndRegion(String industrySector, String region, Pageable pageable) {
         return companyRepository.findByIndustrySectorContainingAndRegionContaining(industrySector, region, pageable);
     }
 
-    @Override
     public Page<Company> findRandomCompanies(Pageable pageable) {
         return companyRepository.findRandomCompanies(pageable);
     }
 
-    @Override
-    public Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable) {
-        return companyRepository.findAllByIdIn(ids, pageable);
+    public Page<Company> findRandomUnseenCompanies(String userId, Pageable pageable) {
+        return companyRepository.findRandomSeenCompanies(userId, pageable);
     }
 
     private void setIfNotEmpty(JsonNode jsonNode, String fieldName, Consumer<String> setter) {
@@ -78,7 +61,6 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     // Make a request to the scrap API
-    @Override
     public Company scrapCompany(String companyName, String address) {
         try {
             HttpResponse<String> response;

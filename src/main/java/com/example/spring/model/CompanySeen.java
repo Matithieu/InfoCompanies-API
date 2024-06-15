@@ -6,9 +6,6 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
-@ToString
-@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -18,14 +15,7 @@ public class CompanySeen {
     private Long id;
 
     @ElementCollection
-    private List<Long> companyIds = List.of();
-    
-    public void addCompanyId(Long newCompanyId) {
-        if (companyIds == null) {
-            companyIds = new ArrayList<>();
-        }
-        companyIds.add(newCompanyId);
-    }
+    private List<Long> companyIds = new ArrayList<>();
+
+    private String userId;
 }
-
-
