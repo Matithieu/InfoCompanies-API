@@ -1,7 +1,7 @@
 package com.example.spring.repository;
 
 import com.example.spring.model.Company;
-import com.example.spring.model.CompanyDetails;
+import com.example.spring.DTO.CompanyDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Company findByCompanyName(String denomination);
 
-    @Query("SELECT new com.example.spring.model.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
+    @Query("SELECT new com.example.spring.DTO.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
             "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT('%', :companyName, '%'))")
     Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
 

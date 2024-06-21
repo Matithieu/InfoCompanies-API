@@ -1,7 +1,7 @@
 package com.example.spring.service;
 
 import com.example.spring.model.Company;
-import com.example.spring.model.CompanyDetails;
+import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.repository.CompanyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

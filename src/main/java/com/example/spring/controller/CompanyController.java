@@ -1,7 +1,7 @@
 package com.example.spring.controller;
 
 import com.example.spring.model.Company;
-import com.example.spring.model.CompanyDetails;
+import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
