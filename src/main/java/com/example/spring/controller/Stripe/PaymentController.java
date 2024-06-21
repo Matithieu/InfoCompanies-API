@@ -1,18 +1,14 @@
 package com.example.spring.controller.Stripe;
 
-import com.example.spring.DAO.ProductDAO;
-import com.example.spring.DTO.RequestDTO;
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.UserResource;
 import com.stripe.Stripe;
-import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
-import com.stripe.net.Webhook;
 import com.stripe.param.checkout.SessionCreateParams;
-import com.stripe.param.checkout.SessionCreateParams.LineItem.PriceData;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,10 +17,14 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.Semaphore;
 
+import static com.example.spring.security.utils.SecurityUtils.getAllHeaders;
+import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
+
 // https://kinsta.com/blog/stripe-java-api/
 
 @RestController
 @CrossOrigin
+@RequestMapping("/v1/stripe")
 public class PaymentController {
 
     @Autowired
@@ -40,14 +40,16 @@ public class PaymentController {
     private String STRIPE_WEBHOOK_SECRET;
 
     @PostMapping("/subscriptions/trial")
-    String newSubscriptionWithTrial(@RequestBody RequestDTO requestDTO) throws Exception {
+    public ResponseEntity<String> newSubscriptionWithTrial(HttpServletRequest request) throws Exception {
         Stripe.apiKey = STRIPE_API_KEY;
 
-        //String clientBaseURL = System.getenv().get("CLIENT_BASE_URL");
-        String clientBaseURL = "http://localhost:5173";
+        String clientBaseURL = "http://localhost/ui";
+        String priceId = request.getHeader("X-priceId");
+        String email = parseEmailFromHeader();
+        System.out.println("Headers: " + getAllHeaders());
 
         // Find the user record from the database
-        User user = userResource.getUserByEmail(requestDTO.getCustomerEmail());
+        User user = userResource.getUserByEmail(email);
 
         try {
             mutex.acquire();
@@ -61,22 +63,14 @@ public class PaymentController {
                 SessionCreateParams.Builder paramsBuilder =
                         SessionCreateParams.builder()
                                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-                                .setCustomer(customer.getId())
                                 .setSuccessUrl(clientBaseURL + "/completion?session_id={CHECKOUT_SESSION_ID}")
                                 .setCancelUrl(clientBaseURL + "/failure")
-                                .setBillingAddressCollection(
-                                        SessionCreateParams.BillingAddressCollection.REQUIRED
-                                )
-                                .setAutomaticTax(
-                                        SessionCreateParams.AutomaticTax.builder()
-                                                .setEnabled(true)
-                                                .build()
-                                )
+                                .setCustomer(customer.getId())
                                 // Develop this section to lower the score
                                 .setSubscriptionData(
                                         SessionCreateParams.SubscriptionData.builder()
                                                 .setTrialPeriodDays(3L)
-                                                .setDescription("Subscription to " + ProductDAO.getProduct(requestDTO.getItem()).getName() + " for " + user.getEmail() + " with a trial period of 3 days.")
+                                                .setDescription("Subscription for " + user.getEmail() + " with a trial period of 3 days.")
                                                 .build()
                                 )
                                 .setClientReferenceId(user.getId());
@@ -86,19 +80,7 @@ public class PaymentController {
                         .addLineItem(
                                 SessionCreateParams.LineItem.builder()
                                         .setQuantity(1L)
-                                        .setPriceData(
-                                                PriceData.builder()
-                                                        .setProductData(
-                                                                PriceData.ProductData.builder()
-                                                                        .putMetadata("app_id", ProductDAO.getProduct(requestDTO.getItem()).getId())
-                                                                        .setName(ProductDAO.getProduct(requestDTO.getItem()).getName())
-                                                                        .setDescription(ProductDAO.getProduct(requestDTO.getItem()).getDescription())
-                                                                        .build()
-                                                        )
-                                                        .setCurrency(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getCurrency())
-                                                        .setUnitAmountDecimal(ProductDAO.getProduct(requestDTO.getItem()).getDefaultPriceObject().getUnitAmountDecimal())
-                                                        .setRecurring(PriceData.Recurring.builder().setInterval(PriceData.Recurring.Interval.MONTH).build())
-                                                        .build())
+                                        .setPrice(priceId)
                                         .build()
                         )
                         .setPhoneNumberCollection(
@@ -108,14 +90,11 @@ public class PaymentController {
                         )
                         .setCustomText(
                                 SessionCreateParams.CustomText.builder()
-                                        .setSubmit(
-                                                SessionCreateParams.CustomText.Submit.builder()
-                                                        .setMessage("You can refund freely during 14 days.")
-                                                        .build()
-                                        )
-                                        .build()
-                        )
-                ;
+                                        .setSubmit(SessionCreateParams.CustomText.Submit.builder()
+                                                .setMessage("You can refund freely during 14 days.")
+                                                .build()
+                                        ).build()
+                        );
 
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId())
@@ -123,44 +102,17 @@ public class PaymentController {
 
                 Session session = Session.create(paramsBuilder.build());
 
-                return session.getUrl();
+                return ResponseEntity.ok(session.getUrl());
 
             } else if (user != null && user.isVerified()) {
-                return "User is already verified";
+                return ResponseEntity.ok("User is already verified");
             } else {
-                return "User not found";
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
         } catch (StripeException e) {
             throw new Exception("Error when fetching /subscriptions/trial ", e);
         } finally {
             mutex.release();
         }
-    }
-
-    @CrossOrigin
-    @PostMapping("/webhook")
-    public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
-        // stripe listen --forward-to localhost:8080/webhook
-        Event event = null;
-
-        try {
-            event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
-        } catch (SignatureVerificationException e) {
-            // Invalid signature
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
-        }
-
-        // Handle the event
-        if ("checkout.session.completed".equals(event.getType())) {
-            Session session = (Session) event.getDataObjectDeserializer().getObject().get();
-
-            // Fulfill the purchase...
-            System.out.println("Checkout session completed: " + session.getCustomerEmail());
-            System.out.println("Session ID:" + session.getClientReferenceId());
-            User user = userResource.getUserByEmail(session.getCustomerEmail());
-            user.setVerified(true);
-        }
-
-        return ResponseEntity.ok("Received");
     }
 }
