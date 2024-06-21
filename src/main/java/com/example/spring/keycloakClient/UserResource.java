@@ -11,7 +11,6 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.spring.DTO.User;
@@ -19,9 +18,7 @@ import com.example.spring.DTO.Role;
 import com.example.spring.security.KeycloakSecurityUtil;
 import jakarta.ws.rs.core.Response;
 
-@CrossOrigin
 @RestController
-@RequestMapping("/keycloak")
 public class UserResource {
 	
 	@Autowired
@@ -32,18 +29,14 @@ public class UserResource {
 	
 	@Value("${realm}")
 	private String realm;
-	
-	@GetMapping
-	@RequestMapping("/users")
-	@PreAuthorize("hasRole('admin')")
+
 	public List<User> getUsers() {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		List<UserRepresentation> userRepresentations = keycloak.realm(realm).users().list();
 		return mapUsers(userRepresentations);
     }
 	
-	@GetMapping(value = "/users/{id}")
-	public User getUser(@PathVariable("id") String id) {
+	public User getUserById(String id) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		return mapUser(keycloak.realm(realm).users().get(id).toRepresentation());
 	}
@@ -64,7 +57,6 @@ public class UserResource {
 		return mapUser(userRepresentation);
 	}
 	
-	@PostMapping(value = "/user")
 	public Response createUser(User user) {
 		user.setTier(QuotaUser.FREE);
 		user.setVerified(true); // To change
@@ -74,30 +66,26 @@ public class UserResource {
 		return Response.ok(user).build();
 	}
 	
-	@PutMapping(value = "/user")
-	public Response updateUser(User user) {
+	public void updateUser(User user) {
 		UserRepresentation userRep = mapUserRep(user);
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).users().get(user.getId()).update(userRep);
-		return Response.ok(user).build();
+		Response.ok(user).build();
 	}
 	
-	@DeleteMapping(value = "/users/{id}")
 	public Response deleteUser(@PathVariable("id") String id) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).users().delete(id);
 		return Response.ok().build();
 	}
 	
-	@GetMapping(value = "/users/{id}/roles")
 	public List<Role> getRoles(@PathVariable("id") String id) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		return RoleResource.mapRoles(keycloak.realm(realm).users()
 				.get(id).roles().realmLevel().listAll());
 	}
 
-	@PostMapping(value = "/users/{id}/roles/{roleName}")
-	public Response createRole(@PathVariable("id") String id, 
+	public Response createRole(@PathVariable("id") String id,
 			@PathVariable("roleName") String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		RoleRepresentation role = keycloak.realm(realm).roles().get(roleName).toRepresentation();

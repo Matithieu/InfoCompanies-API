@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 
 import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
+import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
 
 @CrossOrigin
 @RestController
@@ -21,8 +22,8 @@ public class UserController {
 
     @GetMapping("/user")
     public User getUser() {
-        String email = parseEmailFromHeader();
-        return userResource.getUserByEmail(email);
+        String userId = parseUserFromHeader();
+        return userResource.getUserById(userId);
     }
 
     @PutMapping("/update-user")
