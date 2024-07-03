@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @Aspect
 @Component

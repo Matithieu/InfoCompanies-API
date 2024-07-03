@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @CrossOrigin
 @RestController

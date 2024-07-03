@@ -1,4 +1,4 @@
-package com.example.spring.security;
+package com.example.spring.utils;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.spring.DTO.User;
 import com.example.spring.DTO.Role;
-import com.example.spring.security.KeycloakSecurityUtil;
+import com.example.spring.utils.KeycloakSecurityUtil;
 import jakarta.ws.rs.core.Response;
 
 @RestController

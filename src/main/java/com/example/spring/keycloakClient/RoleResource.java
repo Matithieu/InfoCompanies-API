@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.spring.DTO.Role;
-import com.example.spring.security.KeycloakSecurityUtil;
+import com.example.spring.utils.KeycloakSecurityUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
