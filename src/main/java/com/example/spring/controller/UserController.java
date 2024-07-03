@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
-import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
-import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @CrossOrigin
 @RestController

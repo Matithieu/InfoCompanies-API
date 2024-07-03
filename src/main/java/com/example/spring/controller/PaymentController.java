@@ -1,7 +1,8 @@
-package com.example.spring.controller.Stripe;
+package com.example.spring.controller;
 
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.UserResource;
+import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.Semaphore;
 
-import static com.example.spring.security.utils.SecurityUtils.getAllHeaders;
-import static com.example.spring.security.utils.SecurityUtils.parseEmailFromHeader;
+import static com.example.spring.utils.HeadersUtil.getAllHeaders;
+import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
 
 // https://kinsta.com/blog/stripe-java-api/
 

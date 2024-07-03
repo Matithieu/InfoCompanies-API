@@ -11,14 +11,17 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.spring.DTO.User;
 import com.example.spring.DTO.Role;
-import com.example.spring.security.KeycloakSecurityUtil;
+import com.example.spring.utils.KeycloakSecurityUtil;
 import jakarta.ws.rs.core.Response;
 
-@RestController
+import static com.example.spring.utils.UserQuotaUtil.getQuotaBasedOnTier;
+
+@Service
 public class UserResource {
 	
 	@Autowired
@@ -171,17 +174,5 @@ public class UserResource {
 			}
 		}
 		return null;
-	}
-
-	private QuotaUser getQuotaBasedOnTier(String tier) {
-		return switch (tier) {
-            case "TIER1" -> QuotaUser.TIER1;
-			case "TIER2" -> QuotaUser.TIER2;
-			case "TIER3" -> QuotaUser.TIER3;
-			case "ENTERPRISE" -> QuotaUser.ENTERPRISE;
-			case "UNLIMITED" -> QuotaUser.UNLIMITED;
-
-            case null, default -> QuotaUser.FREE;
-        };
 	}
 }

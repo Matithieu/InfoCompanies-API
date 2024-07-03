@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.example.spring.security.utils.SecurityUtils.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 
 @CrossOrigin

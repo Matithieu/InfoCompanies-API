@@ -1,4 +1,4 @@
-package com.example.spring.controller.Stripe;
+package com.example.spring.utils;
 
 import com.example.spring.DTO.User;
 import com.stripe.exception.StripeException;
