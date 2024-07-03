@@ -1,7 +1,9 @@
-package com.example.spring.controller.Stripe;
+package com.example.spring.controller;
 
+import com.example.spring.DTO.QuotaUser;
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.UserResource;
+import com.example.spring.service.UserQuotaService;
 import com.google.gson.JsonSyntaxException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -24,6 +26,9 @@ public class WebHookController {
 
     @Autowired
     private UserResource userResource;
+
+    @Autowired
+    UserQuotaService userQuotaService;
 
     @Value("${STRIPE_WEBHOOK_SECRET}")
     private String STRIPE_WEBHOOK_SECRET;
@@ -79,10 +84,18 @@ public class WebHookController {
             stripeObject = dataObjectDeserializer.getObject().get();
             Subscription subscription = (Subscription) stripeObject;
             System.out.println("Subscription created: " + subscription.getCustomer());
+
+            String stripePlanId = subscription.getItems().getData().getFirst().getPlan().getId();
+            String tierUser = getTierBasedOnPriceId(stripePlanId);
+            QuotaUser quotaUser = getQuotaBasedOnTier(tierUser);
+
             Customer customer = retrieveCustomer(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
+            user.setTier(quotaUser);
             user.setVerified(true);
+
             userResource.updateUser(user);
+            userQuotaService.updateQuotaForUser(user.getId(), quotaUser.getRemainingSearchesBasedOnUserTier(user));
         } else {
             System.out.println("Failed to get subscription object");
         }
@@ -92,11 +105,25 @@ public class WebHookController {
         Subscription subscription = (Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
         if (subscription != null) {
             System.out.println("Subscription updated: " + subscription.getCustomer());
-            if (subscription.getStatus().equals("canceled")) {
-                Customer customer = retrieveCustomer(subscription.getCustomer());
-                User user = userResource.getUserByEmail(customer.getEmail());
-                user.setVerified(false);
-                userResource.updateUser(user);
+            Customer customer = retrieveCustomer(subscription.getCustomer());
+            User user = userResource.getUserByEmail(customer.getEmail());
+
+            switch (subscription.getStatus()) {
+                case "canceled":
+                case "paused":
+                case "unpaid":
+                    user.setVerified(false);
+                    userResource.updateUser(user);
+                    break;
+                case "active":
+                case "trialing":
+                    user.setVerified(true);
+                    userResource.updateUser(user);
+                    break;
+                case null:
+                default:
+                    System.out.println("Unhandled event type: " + event.getType());
+                    break;
             }
         } else {
             System.out.println("Failed to get subscription object");
