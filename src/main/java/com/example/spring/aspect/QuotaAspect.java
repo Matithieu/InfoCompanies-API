@@ -1,6 +1,5 @@
 package com.example.spring.aspect;
 
-import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.model.UserQuota;
 import com.example.spring.service.UserQuotaService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -21,23 +20,34 @@ public class QuotaAspect {
     @Autowired
     UserQuotaService userQuotaService;
 
-    @Autowired
-    UserResource userResource;
+    // Pointcut that matches all methods within CompanyController
+    @Pointcut("within(com.example.spring.controller.CompanyController)")
+    public void allMethodsInCompanyController() {}
 
-    @Pointcut("execution(* com.example.spring.controller.CompanyController.getRandomCompanies(..))")
-    public void getRandomCompaniesMethod() {}
+    // Pointcut that matches the excluded methods
+    @Pointcut("execution(* com.example.spring.controller.CompanyController.searchCompaniesByName(..)) || " +
+            "execution(* com.example.spring.controller.CompanyController.scrapCompany(..)) || " +
+            "execution(* com.example.spring.controller.CompanyController.getCompaniesByIds(..))")
+    public void excludedMethods() {}
 
-    @Around("getRandomCompaniesMethod()")
+    // Combined pointcut that includes all methods except the excluded ones
+    @Pointcut("allMethodsInCompanyController() && !excludedMethods()")
+    public void allMethodsExceptExcluded() {}
+
+    @Around("allMethodsExceptExcluded()")
     public Object checkQuota(ProceedingJoinPoint joinPoint) throws Throwable {
         String userId = parseUserFromHeader();
 
         UserQuota userQuota = userQuotaService.getQuotaForUser(userId);
 
         if (userQuota.getQuotaUsed() < userQuota.getQuotaAllocated()) {
-            userQuotaService.updateQuotaForUser(userId, userQuota.getQuotaUsed() + 1);
-            return joinPoint.proceed();
-        } else {
-            throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Quota exceeded for user");
+            synchronized (this) {
+                if (userQuota.getQuotaUsed() < userQuota.getQuotaAllocated()) {
+                    userQuotaService.updateQuotaForUser(userId, userQuota.getQuotaUsed() + 1);
+                    return joinPoint.proceed();
+                }
+            }
         }
+        throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "Quota exceeded for user");
     }
 }
