@@ -2,6 +2,7 @@ package com.example.spring.controller;
 
 import com.example.spring.DTO.QuotaUser;
 import com.example.spring.DTO.User;
+import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.service.UserQuotaService;
 import com.google.gson.JsonSyntaxException;
@@ -16,8 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.spring.utils.CustomerUtil.retrieveCustomer;
-import static com.example.spring.utils.UserQuotaUtil.getQuotaBasedOnTier;
-import static com.example.spring.utils.UserQuotaUtil.getTierBasedOnPriceId;
+import static com.example.spring.utils.UserQuotaUtil.*;
 
 @RestController
 @CrossOrigin
@@ -26,6 +26,9 @@ public class WebHookController {
 
     @Autowired
     private UserResource userResource;
+
+    @Autowired
+    RoleResource roleResource;
 
     @Autowired
     UserQuotaService userQuotaService;
@@ -94,8 +97,9 @@ public class WebHookController {
             user.setTier(quotaUser);
             user.setVerified(true);
 
+            roleResource.addRoleToUser(user.getId(), "verified");
             userResource.updateUser(user);
-            userQuotaService.updateQuotaForUser(user.getId(), quotaUser.getRemainingSearchesBasedOnUserTier(user));
+            userQuotaService.createQuotaForUser(user.getId(), getRemainingSearchesBasedOnUserTier(user));
         } else {
             System.out.println("Failed to get subscription object");
         }
@@ -113,11 +117,13 @@ public class WebHookController {
                 case "paused":
                 case "unpaid":
                     user.setVerified(false);
+                    roleResource.removeRoleFromUser(user.getId(), "verified");
                     userResource.updateUser(user);
                     break;
                 case "active":
                 case "trialing":
                     user.setVerified(true);
+                    roleResource.removeRoleFromUser(user.getId(), "verified");
                     userResource.updateUser(user);
                     break;
                 case null:
@@ -136,6 +142,7 @@ public class WebHookController {
             System.out.println("Subscription deleted: " + subscription.getCustomer());
             Customer customer = retrieveCustomer(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
+            roleResource.removeRoleFromUser(user.getId(), "verified");
             user.setVerified(false);
             userResource.updateUser(user);
         } else {

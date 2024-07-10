@@ -5,7 +5,7 @@ import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.*;
+import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.Semaphore;
 
@@ -56,7 +59,7 @@ public class PaymentController {
             mutex.acquire();
             if (user != null && !user.isVerified()) {
                 // Start by finding existing customer record from Stripe or creating a new one if needed
-                Customer customer = CustomerUtil.findOrCreateCustomer(user);
+                //Customer customer = CustomerUtil.findOrCreateCustomer(user);
 
                 System.out.println("User trying to subscribe: " + user.getEmail());
 
@@ -66,36 +69,49 @@ public class PaymentController {
                                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                                 .setSuccessUrl(clientBaseURL + "/completion?session_id={CHECKOUT_SESSION_ID}")
                                 .setCancelUrl(clientBaseURL + "/failure")
-                                .setCustomer(customer.getId())
+                                //.setCustomer(customer.getId())
+                                .setClientReferenceId(user.getId())
+                                .setAllowPromotionCodes(true)
+                                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                                 // Develop this section to lower the score
+                                .putMetadata("user_id", user.getId())
+                                .putMetadata("email", user.getEmail())
                                 .setSubscriptionData(
                                         SessionCreateParams.SubscriptionData.builder()
                                                 .setTrialPeriodDays(3L)
                                                 .setDescription("Subscription for " + user.getEmail() + " with a trial period of 3 days.")
                                                 .build()
                                 )
-                                .setClientReferenceId(user.getId());
-
-                // Add the all the details to the session creation request
-                paramsBuilder
-                        .addLineItem(
-                                SessionCreateParams.LineItem.builder()
-                                        .setQuantity(1L)
-                                        .setPrice(priceId)
-                                        .build()
-                        )
-                        .setPhoneNumberCollection(
-                                SessionCreateParams.PhoneNumberCollection.builder()
-                                        .setEnabled(true)
-                                        .build()
-                        )
-                        .setCustomText(
-                                SessionCreateParams.CustomText.builder()
-                                        .setSubmit(SessionCreateParams.CustomText.Submit.builder()
-                                                .setMessage("You can refund freely during 14 days.")
+                                .setClientReferenceId(user.getId())
+                                // Add the all the details to the session creation request
+                                .addLineItem(
+                                        SessionCreateParams.LineItem.builder()
+                                                .setQuantity(1L)
+                                                .setPrice(priceId)
                                                 .build()
-                                        ).build()
-                        );
+                                )
+                                .setLocale(SessionCreateParams.Locale.AUTO)
+                                .setPhoneNumberCollection(
+                                        SessionCreateParams.PhoneNumberCollection.builder()
+                                                .setEnabled(true)
+                                                .build()
+                                )
+                                .setBillingAddressCollection(
+                                        SessionCreateParams.BillingAddressCollection.REQUIRED
+                                )
+                                .setTaxIdCollection(
+                                        SessionCreateParams.TaxIdCollection.builder()
+                                                .setEnabled(true)
+                                                .build()
+                                )
+                                .setCustomText(
+                                        SessionCreateParams.CustomText.builder()
+                                                .setSubmit(SessionCreateParams.CustomText.Submit.builder()
+                                                        .setMessage("You can refund freely during 14 days.")
+                                                        .build()
+                                                ).build()
+                                )
+                        ;
 
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId())
