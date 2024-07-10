@@ -1,6 +1,7 @@
 package com.example.spring.keycloakClient;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.example.spring.DTO.Role;
@@ -10,18 +11,11 @@ import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.ws.rs.core.Response;
 
 @RestController
-@RequestMapping("/keycloak")
 public class RoleResource {
 
 	@Autowired
@@ -30,20 +24,17 @@ public class RoleResource {
 	@Value("${realm}")
 	private String realm;
 	
-	@GetMapping(value = "/roles")
 	public List<Role> getRoles() {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		List<RoleRepresentation> roleRepresentations = keycloak.realm(realm).roles().list();
 		return mapRoles(roleRepresentations);
     }
 	
-	@GetMapping(value = "/roles/{roleName}")
-	public Role getRole(@PathVariable("roleName") String roleName) {
+	public Role getRole(@RequestBody String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		return mapRole(keycloak.realm(realm).roles().get(roleName).toRepresentation());
     }
 	
-	@PostMapping(value = "/role")
 	public Response createRole(Role role) {
 		RoleRepresentation roleRep = mapRoleRep(role);
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
@@ -51,7 +42,6 @@ public class RoleResource {
 		return Response.ok(role).build();
 	}
 	
-	@PutMapping(value = "/role")
 	public Response updateRole(Role role) {
 		RoleRepresentation roleRep = mapRoleRep(role);
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
@@ -59,11 +49,22 @@ public class RoleResource {
 		return Response.ok(role).build();
 	}
 	
-	@DeleteMapping(value = "/roles/{roleName}")
-	public Response deleteUser(@PathVariable("roleName") String roleName) {
+	public Response deleteUser(@RequestBody String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).roles().deleteRole(roleName);
 		return Response.ok().build();
+	}
+
+	public void addRoleToUser(@RequestBody String userId, @RequestBody String roleName) {
+		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+		keycloak.realm(realm).users().get(userId).roles().realmLevel().add(Collections.singletonList(keycloak.realm(realm).roles().get(roleName).toRepresentation()));
+		Response.ok().build();
+	}
+
+	public void removeRoleFromUser(@RequestBody String userId, @RequestBody String roleName) {
+		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
+		keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Collections.singletonList(keycloak.realm(realm).roles().get(roleName).toRepresentation()));
+		Response.ok().build();
 	}
 	
 	public static List<Role> mapRoles(List<RoleRepresentation> representations) {
