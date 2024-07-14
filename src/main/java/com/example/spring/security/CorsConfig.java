@@ -16,10 +16,8 @@ public class CorsConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:3000/*",
-                "http://localhost:80",
-                "http://localhost",
+                "https://localhost:3000",
+                "https://localhost",
                 "http://localhost/**",
                 "https://stripe.com/**",
                 "https://checkout.stripe.com/**",
