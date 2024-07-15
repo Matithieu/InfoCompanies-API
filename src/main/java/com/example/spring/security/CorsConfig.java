@@ -1,5 +1,6 @@
 package com.example.spring.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,11 +12,16 @@ import java.util.List;
 
 @Configuration
 public class CorsConfig {
+
+    @Value("${HOSTNAME}")
+    private String HOSTNAME;
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
+                HOSTNAME,
                 "https://localhost:3000",
                 "https://localhost",
                 "http://localhost/**",
