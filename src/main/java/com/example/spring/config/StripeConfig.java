@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Configuration
 public class StripeConfig {
+    @Value("${STRIPE_PRICE_ID_FREE}")
+    private String stripePriceIdFree;
 
     @Value("${STRIPE_PRICE_ID_BASIC}")
     private String stripePriceIdBasic;

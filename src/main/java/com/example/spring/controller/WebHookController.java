@@ -36,9 +36,6 @@ public class WebHookController {
     @Value("${STRIPE_WEBHOOK_SECRET}")
     private String STRIPE_WEBHOOK_SECRET;
 
-    @Value("${STRIPE_API_KEY}")
-    private String STRIPE_API_KEY;
-
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws StripeException {
         Event event;

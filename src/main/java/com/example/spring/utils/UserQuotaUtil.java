@@ -25,6 +25,7 @@ public class UserQuotaUtil {
     @PostConstruct
     public void init() {
         priceIdToTierMap = new HashMap<>();
+        priceIdToTierMap.put(stripeConfig.getStripePriceIdFree(), "FREE");
         priceIdToTierMap.put(stripeConfig.getStripePriceIdBasic(), "TIER1");
         priceIdToTierMap.put(stripeConfig.getStripePriceIdPremium(), "TIER2");
         priceIdToTierMap.put("UNLIMITED", "UNLIMITED");
@@ -52,7 +53,7 @@ public class UserQuotaUtil {
 
     public static int getRemainingSearchesBasedOnUserTier(User user) {
         return switch (user.getTier()) {
-            case FREE -> 25;
+            case FREE -> 20;
             case TIER1 -> 100;
             case TIER2 -> 500;
             case ENTERPRISE -> 10_000;

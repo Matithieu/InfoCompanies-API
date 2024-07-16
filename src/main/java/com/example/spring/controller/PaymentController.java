@@ -1,8 +1,10 @@
 package com.example.spring.controller;
 
+import com.example.spring.DTO.QuotaUser;
 import com.example.spring.DTO.User;
+import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
-import com.example.spring.utils.CustomerUtil;
+import com.example.spring.service.UserQuotaService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -19,10 +21,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.Semaphore;
+import java.util.Objects;
 
+import static com.example.spring.utils.CustomerUtil.retrieveCustomer;
 import static com.example.spring.utils.HeadersUtil.getAllHeaders;
 import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
+import static com.example.spring.utils.UserQuotaUtil.*;
 
 // https://kinsta.com/blog/stripe-java-api/
 
@@ -34,34 +38,55 @@ public class PaymentController {
     @Autowired
     private UserResource userResource;
 
-    private static final Semaphore mutex = new Semaphore(1);
+    @Autowired
+    RoleResource roleResource;
+
+    @Autowired
+    UserQuotaService userQuotaService;
 
     @Value("${STRIPE_API_KEY}")
     private String STRIPE_API_KEY;
-    //String STRIPE_API_KEY = System.getenv().get("STRIPE_API_KEY");
 
-    @Value("${STRIPE_WEBHOOK_SECRET}")
-    private String STRIPE_WEBHOOK_SECRET;
+    @Value("${HOSTNAME}")
+    private String HOSTNAME;
+
+    @Value("${STRIPE_PRICE_ID_FREE}")
+    private String STRIPE_PRICE_ID_FREE;
 
     @PostMapping("/subscriptions/trial")
     public ResponseEntity<String> newSubscriptionWithTrial(HttpServletRequest request) throws Exception {
         Stripe.apiKey = STRIPE_API_KEY;
 
-        String clientBaseURL = "http://localhost/ui";
+        String clientBaseURL = "https://" + HOSTNAME + "/ui";
         String priceId = request.getHeader("X-priceId");
         String email = parseEmailFromHeader();
-        System.out.println("Headers: " + getAllHeaders());
+        //System.out.println("Headers: " + getAllHeaders());
 
         // Find the user record from the database
         User user = userResource.getUserByEmail(email);
 
         try {
-            mutex.acquire();
             if (user != null && !user.isVerified()) {
                 // Start by finding existing customer record from Stripe or creating a new one if needed
                 //Customer customer = CustomerUtil.findOrCreateCustomer(user);
 
                 System.out.println("User trying to subscribe: " + user.getEmail());
+
+                // Temporary function for free user
+                if (Objects.equals(priceId, STRIPE_PRICE_ID_FREE)) {
+                    String tierUser = getTierBasedOnPriceId(priceId);
+                    QuotaUser quotaUser = getQuotaBasedOnTier(tierUser);
+
+                    user.setTier(quotaUser);
+                    user.setVerified(true);
+
+                    roleResource.addRoleToUser(user.getId(), "verified");
+                    userResource.updateUser(user);
+                    userQuotaService.createQuotaForUser(user.getId(), getRemainingSearchesBasedOnUserTier(user));
+
+                    // Redicrect to the dashboard
+                    return ResponseEntity.ok(clientBaseURL + "/dashboard");
+                }
 
                 // Next, create a checkout session by adding the details of the checkout
                 SessionCreateParams.Builder paramsBuilder =
@@ -110,8 +135,7 @@ public class PaymentController {
                                                         .setMessage("You can refund freely during 14 days.")
                                                         .build()
                                                 ).build()
-                                )
-                        ;
+                                );
 
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId())
@@ -128,8 +152,6 @@ public class PaymentController {
             }
         } catch (StripeException e) {
             throw new Exception("Error when fetching /subscriptions/trial ", e);
-        } finally {
-            mutex.release();
         }
     }
 }
