@@ -116,7 +116,7 @@ public class CompanyController {
             }
 
             else {
-                return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.OK);
+                return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.TOO_EARLY);
             }
         }
         catch (Exception e) {
