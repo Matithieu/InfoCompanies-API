@@ -5,6 +5,7 @@ import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.service.UserQuotaService;
+import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -23,8 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
-import static com.example.spring.utils.CustomerUtil.retrieveCustomer;
-import static com.example.spring.utils.HeadersUtil.getAllHeaders;
 import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
 import static com.example.spring.utils.UserQuotaUtil.*;
 
@@ -67,26 +66,7 @@ public class PaymentController {
 
         try {
             if (user != null && !user.isVerified()) {
-                // Start by finding existing customer record from Stripe or creating a new one if needed
-                //Customer customer = CustomerUtil.findOrCreateCustomer(user);
-
                 System.out.println("User trying to subscribe: " + user.getEmail());
-
-                // Temporary function for free user
-                if (Objects.equals(priceId, STRIPE_PRICE_ID_FREE)) {
-                    String tierUser = getTierBasedOnPriceId(priceId);
-                    QuotaUser quotaUser = getQuotaBasedOnTier(tierUser);
-
-                    user.setTier(quotaUser);
-                    user.setVerified(true);
-
-                    roleResource.addRoleToUser(user.getId(), "verified");
-                    userResource.updateUser(user);
-                    userQuotaService.createQuotaForUser(user.getId(), getRemainingSearchesBasedOnUserTier(user));
-
-                    // Redicrect to the dashboard
-                    return ResponseEntity.ok(clientBaseURL + "/dashboard");
-                }
 
                 // Next, create a checkout session by adding the details of the checkout
                 SessionCreateParams.Builder paramsBuilder =
@@ -98,6 +78,7 @@ public class PaymentController {
                                 .setClientReferenceId(user.getId())
                                 .setAllowPromotionCodes(true)
                                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
+                                .setPaymentMethodCollection(SessionCreateParams.PaymentMethodCollection.IF_REQUIRED)
                                 // Develop this section to lower the score
                                 .putMetadata("user_id", user.getId())
                                 .putMetadata("email", user.getEmail())
@@ -136,6 +117,21 @@ public class PaymentController {
                                                         .build()
                                                 ).build()
                                 );
+
+                if (Objects.equals(priceId, STRIPE_PRICE_ID_FREE)) {
+                    paramsBuilder.setSubscriptionData(
+                            SessionCreateParams.SubscriptionData.builder()
+                                    .setTrialSettings(
+                                            SessionCreateParams.SubscriptionData.TrialSettings.builder()
+                                                    .setEndBehavior(
+                                                            SessionCreateParams.SubscriptionData.TrialSettings.EndBehavior.builder()
+                                                                    .setMissingPaymentMethod(
+                                                                            SessionCreateParams.SubscriptionData.TrialSettings.EndBehavior.MissingPaymentMethod.CANCEL
+                                                                    ).build()
+                                                    ).build()
+                                    ).build()
+                    );
+                }
 
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId())

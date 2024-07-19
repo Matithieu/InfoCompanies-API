@@ -56,6 +56,7 @@ public class CustomerUtil {
                                         .setPostalCode(user.getPostalCode())
                                         .build())
                         .setDescription("Customer for " + user.getEmail())
+                        .putMetadata("user_id", user.getId())
                         .build();
 
                 RequestOptions requestOptions = RequestOptions.builder()
