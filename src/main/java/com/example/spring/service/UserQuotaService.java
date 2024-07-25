@@ -1,6 +1,8 @@
 package com.example.spring.service;
 
+import com.example.spring.model.Config;
 import com.example.spring.model.UserQuota;
+import com.example.spring.repository.ConfigRepository;
 import com.example.spring.repository.UserQuotaRepository;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -12,9 +14,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @EnableScheduling
@@ -23,27 +29,42 @@ public class UserQuotaService {
 
     private static final Logger LOGGER = Logger.getLogger(UserQuotaService.class.getName());
 
-    private final UserQuotaRepository userQuotaRepository;
-    private final Cache<String, UserQuota> quotaCache;
-    private final Map<String, UserQuota> dirtyQuotas;
+    @Autowired
+    ConfigRepository configRepository;
 
     @Autowired
-    public UserQuotaService(UserQuotaRepository userQuotaRepository) {
-        this.userQuotaRepository = userQuotaRepository;
+    UserQuotaRepository userQuotaRepository;
+
+    private final Cache<String, UserQuota> quotaCache;
+    private final Map<String, UserQuota> dirtyQuotas;
+    private final Lock readLock;
+    private final Lock writeLock;
+
+    @Autowired
+    public UserQuotaService() {
+        long cacheExpireAfterWrite = 30;
+        long cacheMaximumSize = 1000;
         this.quotaCache = Caffeine.newBuilder()
-                .expireAfterWrite(30, TimeUnit.MINUTES)
-                .maximumSize(1000)
+                .expireAfterWrite(cacheExpireAfterWrite, TimeUnit.MINUTES)
+                .maximumSize(cacheMaximumSize)
                 .build();
         this.dirtyQuotas = new ConcurrentHashMap<>();
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        this.readLock = lock.readLock();
+        this.writeLock = lock.writeLock();
     }
 
     public UserQuota getQuotaForUser(String userId) {
-        return quotaCache.get(userId, this::loadQuotaFromDatabase);
+        readLock.lock();
+        try {
+            return quotaCache.get(userId, this::loadQuotaFromDatabase);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     public void createQuotaForUser(String userId, int quotaAllocated) {
         UserQuota userQuota = new UserQuota(userId, quotaAllocated, 0);
-        userQuota.setLastResetDate(LocalDate.now()); // Set the last reset date to the current date
         userQuotaRepository.save(userQuota);
         quotaCache.put(userId, userQuota);
     }
@@ -52,41 +73,60 @@ public class UserQuotaService {
         return userQuotaRepository.findByUserId(userId).orElse(null);
     }
 
-    public synchronized void updateQuotaForUser(String userId, int quotaUsed) {
-        UserQuota userQuota = getQuotaForUser(userId);
-        userQuota.setQuotaUsed(quotaUsed);
-        dirtyQuotas.put(userId, userQuota); // Mark as dirty
-        quotaCache.put(userId, userQuota);
+    public void updateQuotaForUser(String userId, int quotaUsed) {
+        writeLock.lock();
+        try {
+            UserQuota userQuota = getQuotaForUser(userId);
+            userQuota.setQuotaUsed(quotaUsed);
+            dirtyQuotas.put(userId, userQuota);
+            quotaCache.put(userId, userQuota);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Scheduled(fixedRate = 1000 * 60 * 3) // Every 3 minutes
     public void flushQuotas() {
         LOGGER.info("Scheduled task running...");
-        if (!dirtyQuotas.isEmpty()) {
-            LOGGER.info("Flushing quotas...");
-            userQuotaRepository.saveAll(dirtyQuotas.values());
-            dirtyQuotas.clear();
+        writeLock.lock();
+        try {
+            if (!dirtyQuotas.isEmpty()) {
+                LOGGER.info("Flushing quotas...");
+                userQuotaRepository.saveAll(dirtyQuotas.values());
+                dirtyQuotas.clear();
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to flush quotas", e);
+        } finally {
+            writeLock.unlock();
         }
     }
 
-    @Scheduled(cron = "0 0 0 1 * ?") // At midnight on the first day of every month
+    @Scheduled(cron = "0 0 0 * * *") // Reset every day at midnight
     public void resetMonthlyQuotas() {
         resetAllQuotas();
     }
 
-    public synchronized void resetAllQuotas() {
-        LOGGER.info("Resetting all quotas...");
-        LocalDate now = LocalDate.now();
+    public void resetAllQuotas() {
+        LocalDate now = LocalDate.now(ZoneId.systemDefault());
+        LocalDate lastResetDate = configRepository.findTopByOrderByIdDesc().get().getLastResetQuotaDate();
         Iterable<UserQuota> allQuotas = userQuotaRepository.findAll();
-        for (UserQuota quota : allQuotas) {
-            if (!now.isEqual(quota.getLastResetDate())) { // Check if it has already been reset this month
-                quota.setQuotaUsed(0);
-                quota.setLastResetDate(now); // Update the last reset date
-                quotaCache.put(quota.getUserId(), quota);
-                dirtyQuotas.put(quota.getUserId(), quota); // Mark as dirty
+        LOGGER.info("Resetting all quotas. Last reset date: " + lastResetDate);
+        writeLock.lock();
+        try {
+            // Check if it has already been this day
+            if (now.isAfter(lastResetDate)) {
+                for (UserQuota quota : allQuotas) {
+                    quota.setQuotaUsed(0);
+                    quotaCache.put(quota.getUserId(), quota);
+                    dirtyQuotas.put(quota.getUserId(), quota);
+                }
+                updateLastResetQuotaDate(now);
             }
+            flushQuotas();
+        } finally {
+            writeLock.unlock();
         }
-        flushQuotas();
     }
 
     @PreDestroy
@@ -98,28 +138,31 @@ public class UserQuotaService {
     @PostConstruct
     public void init() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::onShutdown));
-        updateQuotasWithDefaultLastResetDate(); // Update quotas with default last reset date if necessary
-        checkAndResetQuotasIfNecessary(); // Check and reset quotas if necessary
+        updateQuotasWithDefaultLastResetDate();
+        checkAndResetQuotasIfNecessary();
     }
 
     public void updateQuotasWithDefaultLastResetDate() {
-        Iterable<UserQuota> allQuotas = userQuotaRepository.findAll();
-        LocalDate defaultDate = LocalDate.now();
-        for (UserQuota quota : allQuotas) {
-            if (quota.getLastResetDate() == null) {
-                quota.setLastResetDate(defaultDate);
-                userQuotaRepository.save(quota);
-            }
+        LocalDate defaultDate = LocalDate.now(ZoneId.systemDefault());
+        Config config = configRepository.findTopByOrderByIdDesc().orElse(null);
+        if (config == null) {
+            config = new Config();
+            config.setLastResetQuotaDate(defaultDate);
+            configRepository.save(config);
         }
     }
 
     public void checkAndResetQuotasIfNecessary() {
-        LocalDate now = LocalDate.now();
-        LocalDate firstDayOfMonth = now.withDayOfMonth(1);
-        boolean needReset = userQuotaRepository.findAll().stream()
-                .anyMatch(quota -> quota.getLastResetDate() == null || !firstDayOfMonth.isEqual(quota.getLastResetDate()));
-        if (needReset) {
+        LocalDate now = LocalDate.now(ZoneId.systemDefault());
+        LocalDate lastResetDate = configRepository.findTopByOrderByIdDesc().get().getLastResetQuotaDate();
+        if (now.isAfter(lastResetDate)) {
             resetAllQuotas();
         }
+    }
+
+    private void updateLastResetQuotaDate(LocalDate date) {
+        Config config = configRepository.findTopByOrderByIdDesc().get();
+        config.setLastResetQuotaDate(date);
+        configRepository.save(config);
     }
 }
