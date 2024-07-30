@@ -111,7 +111,7 @@ public class Company {
 
     private String industrySector;
     private String phoneNumber;
-    @Column(length = 300)
+    @Column(length = 3000)
     private String website;
     @Column(length = 10000)
     private String reviews;
