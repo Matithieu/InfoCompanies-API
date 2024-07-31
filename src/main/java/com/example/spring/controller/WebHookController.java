@@ -43,15 +43,12 @@ public class WebHookController {
         try {
             event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
         } catch (JsonSyntaxException e) {
-            System.out.println("⚠️  Webhook error while parsing basic request.");
+            System.out.println("⚠️  Webhook error while parsing basic request: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payload");
         } catch (SignatureVerificationException e) {
-            System.out.println("⚠️  Webhook error: invalid signature.");
+            System.out.println("⚠️  Webhook error: invalid signature: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
-
-        // System.out.println("API VERSION" + event.getApiVersion());
-        // System.out.println("STRIPE VERSION" + Stripe.API_VERSION);
 
         switch (event.getType()) {
             case "charge.succeeded":
