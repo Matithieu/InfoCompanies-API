@@ -13,15 +13,15 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("${HOSTNAME}")
-    private String HOSTNAME;
+    @Value("${FULL_DOMAIN}")
+    private String FULL_DOMAIN;
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
-                HOSTNAME,
+                FULL_DOMAIN,
                 "https://localhost:3000",
                 "https://localhost",
                 "http://localhost/**",
