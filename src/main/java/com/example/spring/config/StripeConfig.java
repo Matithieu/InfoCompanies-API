@@ -15,5 +15,4 @@ public class StripeConfig {
 
     @Value("${STRIPE_PRICE_ID_PREMIUM}")
     private String stripePriceIdPremium;
-
 }

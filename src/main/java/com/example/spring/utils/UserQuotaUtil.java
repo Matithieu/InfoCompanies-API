@@ -1,6 +1,6 @@
 package com.example.spring.utils;
 
-import com.example.spring.DTO.QuotaUser;
+import com.example.spring.DTO.TierUser;
 import com.example.spring.DTO.User;
 import com.example.spring.config.StripeConfig;
 import jakarta.annotation.PostConstruct;
@@ -32,14 +32,14 @@ public class UserQuotaUtil {
         priceIdToTierMap.put("ENTERPRISE", "ENTERPRISE");
     }
 
-    public static QuotaUser getQuotaBasedOnTier(String tier) {
+    public static TierUser getQuotaBasedOnTier(String tier) {
         return switch (tier) {
-            case "TIER1" -> QuotaUser.TIER1;
-            case "TIER2" -> QuotaUser.TIER2;
-            case "ENTERPRISE" -> QuotaUser.ENTERPRISE;
-            case "UNLIMITED" -> QuotaUser.UNLIMITED;
+            case "TIER1" -> TierUser.TIER1;
+            case "TIER2" -> TierUser.TIER2;
+            case "ENTERPRISE" -> TierUser.ENTERPRISE;
+            case "UNLIMITED" -> TierUser.UNLIMITED;
 
-            case null, default -> QuotaUser.FREE;
+            case null, default -> TierUser.FREE;
         };
     }
 

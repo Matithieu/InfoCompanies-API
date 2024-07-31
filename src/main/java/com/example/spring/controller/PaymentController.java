@@ -1,14 +1,11 @@
 package com.example.spring.controller;
 
-import com.example.spring.DTO.QuotaUser;
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.service.UserQuotaService;
-import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 
 import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
-import static com.example.spring.utils.UserQuotaUtil.*;
 
 // https://kinsta.com/blog/stripe-java-api/
 

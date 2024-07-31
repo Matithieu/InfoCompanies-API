@@ -2,7 +2,7 @@ package com.example.spring.keycloakClient;
 
 import java.util.*;
 
-import com.example.spring.DTO.QuotaUser;
+import com.example.spring.DTO.TierUser;
 import com.example.spring.service.UserQuotaService;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
@@ -61,7 +61,7 @@ public class UserResource {
 	}
 	
 	public Response createUser(User user) {
-		user.setTier(QuotaUser.FREE);
+		user.setTier(TierUser.FREE);
 		user.setVerified(true); // To change
 		UserRepresentation userRep = mapUserRep(user);
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();

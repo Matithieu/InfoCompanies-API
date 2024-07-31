@@ -33,7 +33,7 @@ public class User {
 
 	private String country;
 
-	private QuotaUser tier;
+	private TierUser tier;
 
 	private boolean isVerified;
 }

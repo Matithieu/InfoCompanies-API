@@ -1,6 +1,6 @@
 package com.example.spring.controller;
 
-import com.example.spring.DTO.QuotaUser;
+import com.example.spring.DTO.TierUser;
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
@@ -83,12 +83,12 @@ public class WebHookController {
             System.out.println("Subscription created: " + subscription.getCustomer());
 
             String stripePlanId = subscription.getItems().getData().getFirst().getPlan().getId();
-            String tierUser = getTierBasedOnPriceId(stripePlanId);
-            QuotaUser quotaUser = getQuotaBasedOnTier(tierUser);
+            String tier = getTierBasedOnPriceId(stripePlanId);
+            TierUser tierUser = getQuotaBasedOnTier(tier);
 
             Customer customer = retrieveCustomer(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
-            user.setTier(quotaUser);
+            user.setTier(tierUser);
             user.setVerified(true);
 
             roleResource.addRoleToUser(user.getId(), "verified");
