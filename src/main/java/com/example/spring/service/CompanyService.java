@@ -1,7 +1,7 @@
 package com.example.spring.service;
 
-import com.example.spring.model.Company;
 import com.example.spring.DTO.CompanyDetails;
+import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,8 +42,16 @@ public class CompanyService {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
 
-    public Page<Company> getCompaniesByIndustrySectorAndRegion(String industrySector, String region, Pageable pageable) {
-        return companyRepository.findByIndustrySectorContainingAndRegionContaining(industrySector, region, pageable);
+    public Page<Company> getCompaniesByFilters(List<String> regions,
+                                               List<String> cities,
+                                               List<String> industrySectors,
+                                               List<String> legalForms,
+                                               Pageable pageable) {
+        System.out.println("regions: " + regions);
+        System.out.println("cities: " + cities);
+        System.out.println("industrySectors: " + industrySectors);
+        System.out.println("legalForms: " + legalForms);
+        return companyRepository.findCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
     }
 
     public Page<Company> findRandomCompanies(Pageable pageable) {

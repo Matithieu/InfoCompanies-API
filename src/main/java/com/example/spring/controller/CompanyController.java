@@ -1,7 +1,7 @@
 package com.example.spring.controller;
 
-import com.example.spring.model.Company;
 import com.example.spring.DTO.CompanyDetails;
+import com.example.spring.model.Company;
 import com.example.spring.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
@@ -53,24 +54,32 @@ public class CompanyController {
         return companyService.searchCompanies(companyName, pageable);
     }
 
-    // Example: http://localhost:8080/api/v1/company/filter-by-parameters?sector=Technology&region=California&page=0
+    // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
     @GetMapping("/filter-by-parameters")
-    public ResponseEntity<Page<Company>> getCompaniesByParameters(@RequestParam(value = "sector", required = false) String sector,
-                                                                  @RequestParam(value = "region", required = false) String region,
-                                                                  @RequestParam(defaultValue = "0") int page,
-                                                                  @RequestParam(defaultValue = "10") int size) {
+    public Page<Company> getCompaniesByFilters(
+            @RequestParam(required = false) List<String> regions,
+            @RequestParam(required = false) List<String> cities,
+            @RequestParam(required = false) List<String> industrySectors,
+            @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Replace null lists with empty lists
+        regions = (regions == null) ? Collections.emptyList() : regions;
+        cities = (cities == null) ? Collections.emptyList() : cities;
+        industrySectors = (industrySectors == null) ? Collections.emptyList() : industrySectors;
+        legalForms = (legalForms == null) ? Collections.emptyList() : legalForms;
+
         Pageable pageable = PageRequest.of(page, size);
-        Page<Company> result = companyService.getCompaniesByIndustrySectorAndRegion(sector, region, pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
     }
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
     @GetMapping("/random")
-    public ResponseEntity<Page<Company>> getRandomCompanies(@RequestParam(defaultValue = "0") int page,
-                                                            @RequestParam(defaultValue = "10") int size) {
+    public Page<Company> getRandomCompanies(@RequestParam(defaultValue = "0") int page,
+                                            @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Company> result = companyService.findRandomCompanies(pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return companyService.findRandomCompanies(pageable);
     }
 
     // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
@@ -94,7 +103,7 @@ public class CompanyController {
             System.out.println("Date now" + LocalDate.now().minusDays(1));
 
             // If the scrapping date is older than 1 day, then scrap the company again
-            if((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
+            if ((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
                 Company companyScraped = companyService.scrapCompany(company.getCompanyName(), company.getCity());
 
                 company.setCompanyName(companyScraped.getCompanyName());
@@ -113,13 +122,10 @@ public class CompanyController {
                 companyService.saveCompany(company);
 
                 return new ResponseEntity<>(company, HttpStatus.OK);
-            }
-
-            else {
+            } else {
                 return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.TOO_EARLY);
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
