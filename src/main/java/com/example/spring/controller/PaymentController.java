@@ -4,8 +4,10 @@ import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.service.UserQuotaService;
+import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -63,6 +65,7 @@ public class PaymentController {
         try {
             if (user != null && !user.isVerified()) {
                 System.out.println("User trying to subscribe: " + user.getEmail());
+                Customer customer = CustomerUtil.findOrCreateCustomer(user);
 
                 // Next, create a checkout session by adding the details of the checkout
                 SessionCreateParams.Builder paramsBuilder =
@@ -70,7 +73,7 @@ public class PaymentController {
                                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
                                 .setSuccessUrl(clientBaseURL + "/completion?session_id={CHECKOUT_SESSION_ID}")
                                 .setCancelUrl(clientBaseURL + "/failure")
-                                //.setCustomer(customer.getId())
+                                .setCustomer(customer.getId())
                                 .setClientReferenceId(user.getId())
                                 .setAllowPromotionCodes(true)
                                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
