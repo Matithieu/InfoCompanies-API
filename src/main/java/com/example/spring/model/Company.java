@@ -132,4 +132,11 @@ public class Company {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate scrapingDate;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate dateCreation;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate lastProcessingDate;
+    private String numberOfEmployee;
+    private String companyCategory;
 }
