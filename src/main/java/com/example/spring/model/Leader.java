@@ -3,8 +3,6 @@ package com.example.spring.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 @Entity
 public class Leader {
@@ -15,16 +13,14 @@ public class Leader {
     private String role;
     private String lastName;
     private String firstName;
-    private Long gestionNumber;
+    private String gestionNumber;
     private String type;
     private String eventName;
-    private String greffe;
-
-    @Column(name = "date_of_greffe")
-    private Date dateOfGreffe;
     private String usageName;
     private String pseudo;
+
+    @Column(length = 3000)
     private String companyName;
     private String legalForm;
-    private long idData;
+    private String idData;
 }
