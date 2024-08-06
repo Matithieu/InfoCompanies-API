@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class LeaderService {
@@ -18,8 +20,8 @@ public class LeaderService {
         return leaderRepository.findLeaderById(id);
     }
 
-    public Leader getLeaderBySiren(String siren) {
-        return leaderRepository.findBySiren(siren);
+    public List<Leader> getLeadersBySirens(String siren) {
+        return leaderRepository.findAllBySiren(siren);
     }
 
     public Page<Leader> getLeadersByFirstAndLastName(String firstName, String lastName, Pageable pageable) {

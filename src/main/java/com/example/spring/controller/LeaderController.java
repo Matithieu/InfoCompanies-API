@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/v1/leader")
@@ -23,10 +25,10 @@ public class LeaderController {
         return leaderService.getLeaderById(id);
     }
 
-    // Example: http://localhost:8080/api/v1/leader/get-by-siren?siren=1234&page=0
+    // Example: http://localhost:8080/api/v1/leader/get-by-siren?siren=exemple
     @GetMapping("/get-by-siren")
-    public Leader getLeaderBySiren(@RequestParam("siren") String siren) {
-        return leaderService.getLeaderBySiren(siren);
+    public List<Leader> getLeaderBySiren(@RequestParam("siren") String siren) {
+        return leaderService.getLeadersBySirens(siren);
     }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-first-and-last-name?firstName=exemple&lastName=exemple&page=0
