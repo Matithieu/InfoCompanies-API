@@ -28,9 +28,9 @@ public class UserController {
 
     @PutMapping("/update-user")
     public Response updateUser(@RequestBody User user) {
-        if(user.getEmail() != null) {
+        if (user.getEmail() != null) {
             String email = parseEmailFromHeader();
-            if(Objects.equals(user.getEmail(), email)) {
+            if (Objects.equals(user.getEmail(), email)) {
                 userResource.updateUser(user);
                 return Response.ok().build();
             }
@@ -38,4 +38,11 @@ public class UserController {
 
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
+
+    /*
+    @GetMapping("/register")
+    public String registerEndpoint() {
+        return userResource.returnRegistrationEndpoint();
+    }
+     */
 }
