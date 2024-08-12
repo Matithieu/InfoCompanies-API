@@ -22,7 +22,8 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "(:regions IS NULL OR c.region IN :regions) " +
             "OR (:cities IS NULL OR c.city IN :cities) " +
             "OR (:industrySectors IS NULL OR c.industrySector IN :industrySectors) " +
-            "OR (:legalForms IS NULL OR c.legalForm IN :legalForms)")
+            "OR (:legalForms IS NULL OR c.legalForm IN :legalForms) " +
+            "ORDER BY c.phoneNumber")
     Page<Company> findCompaniesByFilters(
             @Param("regions") List<String> regions,
             @Param("cities") List<String> cities,

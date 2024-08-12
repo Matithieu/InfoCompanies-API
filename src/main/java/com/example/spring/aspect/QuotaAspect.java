@@ -27,7 +27,8 @@ public class QuotaAspect {
     // Pointcut that matches the excluded methods
     @Pointcut("execution(* com.example.spring.controller.CompanyController.searchCompaniesByName(..)) || " +
             "execution(* com.example.spring.controller.CompanyController.scrapCompany(..)) || " +
-            "execution(* com.example.spring.controller.CompanyController.getCompaniesByIds(..))")
+            "execution(* com.example.spring.controller.CompanyController.getCompaniesByIds(..)) || " +
+            "execution(* com.example.spring.controller.CompanyController.getCompaniesOnLandingByFilters(..))")
     public void excludedMethods() {}
 
     // Combined pointcut that includes all methods except the excluded ones

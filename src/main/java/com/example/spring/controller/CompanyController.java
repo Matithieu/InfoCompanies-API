@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.service.CompanyService;
+import com.example.spring.utils.CompanyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,14 +65,7 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        // Replace null lists with empty lists
-        regions = (regions == null) ? Collections.emptyList() : regions;
-        cities = (cities == null) ? Collections.emptyList() : cities;
-        industrySectors = (industrySectors == null) ? Collections.emptyList() : industrySectors;
-        legalForms = (legalForms == null) ? Collections.emptyList() : legalForms;
-
-        Pageable pageable = PageRequest.of(page, size);
-        return companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, page, size, false);
     }
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
@@ -128,5 +122,43 @@ public class CompanyController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
+    @GetMapping("/landing-filter")
+    public Page<Company> getCompaniesOnLandingByFilters(
+            @RequestParam(required = false) List<String> regions,
+            @RequestParam(required = false) List<String> cities,
+            @RequestParam(required = false) List<String> industrySectors,
+            @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        // Replace null lists with empty lists
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, page, size, true);
+    }
+
+    private Page<Company> companiesWithFilters(
+            @RequestParam(required = false) List<String> regions,
+            @RequestParam(required = false) List<String> cities,
+            @RequestParam(required = false) List<String> industrySectors,
+            @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            boolean isObstructed) {
+
+        regions = (regions == null) ? Collections.emptyList() : regions;
+        cities = (cities == null) ? Collections.emptyList() : cities;
+        industrySectors = (industrySectors == null) ? Collections.emptyList() : industrySectors;
+        legalForms = (legalForms == null) ? Collections.emptyList() : legalForms;
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+
+        if (isObstructed) {
+            result = CompanyUtil.obstructCompanies(result);
+        }
+
+        return result;
     }
 }

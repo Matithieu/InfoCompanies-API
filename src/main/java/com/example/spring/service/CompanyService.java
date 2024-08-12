@@ -47,10 +47,6 @@ public class CompanyService {
                                                List<String> industrySectors,
                                                List<String> legalForms,
                                                Pageable pageable) {
-        System.out.println("regions: " + regions);
-        System.out.println("cities: " + cities);
-        System.out.println("industrySectors: " + industrySectors);
-        System.out.println("legalForms: " + legalForms);
         return companyRepository.findCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
     }
 
