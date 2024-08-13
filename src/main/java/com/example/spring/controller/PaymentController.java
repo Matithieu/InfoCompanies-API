@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 
 import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 // https://kinsta.com/blog/stripe-java-api/
 
@@ -57,10 +58,11 @@ public class PaymentController {
         String clientBaseURL = "https://" + HOSTNAME + "/ui";
         String priceId = request.getHeader("X-priceId");
         String email = parseEmailFromHeader();
+        String userId = parseUserFromHeader();
         //System.out.println("Headers: " + getAllHeaders());
 
         // Find the user record from the database
-        User user = userResource.getUserByEmail(email);
+        User user = userResource.getUserById(userId);
 
         try {
             if (user != null && !user.isVerified()) {
@@ -74,6 +76,12 @@ public class PaymentController {
                                 .setSuccessUrl(clientBaseURL + "/completion?session_id={CHECKOUT_SESSION_ID}")
                                 .setCancelUrl(clientBaseURL + "/failure")
                                 .setCustomer(customer.getId())
+                                .setCustomerUpdate(
+                                        SessionCreateParams.CustomerUpdate.builder()
+                                                .setName(SessionCreateParams.CustomerUpdate.Name.AUTO)
+                                                .setAddress(SessionCreateParams.CustomerUpdate.Address.AUTO)
+                                                .build()
+                                )
                                 .setClientReferenceId(user.getId())
                                 .setAllowPromotionCodes(true)
                                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
