@@ -147,10 +147,10 @@ public class CompanyController {
             @RequestParam(defaultValue = "10") int size,
             boolean isObstructed) {
 
-        regions = (regions == null) ? Collections.emptyList() : regions;
-        cities = (cities == null) ? Collections.emptyList() : cities;
-        industrySectors = (industrySectors == null) ? Collections.emptyList() : industrySectors;
-        legalForms = (legalForms == null) ? Collections.emptyList() : legalForms;
+        regions = (regions == null || regions.isEmpty()) ? null : regions;
+        cities = (cities == null || cities.isEmpty()) ? null : cities;
+        industrySectors = (industrySectors == null || industrySectors.isEmpty()) ? null : industrySectors;
+        legalForms = (legalForms == null || legalForms.isEmpty()) ? null : legalForms;
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
