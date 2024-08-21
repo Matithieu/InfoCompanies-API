@@ -1,10 +1,12 @@
 package com.example.spring.utils;
 
 import com.example.spring.model.Company;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class CompanyUtil {
@@ -34,5 +36,11 @@ public class CompanyUtil {
             return null;
         }
         return data.substring(0, 3) + data.substring(3).replaceAll("[a-zA-Z0-9]", "*");
+    }
+
+    public static void setIfNotEmpty(JsonNode jsonNode, String fieldName, Consumer<String> setter) {
+        if (jsonNode.hasNonNull(fieldName) && !jsonNode.get(fieldName).asText().isEmpty()) {
+            setter.accept(jsonNode.get(fieldName).asText());
+        }
     }
 }
