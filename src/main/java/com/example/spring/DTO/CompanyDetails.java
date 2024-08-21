@@ -1,16 +1,17 @@
 package com.example.spring.DTO;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Setter
+import java.io.Serializable;
+
 @Getter
-public class CompanyDetails {
-
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CompanyDetails implements Serializable {
     private Long id;
     private String companyName;
     private String industrySector;

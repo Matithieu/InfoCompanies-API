@@ -6,6 +6,8 @@ import com.example.spring.repository.CompanyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +20,8 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Consumer;
+
+import static com.example.spring.utils.CompanyUtil.setIfNotEmpty;
 
 @Service
 public class CompanyService {
@@ -34,10 +37,7 @@ public class CompanyService {
         return companyRepository.findAllByIdIn(ids, pageable);
     }
 
-    public void saveCompany(Company company) {
-        companyRepository.save(company);
-    }
-
+    @Cacheable(value = "companySearch", key = "#companyName + #pageable")
     public Page<CompanyDetails> searchCompanies(String companyName, Pageable pageable) {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
@@ -58,21 +58,15 @@ public class CompanyService {
         return companyRepository.findRandomSeenCompanies(userId, pageable);
     }
 
-    private void setIfNotEmpty(JsonNode jsonNode, String fieldName, Consumer<String> setter) {
-        if (jsonNode.hasNonNull(fieldName) && !jsonNode.get(fieldName).asText().isEmpty()) {
-            setter.accept(jsonNode.get(fieldName).asText());
-        }
-    }
-
-    // Make a request to the scrap API
-    public Company scrapCompany(String companyName, String address) {
+    @CachePut(value = "companies", key = "#company.id")
+    public Company scrapCompany(Company company) {
         try {
             HttpResponse<String> response;
             try (HttpClient client = HttpClient.newHttpClient()) {
 
                 // Create the request
-                String encodedCompanyName = URLEncoder.encode(companyName, StandardCharsets.UTF_8);
-                String encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8);
+                String encodedCompanyName = URLEncoder.encode(company.getCompanyName(), StandardCharsets.UTF_8);
+                String encodedAddress = URLEncoder.encode(company.getAddress(), StandardCharsets.UTF_8);
 
                 String url = String.format("http://scraping:8081/api/company-info?companyName=%s&address=%s", encodedCompanyName, encodedAddress);
                 HttpRequest request = HttpRequest.newBuilder()
@@ -87,25 +81,30 @@ public class CompanyService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(response.body());
 
-            Company company = new Company();
+            Company companyScrapped = new Company();
 
-            setIfNotEmpty(jsonNode, "companyName", company::setCompanyName);
-            setIfNotEmpty(jsonNode, "phoneNumber", company::setPhoneNumber);
-            setIfNotEmpty(jsonNode, "website", company::setWebsite);
-            setIfNotEmpty(jsonNode, "instagram", company::setInstagram);
-            setIfNotEmpty(jsonNode, "facebook", company::setFacebook);
-            setIfNotEmpty(jsonNode, "twitter", company::setTwitter);
-            setIfNotEmpty(jsonNode, "linkedin", company::setLinkedin);
-            setIfNotEmpty(jsonNode, "youtube", company::setYoutube);
-            setIfNotEmpty(jsonNode, "email", company::setEmail);
-            setIfNotEmpty(jsonNode, "scrapingDate", (value) -> company.setScrapingDate(LocalDate.parse(value)));
-            setIfNotEmpty(jsonNode, "reviews", company::setReviews);
-            setIfNotEmpty(jsonNode, "schedule", company::setSchedule);
+            setIfNotEmpty(jsonNode, "companyName", companyScrapped::setCompanyName);
+            setIfNotEmpty(jsonNode, "phoneNumber", companyScrapped::setPhoneNumber);
+            setIfNotEmpty(jsonNode, "website", companyScrapped::setWebsite);
+            setIfNotEmpty(jsonNode, "instagram", companyScrapped::setInstagram);
+            setIfNotEmpty(jsonNode, "facebook", companyScrapped::setFacebook);
+            setIfNotEmpty(jsonNode, "twitter", companyScrapped::setTwitter);
+            setIfNotEmpty(jsonNode, "linkedin", companyScrapped::setLinkedin);
+            setIfNotEmpty(jsonNode, "youtube", companyScrapped::setYoutube);
+            setIfNotEmpty(jsonNode, "email", companyScrapped::setEmail);
+            setIfNotEmpty(jsonNode, "scrapingDate", (value) -> companyScrapped.setScrapingDate(LocalDate.parse(value)));
+            setIfNotEmpty(jsonNode, "reviews", companyScrapped::setReviews);
+            setIfNotEmpty(jsonNode, "schedule", companyScrapped::setSchedule);
 
-            return company;
+            return companyScrapped;
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to scrap company information: ", e);
         }
+    }
+
+    @CachePut(value = "companies", key = "#company.id")
+    public void saveCompany(Company company) {
+        companyRepository.save(company);
     }
 }
