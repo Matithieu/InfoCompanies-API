@@ -1,11 +1,17 @@
 package com.example.spring.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Entity
 @Table(name = "Companies")
