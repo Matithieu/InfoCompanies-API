@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
@@ -65,7 +64,8 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, page, size, false);
+        Pageable pageable = PageRequest.of(page, size);
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, pageable, false);
     }
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
@@ -98,7 +98,7 @@ public class CompanyController {
 
             // If the scrapping date is older than 1 day, then scrap the company again
             if ((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
-                Company companyScraped = companyService.scrapCompany(company.getCompanyName(), company.getCity());
+                Company companyScraped = companyService.scrapCompany(company);
 
                 company.setCompanyName(companyScraped.getCompanyName());
                 company.setPhoneNumber(companyScraped.getPhoneNumber());
@@ -130,12 +130,10 @@ public class CompanyController {
             @RequestParam(required = false) List<String> regions,
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
-            @RequestParam(required = false) List<String> legalForms,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(required = false) List<String> legalForms) {
 
-        // Replace null lists with empty lists
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, page, size, true);
+        Pageable pageable = PageRequest.of(0, 10);
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, pageable, true);
     }
 
     private Page<Company> companiesWithFilters(
@@ -143,8 +141,7 @@ public class CompanyController {
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
             @RequestParam(required = false) List<String> legalForms,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam Pageable pageable,
             boolean isObstructed) {
 
         regions = (regions == null || regions.isEmpty()) ? null : regions;
@@ -152,7 +149,6 @@ public class CompanyController {
         industrySectors = (industrySectors == null || industrySectors.isEmpty()) ? null : industrySectors;
         legalForms = (legalForms == null || legalForms.isEmpty()) ? null : legalForms;
 
-        Pageable pageable = PageRequest.of(page, size);
         Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
 
         if (isObstructed) {
