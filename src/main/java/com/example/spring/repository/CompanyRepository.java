@@ -15,7 +15,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     Company findCompanyById(Long id);
 
     @Query("SELECT new com.example.spring.DTO.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
-            "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT('%', :companyName, '%'))")
+            "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT(:companyName, '%'))")
     Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
 
     @Query("SELECT c FROM Company c WHERE " +
