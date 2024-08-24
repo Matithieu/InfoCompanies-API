@@ -93,14 +93,10 @@ public class CompanyController {
         try {
             Company company = companyService.getCompanyById(companyId);
 
-            System.out.println("Company" + company.getScrapingDate());
-            System.out.println("Date now" + LocalDate.now().minusDays(1));
-
             // If the scrapping date is older than 1 day, then scrap the company again
             if ((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
                 Company companyScraped = companyService.scrapCompany(company);
 
-                company.setCompanyName(companyScraped.getCompanyName());
                 company.setPhoneNumber(companyScraped.getPhoneNumber());
                 company.setWebsite(companyScraped.getWebsite());
                 company.setInstagram(companyScraped.getInstagram());
@@ -120,7 +116,7 @@ public class CompanyController {
                 return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.TOO_EARLY);
             }
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Failed to scrap company information: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
