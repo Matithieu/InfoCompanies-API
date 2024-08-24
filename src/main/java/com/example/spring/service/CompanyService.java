@@ -6,7 +6,6 @@ import com.example.spring.repository.CompanyRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,7 +57,6 @@ public class CompanyService {
         return companyRepository.findRandomSeenCompanies(userId, pageable);
     }
 
-    @CachePut(value = "companies", key = "#company.id")
     public Company scrapCompany(Company company) {
         try {
             HttpResponse<String> response;
@@ -103,7 +101,6 @@ public class CompanyService {
         }
     }
 
-    @CachePut(value = "companies", key = "#company.id")
     public void saveCompany(Company company) {
         companyRepository.save(company);
     }
