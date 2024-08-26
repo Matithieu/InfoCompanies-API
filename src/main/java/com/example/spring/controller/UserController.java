@@ -6,9 +6,6 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
-import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
 import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @CrossOrigin
@@ -28,12 +25,17 @@ public class UserController {
 
     @PutMapping("/update-user")
     public Response updateUser(@RequestBody User user) {
-        if (user.getEmail() != null) {
-            String email = parseEmailFromHeader();
-            if (Objects.equals(user.getEmail(), email)) {
-                userResource.updateUser(user);
-                return Response.ok().build();
-            }
+        String id = parseUserFromHeader();
+        User existingUser = userResource.getUserById(id);
+
+        if (existingUser != null) {
+            // Ensure that the user's ID and verified status are not changed
+            user.setId(existingUser.getId());
+            user.setVerified(existingUser.isVerified());
+            user.setTier(existingUser.getTier());
+
+            userResource.updateUser(user);
+            return Response.ok().build();
         }
 
         return Response.status(Response.Status.BAD_REQUEST).build();
