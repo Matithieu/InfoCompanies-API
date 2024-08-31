@@ -23,12 +23,22 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "(:regions IS NULL OR c.region IN :regions) AND " +
             "(:cities IS NULL OR c.city IN :cities) AND " +
             "(:industrySectors IS NULL OR c.industrySector IN :industrySectors) AND " +
-            "(:legalForms IS NULL OR c.legalForm IN :legalForms) " +
+            "(:legalForms IS NULL OR c.legalForm IN :legalForms) AND " +
+            "(:includeLinkedin IS NULL OR :includeLinkedin = FALSE OR (c.linkedin IS NOT NULL AND c.linkedin <> '')) AND " +
+            "(:includeYoutube IS NULL OR :includeYoutube = FALSE OR (c.youtube IS NOT NULL AND c.youtube <> '')) AND " +
+            "(:includeFacebook IS NULL OR :includeFacebook = FALSE OR (c.facebook IS NOT NULL AND c.facebook <> '')) AND " +
+            "(:includeInstagram IS NULL OR :includeInstagram = FALSE OR (c.instagram IS NOT NULL AND c.instagram <> '')) AND " +
+            "(:includeTwitter IS NULL OR :includeTwitter = FALSE OR (c.twitter IS NOT NULL AND c.twitter <> '')) " +
             "ORDER BY c.phoneNumber")
     Page<Company> findCompaniesByFilters(@Param("regions") List<String> regions,
                                          @Param("cities") List<String> cities,
                                          @Param("industrySectors") List<String> industrySectors,
                                          @Param("legalForms") List<String> legalForms,
+                                         @Param("includeLinkedin") Boolean includeLinkedin,
+                                         @Param("includeYoutube") Boolean includeYoutube,
+                                         @Param("includeFacebook") Boolean includeFacebook,
+                                         @Param("includeInstagram") Boolean includeInstagram,
+                                         @Param("includeTwitter") Boolean includeTwitter,
                                          Pageable pageable);
 
     @Query("SELECT c FROM Company c WHERE " +
@@ -36,6 +46,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "(:cities IS NULL OR c.city IN :cities) AND " +
             "(:industrySectors IS NULL OR c.industrySector IN :industrySectors) AND " +
             "(:legalForms IS NULL OR c.legalForm IN :legalForms) AND " +
+            "(:includeLinkedin IS NULL OR :includeLinkedin = FALSE OR (c.linkedin IS NOT NULL AND c.linkedin <> '')) AND " +
+            "(:includeYoutube IS NULL OR :includeYoutube = FALSE OR (c.youtube IS NOT NULL AND c.youtube <> '')) AND " +
+            "(:includeFacebook IS NULL OR :includeFacebook = FALSE OR (c.facebook IS NOT NULL AND c.facebook <> '')) AND " +
+            "(:includeInstagram IS NULL OR :includeInstagram = FALSE OR (c.instagram IS NOT NULL AND c.instagram <> '')) AND " +
+            "(:includeTwitter IS NULL OR :includeTwitter = FALSE OR (c.twitter IS NOT NULL AND c.twitter <> '')) AND" +
             "((:comparator = '>' AND c.numberOfEmployee > :numberOfEmployee) OR " +
             " (:comparator = '<' AND c.numberOfEmployee < :numberOfEmployee) OR " +
             " (:comparator = '=' AND c.numberOfEmployee = :numberOfEmployee)) " +
@@ -46,6 +61,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                                            @Param("legalForms") List<String> legalForms,
                                                            @Param("comparator") String comparator,
                                                            @Param("numberOfEmployee") Integer numberOfEmployee,
+                                                           @Param("includeLinkedin") Boolean includeLinkedin,
+                                                           @Param("includeYoutube") Boolean includeYoutube,
+                                                           @Param("includeFacebook") Boolean includeFacebook,
+                                                           @Param("includeInstagram") Boolean includeInstagram,
+                                                           @Param("includeTwitter") Boolean includeTwitter,
                                                            Pageable pageable);
 
     @Query(value = "SELECT * FROM companies WHERE companies.phone_number IS NOT NULL ORDER BY RANDOM()",

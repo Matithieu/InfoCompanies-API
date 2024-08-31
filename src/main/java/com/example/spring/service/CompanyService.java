@@ -47,15 +47,25 @@ public class CompanyService {
                                                List<String> legalForms,
                                                String comparator,
                                                Integer numberOfEmployee,
+                                               List<String> socials,
                                                Pageable pageable) {
+        boolean includeLinkedin = socials.contains("linkedin");
+        boolean includeYoutube = socials.contains("youtube");
+        boolean includeFacebook = socials.contains("facebook");
+        boolean includeInstagram = socials.contains("instagram");
+        boolean includeTwitter = socials.contains("twitter");
+
         if (numberOfEmployee == null || comparator == null || (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
-            return companyRepository.findCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+            return companyRepository.findCompaniesByFilters(regions, cities, industrySectors,
+                    legalForms, includeLinkedin, includeYoutube,
+                    includeFacebook, includeInstagram, includeTwitter, pageable);
         }
 
         // Apply the filtering by comparator and numberOfEmployee if valid
         return companyRepository.findCompaniesByFiltersWithEmployeeFilter(
-                regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, pageable);
-
+                regions, cities, industrySectors, legalForms, comparator,
+                numberOfEmployee, includeLinkedin, includeYoutube,
+                includeFacebook, includeInstagram, includeTwitter, pageable);
     }
 
     public Page<Company> findRandomCompanies(Pageable pageable) {
