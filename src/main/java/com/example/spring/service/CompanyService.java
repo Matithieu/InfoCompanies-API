@@ -45,8 +45,17 @@ public class CompanyService {
                                                List<String> cities,
                                                List<String> industrySectors,
                                                List<String> legalForms,
+                                               String comparator,
+                                               Integer numberOfEmployee,
                                                Pageable pageable) {
-        return companyRepository.findCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+        if (numberOfEmployee == null || comparator == null || (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
+            return companyRepository.findCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+        }
+
+        // Apply the filtering by comparator and numberOfEmployee if valid
+        return companyRepository.findCompaniesByFiltersWithEmployeeFilter(
+                regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, pageable);
+
     }
 
     public Page<Company> findRandomCompanies(Pageable pageable) {

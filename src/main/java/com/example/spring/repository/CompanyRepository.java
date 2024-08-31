@@ -18,6 +18,7 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT(:companyName, '%'))")
     Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
 
+    // Query without the numberOfEmployee filter
     @Query("SELECT c FROM Company c WHERE " +
             "(:regions IS NULL OR c.region IN :regions) AND " +
             "(:cities IS NULL OR c.city IN :cities) AND " +
@@ -29,6 +30,23 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                          @Param("industrySectors") List<String> industrySectors,
                                          @Param("legalForms") List<String> legalForms,
                                          Pageable pageable);
+
+    @Query("SELECT c FROM Company c WHERE " +
+            "(:regions IS NULL OR c.region IN :regions) AND " +
+            "(:cities IS NULL OR c.city IN :cities) AND " +
+            "(:industrySectors IS NULL OR c.industrySector IN :industrySectors) AND " +
+            "(:legalForms IS NULL OR c.legalForm IN :legalForms) AND " +
+            "((:comparator = '>' AND c.numberOfEmployee > :numberOfEmployee) OR " +
+            " (:comparator = '<' AND c.numberOfEmployee < :numberOfEmployee) OR " +
+            " (:comparator = '=' AND c.numberOfEmployee = :numberOfEmployee)) " +
+            "ORDER BY c.phoneNumber")
+    Page<Company> findCompaniesByFiltersWithEmployeeFilter(@Param("regions") List<String> regions,
+                                                           @Param("cities") List<String> cities,
+                                                           @Param("industrySectors") List<String> industrySectors,
+                                                           @Param("legalForms") List<String> legalForms,
+                                                           @Param("comparator") String comparator,
+                                                           @Param("numberOfEmployee") Integer numberOfEmployee,
+                                                           Pageable pageable);
 
     @Query(value = "SELECT * FROM companies WHERE companies.phone_number IS NOT NULL ORDER BY RANDOM()",
             countQuery = "SELECT COUNT(*) FROM companies WHERE companies.phone_number IS NOT NULL", nativeQuery = true)

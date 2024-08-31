@@ -61,11 +61,13 @@ public class CompanyController {
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
             @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(required = false) String comparator,
+            @RequestParam(required = false) Integer numberOfEmployee,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, pageable, false);
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, pageable, false);
     }
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
@@ -126,10 +128,12 @@ public class CompanyController {
             @RequestParam(required = false) List<String> regions,
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
-            @RequestParam(required = false) List<String> legalForms) {
+            @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(required = false) String comparator,
+            @RequestParam(required = false) Integer numberOfEmployee) {
 
         Pageable pageable = PageRequest.of(0, 10);
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, pageable, true);
+        return companiesWithFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, pageable, true);
     }
 
     private Page<Company> companiesWithFilters(
@@ -137,6 +141,8 @@ public class CompanyController {
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
             @RequestParam(required = false) List<String> legalForms,
+            @RequestParam(required = false) String comparator,
+            @RequestParam(required = false) Integer numberOfEmployee,
             @RequestParam Pageable pageable,
             boolean isObstructed) {
 
@@ -145,7 +151,7 @@ public class CompanyController {
         industrySectors = (industrySectors == null || industrySectors.isEmpty()) ? null : industrySectors;
         legalForms = (legalForms == null || legalForms.isEmpty()) ? null : legalForms;
 
-        Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, pageable);
+        Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, pageable);
 
         if (isObstructed) {
             result = CompanyUtil.obstructCompanies(result);

@@ -143,6 +143,6 @@ public class Company {
     private LocalDate dateCreation;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate lastProcessingDate;
-    private String numberOfEmployee;
+    private Integer numberOfEmployee;
     private String companyCategory;
 }
