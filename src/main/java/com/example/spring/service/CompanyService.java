@@ -49,16 +49,28 @@ public class CompanyService {
                                                Integer numberOfEmployee,
                                                List<String> socials,
                                                Pageable pageable) {
-        boolean includeLinkedin = socials.contains("linkedin");
-        boolean includeYoutube = socials.contains("youtube");
-        boolean includeFacebook = socials.contains("facebook");
-        boolean includeInstagram = socials.contains("instagram");
-        boolean includeTwitter = socials.contains("twitter");
 
-        if (numberOfEmployee == null || comparator == null || (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
-            return companyRepository.findCompaniesByFilters(regions, cities, industrySectors,
-                    legalForms, includeLinkedin, includeYoutube,
-                    includeFacebook, includeInstagram, includeTwitter, pageable);
+        boolean includeLinkedin = false;
+        boolean includeYoutube = false;
+        boolean includeFacebook = false;
+        boolean includeInstagram = false;
+        boolean includeTwitter = false;
+
+        // Check if the socials list is not null and not empty
+        if (socials != null && !socials.isEmpty()) {
+            includeLinkedin = socials.contains("linkedin");
+            includeYoutube = socials.contains("youtube");
+            includeFacebook = socials.contains("facebook");
+            includeInstagram = socials.contains("instagram");
+            includeTwitter = socials.contains("twitter");
+        }
+
+        if (numberOfEmployee == null || comparator == null ||
+                (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
+            return companyRepository.findCompaniesByFilters(
+                    regions, cities, industrySectors, legalForms,
+                    includeLinkedin, includeYoutube, includeFacebook,
+                    includeInstagram, includeTwitter, pageable);
         }
 
         // Apply the filtering by comparator and numberOfEmployee if valid
