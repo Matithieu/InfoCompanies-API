@@ -28,7 +28,10 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "(:includeYoutube IS NULL OR :includeYoutube = FALSE OR (c.youtube IS NOT NULL AND c.youtube <> '')) AND " +
             "(:includeFacebook IS NULL OR :includeFacebook = FALSE OR (c.facebook IS NOT NULL AND c.facebook <> '')) AND " +
             "(:includeInstagram IS NULL OR :includeInstagram = FALSE OR (c.instagram IS NOT NULL AND c.instagram <> '')) AND " +
-            "(:includeTwitter IS NULL OR :includeTwitter = FALSE OR (c.twitter IS NOT NULL AND c.twitter <> '')) " +
+            "(:includeTwitter IS NULL OR :includeTwitter = FALSE OR (c.twitter IS NOT NULL AND c.twitter <> '')) AND " +
+            "(:includePhoneNumber IS NULL OR :includePhoneNumber = FALSE OR (c.phoneNumber IS NOT NULL AND c.phoneNumber <> '')) AND " +
+            "(:includeEmail IS NULL OR :includeEmail = FALSE OR (c.email IS NOT NULL AND c.email <> '')) AND " +
+            "(:includeWebsite IS NULL OR :includeWebsite = FALSE OR (c.website IS NOT NULL AND c.website <> '')) " +
             "ORDER BY c.phoneNumber")
     Page<Company> findCompaniesByFilters(@Param("regions") List<String> regions,
                                          @Param("cities") List<String> cities,
@@ -39,7 +42,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                          @Param("includeFacebook") Boolean includeFacebook,
                                          @Param("includeInstagram") Boolean includeInstagram,
                                          @Param("includeTwitter") Boolean includeTwitter,
+                                         @Param("includePhoneNumber") Boolean includePhoneNumber,
+                                         @Param("includeEmail") Boolean includeEmail,
+                                         @Param("includeWebsite") Boolean includeWebsite,
                                          Pageable pageable);
+
 
     @Query("SELECT c FROM Company c WHERE " +
             "(:regions IS NULL OR c.region IN :regions) AND " +
@@ -51,6 +58,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
             "(:includeFacebook IS NULL OR :includeFacebook = FALSE OR (c.facebook IS NOT NULL AND c.facebook <> '')) AND " +
             "(:includeInstagram IS NULL OR :includeInstagram = FALSE OR (c.instagram IS NOT NULL AND c.instagram <> '')) AND " +
             "(:includeTwitter IS NULL OR :includeTwitter = FALSE OR (c.twitter IS NOT NULL AND c.twitter <> '')) AND" +
+            "(:includePhoneNumber IS NULL OR :includePhoneNumber = FALSE OR (c.phoneNumber IS NOT NULL AND c.phoneNumber <> '')) AND " +
+            "(:includeEmail IS NULL OR :includeEmail = FALSE OR (c.email IS NOT NULL AND c.email <> '')) AND " +
+            "(:includeWebsite IS NULL OR :includeWebsite = FALSE OR (c.website IS NOT NULL AND c.website <> '')) AND" +
             "((:comparator = '>' AND c.numberOfEmployee > :numberOfEmployee) OR " +
             " (:comparator = '<' AND c.numberOfEmployee < :numberOfEmployee) OR " +
             " (:comparator = '=' AND c.numberOfEmployee = :numberOfEmployee)) " +
@@ -66,6 +76,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
                                                            @Param("includeFacebook") Boolean includeFacebook,
                                                            @Param("includeInstagram") Boolean includeInstagram,
                                                            @Param("includeTwitter") Boolean includeTwitter,
+                                                           @Param("includePhoneNumber") Boolean includePhoneNumber,
+                                                           @Param("includeEmail") Boolean includeEmail,
+                                                           @Param("includeWebsite") Boolean includeWebsite,
                                                            Pageable pageable);
 
     @Query(value = "SELECT * FROM companies WHERE companies.phone_number IS NOT NULL ORDER BY RANDOM()",

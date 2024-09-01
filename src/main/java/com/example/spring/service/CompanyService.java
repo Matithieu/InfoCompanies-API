@@ -48,6 +48,7 @@ public class CompanyService {
                                                String comparator,
                                                Integer numberOfEmployee,
                                                List<String> socials,
+                                               List<String> contact,
                                                Pageable pageable) {
 
         boolean includeLinkedin = false;
@@ -55,6 +56,10 @@ public class CompanyService {
         boolean includeFacebook = false;
         boolean includeInstagram = false;
         boolean includeTwitter = false;
+
+        boolean includePhoneNumber = false;
+        boolean includeEmail = false;
+        boolean includeWebsite = false;
 
         // Check if the socials list is not null and not empty
         if (socials != null && !socials.isEmpty()) {
@@ -65,19 +70,28 @@ public class CompanyService {
             includeTwitter = socials.contains("twitter");
         }
 
+        // Check if the contact list is not null and not empty
+        if (contact != null && !contact.isEmpty()) {
+            includePhoneNumber = contact.contains("phone");
+            includeEmail = contact.contains("email");
+            includeWebsite = contact.contains("website");
+        }
+
         if (numberOfEmployee == null || comparator == null ||
                 (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
             return companyRepository.findCompaniesByFilters(
                     regions, cities, industrySectors, legalForms,
                     includeLinkedin, includeYoutube, includeFacebook,
-                    includeInstagram, includeTwitter, pageable);
+                    includeInstagram, includeTwitter,
+                    includePhoneNumber, includeEmail, includeWebsite, pageable);
         }
 
         // Apply the filtering by comparator and numberOfEmployee if valid
         return companyRepository.findCompaniesByFiltersWithEmployeeFilter(
                 regions, cities, industrySectors, legalForms, comparator,
                 numberOfEmployee, includeLinkedin, includeYoutube,
-                includeFacebook, includeInstagram, includeTwitter, pageable);
+                includeFacebook, includeInstagram, includeTwitter,
+                includePhoneNumber, includeEmail, includeWebsite, pageable);
     }
 
     public Page<Company> findRandomCompanies(Pageable pageable) {
