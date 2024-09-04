@@ -3,12 +3,15 @@ package com.example.spring.service;
 import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
+import com.example.spring.specification.CompanySpecification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -41,57 +44,35 @@ public class CompanyService {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
 
-    public Page<Company> getCompaniesByFilters(List<String> regions,
-                                               List<String> cities,
-                                               List<String> industrySectors,
-                                               List<String> legalForms,
-                                               String comparator,
-                                               Integer numberOfEmployee,
-                                               List<String> socials,
-                                               List<String> contact,
-                                               Pageable pageable) {
+    public Page<Company> findCompaniesByFilters(List<String> regions, List<String> cities, List<String> industrySectors, List<String> legalForms,
+                                                String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts,
+                                                Pageable pageable) {
 
-        boolean includeLinkedin = false;
-        boolean includeYoutube = false;
-        boolean includeFacebook = false;
-        boolean includeInstagram = false;
-        boolean includeTwitter = false;
+        Specification<Company> specification = Specification.where(CompanySpecification.regionIn(regions))
+                .and(CompanySpecification.cityIn(cities))
+                .and(CompanySpecification.industrySectorIn(industrySectors))
+                .and(CompanySpecification.legalFormIn(legalForms))
+                .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
+                .and(CompanySpecification.socialMediaNotNull(socials))
+                .and(CompanySpecification.contactInfoNotNull(contacts));
 
-        boolean includePhoneNumber = false;
-        boolean includeEmail = false;
-        boolean includeWebsite = false;
+        return companyRepository.findAll(specification, pageable);
+    }
 
-        // Check if the socials list is not null and not empty
-        if (socials != null && !socials.isEmpty()) {
-            includeLinkedin = socials.contains("linkedin");
-            includeYoutube = socials.contains("youtube");
-            includeFacebook = socials.contains("facebook");
-            includeInstagram = socials.contains("instagram");
-            includeTwitter = socials.contains("twitter");
-        }
+    @Cacheable(value = "companyCounts", key = "#root.methodName + #regions + #cities + #industrySectors + #legalForms + #comparator + #numberOfEmployee + #socials + #contacts")
+    public long countCompaniesByFilters(List<String> regions, List<String> cities, List<String> industrySectors, List<String> legalForms,
+                                        String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts) {
 
-        // Check if the contact list is not null and not empty
-        if (contact != null && !contact.isEmpty()) {
-            includePhoneNumber = contact.contains("phone");
-            includeEmail = contact.contains("email");
-            includeWebsite = contact.contains("website");
-        }
+        Specification<Company> specification = Specification.where(CompanySpecification.regionIn(regions))
+                .and(CompanySpecification.cityIn(cities))
+                .and(CompanySpecification.industrySectorIn(industrySectors))
+                .and(CompanySpecification.legalFormIn(legalForms))
+                .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
+                .and(CompanySpecification.socialMediaNotNull(socials))
+                .and(CompanySpecification.contactInfoNotNull(contacts));
 
-        if (numberOfEmployee == null || comparator == null ||
-                (!comparator.equals(">") && !comparator.equals("<") && !comparator.equals("="))) {
-            return companyRepository.findCompaniesByFilters(
-                    regions, cities, industrySectors, legalForms,
-                    includeLinkedin, includeYoutube, includeFacebook,
-                    includeInstagram, includeTwitter,
-                    includePhoneNumber, includeEmail, includeWebsite, pageable);
-        }
-
-        // Apply the filtering by comparator and numberOfEmployee if valid
-        return companyRepository.findCompaniesByFiltersWithEmployeeFilter(
-                regions, cities, industrySectors, legalForms, comparator,
-                numberOfEmployee, includeLinkedin, includeYoutube,
-                includeFacebook, includeInstagram, includeTwitter,
-                includePhoneNumber, includeEmail, includeWebsite, pageable);
+        // Run a custom count query that only calculates the total number of companies matching the filters
+        return companyRepository.count(specification);
     }
 
     public Page<Company> findRandomCompanies(Pageable pageable) {
@@ -146,7 +127,14 @@ public class CompanyService {
         }
     }
 
+    @CacheEvict(value = "companyCounts", allEntries = true)
     public void saveCompany(Company company) {
         companyRepository.save(company);
     }
+
+    @CacheEvict(value = "companyCounts", allEntries = true)
+    public void deleteCompany(Long id) {
+        companyRepository.deleteById(id);
+    }
+
 }
