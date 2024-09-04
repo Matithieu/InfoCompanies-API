@@ -31,7 +31,7 @@ public class CompanySpecification {
     public static Specification<Company> employeeComparator(String comparator, Integer numberOfEmployee) {
         return (root, query, builder) -> {
             if (comparator == null || numberOfEmployee == null) {
-                return null;  // Instead of builder.conjunction()
+                return null;
             }
             return switch (comparator) {
                 case ">" -> builder.greaterThan(root.get("numberOfEmployee"), numberOfEmployee);
@@ -45,7 +45,7 @@ public class CompanySpecification {
     public static Specification<Company> socialMediaNotNull(List<String> socials) {
         return (root, query, builder) -> {
             if (socials == null || socials.isEmpty()) {
-                return builder.conjunction();
+                return null;
             }
             Predicate predicate = builder.conjunction();
             if (socials.contains("linkedin")) {
@@ -70,7 +70,7 @@ public class CompanySpecification {
     public static Specification<Company> contactInfoNotNull(List<String> contacts) {
         return (root, query, builder) -> {
             if (contacts == null || contacts.isEmpty()) {
-                return builder.conjunction();
+                return null;
             }
             Predicate predicate = builder.conjunction();
             if (contacts.contains("phone")) {
