@@ -5,10 +5,7 @@ import com.example.spring.model.Company;
 import com.example.spring.service.CompanyService;
 import com.example.spring.utils.CompanyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,8 +65,16 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
+        // Cache and retrieve the total count
+        long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
+                comparator, numberOfEmployee, socials, contacts);
+
         Pageable pageable = PageRequest.of(page, size);
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, socials, contacts, pageable, false);
+        Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
+                comparator, numberOfEmployee, socials, contacts, pageable);
+
+        // Optionally set total elements manually (though Page already manages it)
+        return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
     }
 
     // Example: http://localhost:8080/api/v1/company/random?page=0
@@ -138,32 +143,14 @@ public class CompanyController {
     ) {
 
         Pageable pageable = PageRequest.of(0, 10);
-        return companiesWithFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, socials, contacts, pageable, true);
-    }
+        // Cache and retrieve the total count
+        long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
+                comparator, numberOfEmployee, socials, contacts);
 
-    private Page<Company> companiesWithFilters(
-            @RequestParam(required = false) List<String> regions,
-            @RequestParam(required = false) List<String> cities,
-            @RequestParam(required = false) List<String> industrySectors,
-            @RequestParam(required = false) List<String> legalForms,
-            @RequestParam(required = false) String comparator,
-            @RequestParam(required = false) Integer numberOfEmployee,
-            @RequestParam(required = false) List<String> socials,
-            @RequestParam(required = false) List<String> contacts,
-            @RequestParam Pageable pageable,
-            boolean isObstructed) {
+        Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
+                comparator, numberOfEmployee, socials, contacts, pageable);
 
-        regions = (regions == null || regions.isEmpty()) ? null : regions;
-        cities = (cities == null || cities.isEmpty()) ? null : cities;
-        industrySectors = (industrySectors == null || industrySectors.isEmpty()) ? null : industrySectors;
-        legalForms = (legalForms == null || legalForms.isEmpty()) ? null : legalForms;
-
-        Page<Company> result = companyService.getCompaniesByFilters(regions, cities, industrySectors, legalForms, comparator, numberOfEmployee, socials, contacts, pageable);
-
-        if (isObstructed) {
-            result = CompanyUtil.obstructCompanies(result);
-        }
-
-        return result;
+        companiesPage = CompanyUtil.obstructCompanies(companiesPage);
+        return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
     }
 }
