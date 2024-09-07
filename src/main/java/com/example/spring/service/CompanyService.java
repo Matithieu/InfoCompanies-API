@@ -3,6 +3,7 @@ package com.example.spring.service;
 import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
+import com.example.spring.repository.CompanySeenRepository;
 import com.example.spring.specification.CompanySpecification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,9 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
+    @Autowired
+    private CompanySeenRepository companySeenRepository;
+
     public Company getCompanyById(Long id) {
         return companyRepository.findCompanyById(id);
     }
@@ -49,8 +53,8 @@ public class CompanyService {
     }
 
     public Page<Company> findCompaniesByFilters(List<String> regions, List<String> cities, List<String> industrySectors, List<String> legalForms,
-                                                String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts,
-                                                Pageable pageable) {
+                                                String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts, boolean isCompanySeen,
+                                                String userId, Pageable pageable) {
 
         Specification<Company> specification = Specification.where(CompanySpecification.regionIn(regions))
                 .and(CompanySpecification.cityIn(cities))
@@ -58,7 +62,8 @@ public class CompanyService {
                 .and(CompanySpecification.legalFormIn(legalForms))
                 .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
                 .and(CompanySpecification.socialMediaNotNull(socials))
-                .and(CompanySpecification.contactInfoNotNull(contacts));
+                .and(CompanySpecification.contactInfoNotNull(contacts))
+                .and(CompanySpecification.notSeenByUser(isCompanySeen, userId, companySeenRepository));
 
         return companyRepository.findAll(specification, pageable);
     }

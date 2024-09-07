@@ -1,9 +1,12 @@
 package com.example.spring.specification;
 
 import com.example.spring.model.Company;
+import com.example.spring.model.CompanySeen;
+import com.example.spring.repository.CompanySeenRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompanySpecification {
@@ -83,6 +86,27 @@ public class CompanySpecification {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("website")));
             }
             return predicate;
+        };
+    }
+
+    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId, CompanySeenRepository companySeenRepository) {
+        return (root, query, builder) -> {
+            if (!isCompanySeen || userId == null || userId.isEmpty()) {
+                return null;
+            }
+
+            // Fetch the CompanySeen object for the given userId
+            List<Long> seenCompanyIds = companySeenRepository.findByUserId(userId)
+                    .map(CompanySeen::getCompanyIds)
+                    .orElse(new ArrayList<>());
+
+            // If the user has seen companies, exclude those from the results
+            if (!seenCompanyIds.isEmpty()) {
+                return builder.not(root.get("id").in(seenCompanyIds));
+            }
+
+            // If the user hasn't seen any companies, return null (no exclusion needed)
+            return null;
         };
     }
 }

@@ -71,6 +71,7 @@ public class CompanyController {
             @RequestParam(required = false) Integer numberOfEmployee,
             @RequestParam(required = false) List<String> socials,
             @RequestParam(required = false) List<String> contacts,
+            @RequestParam(required = false) boolean isCompanySeen,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
@@ -78,9 +79,10 @@ public class CompanyController {
         long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
                 comparator, numberOfEmployee, socials, contacts);
 
+        String userId = parseUserFromHeader();
         Pageable pageable = PageRequest.of(page, size);
         Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts, pageable);
+                comparator, numberOfEmployee, socials, contacts, isCompanySeen, userId, pageable);
 
         // Optionally set total elements manually (though Page already manages it)
         return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
@@ -156,8 +158,9 @@ public class CompanyController {
         long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
                 comparator, numberOfEmployee, socials, contacts);
 
+        String userId = "";
         Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts, pageable);
+                comparator, numberOfEmployee, socials, contacts, false, userId, pageable);
 
         companiesPage = CompanyUtil.obstructCompanies(companiesPage);
         return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
