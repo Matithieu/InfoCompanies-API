@@ -42,6 +42,15 @@ public class CompanyController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    // Example: http://localhost:8080/api/v1/company/get-seen-by-user?page=0
+    @GetMapping("/get-seen-by-user")
+    public Page<Company> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String userId = parseUserFromHeader();
+        return companyService.getCompaniesSeenByUser(userId, pageable);
+    }
+
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
     @GetMapping("/search-by-name")
     public Page<CompanyDetails> searchCompaniesByName(@RequestParam("companyName") String companyName,

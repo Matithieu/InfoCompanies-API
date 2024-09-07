@@ -39,6 +39,10 @@ public class CompanyService {
         return companyRepository.findAllByIdIn(ids, pageable);
     }
 
+    public Page<Company> getCompaniesSeenByUser(String userId, Pageable pageable) {
+        return companyRepository.findCompaniesSeenByUser(userId, pageable);
+    }
+
     @Cacheable(value = "companySearch", key = "#companyName + #pageable")
     public Page<CompanyDetails> searchCompanies(String companyName, Pageable pageable) {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
@@ -136,5 +140,4 @@ public class CompanyService {
     public void deleteCompany(Long id) {
         companyRepository.deleteById(id);
     }
-
 }

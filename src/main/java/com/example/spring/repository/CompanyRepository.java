@@ -35,4 +35,10 @@ public interface CompanyRepository extends JpaRepository<Company, Long>, JpaSpec
     Page<Company> findRandomSeenCompanies(@Param("userId") String userId, Pageable pageable);
 
     Page<Company> findAll(Specification<Company> specification, Pageable pageable);
+
+    @Query(value = "SELECT c.* FROM companies c JOIN company_seen_company_ids csci ON c.id = csci.company_ids " +
+            "JOIN company_seen cs ON csci.company_seen_id = cs.id WHERE cs.user_id = :userId",
+            countQuery = "SELECT COUNT(c.id) FROM companies c JOIN company_seen_company_ids csci ON c.id = csci.company_ids " +
+                    "JOIN company_seen cs ON csci.company_seen_id = cs.id WHERE cs.user_id = :userId", nativeQuery = true)
+    Page<Company> findCompaniesSeenByUser(String userId, Pageable pageable);
 }
