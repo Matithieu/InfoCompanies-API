@@ -22,7 +22,7 @@ public class CorsConfig {
         configuration.setAllowCredentials(true);
         configuration.setAllowedOrigins(List.of(
                 FULL_DOMAIN,
-                "https://localhost:3000",
+                "https://localhost:5173",
                 "https://localhost",
                 "http://localhost/**",
                 "https://stripe.com/**",
