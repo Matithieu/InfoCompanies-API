@@ -3,7 +3,7 @@ package com.example.spring.service;
 import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
-import com.example.spring.repository.CompanySeenRepository;
+import com.example.spring.repository.UserCompanyStatusRepository;
 import com.example.spring.specification.CompanySpecification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,7 +33,7 @@ public class CompanyService {
     private CompanyRepository companyRepository;
 
     @Autowired
-    private CompanySeenRepository companySeenRepository;
+    private UserCompanyStatusRepository userCompanyStatusRepository;
 
     public Company getCompanyById(Long id) {
         return companyRepository.findCompanyById(id);
@@ -63,7 +63,7 @@ public class CompanyService {
                 .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
                 .and(CompanySpecification.socialMediaNotNull(socials))
                 .and(CompanySpecification.contactInfoNotNull(contacts))
-                .and(CompanySpecification.notSeenByUser(isCompanySeen, userId, companySeenRepository));
+                .and(CompanySpecification.notSeenByUser(isCompanySeen, userId, userCompanyStatusRepository));
 
         return companyRepository.findAll(specification, pageable);
     }
@@ -84,12 +84,8 @@ public class CompanyService {
         return companyRepository.count(specification);
     }
 
-    public Page<Company> findRandomCompanies(Pageable pageable) {
-        return companyRepository.findRandomCompanies(pageable);
-    }
-
     public Page<Company> findRandomUnseenCompanies(String userId, Pageable pageable) {
-        return companyRepository.findRandomSeenCompanies(userId, pageable);
+        return companyRepository.findRandomUnseenCompanies(userId, pageable);
     }
 
     public Company scrapCompany(Company company) {

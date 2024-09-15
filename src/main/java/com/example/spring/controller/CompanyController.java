@@ -88,14 +88,6 @@ public class CompanyController {
         return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
     }
 
-    // Example: http://localhost:8080/api/v1/company/random?page=0
-    @GetMapping("/random")
-    public Page<Company> getRandomCompanies(@RequestParam(defaultValue = "0") int page,
-                                            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return companyService.findRandomCompanies(pageable);
-    }
-
     // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
     @GetMapping("/random-unseen")
     public ResponseEntity<Page<Company>> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,

@@ -20,25 +20,20 @@ public interface CompanyRepository extends JpaRepository<Company, Long>, JpaSpec
             "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT(:companyName, '%'))")
     Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
 
-    @Query(value = "SELECT * FROM companies WHERE companies.phone_number IS NOT NULL ORDER BY RANDOM()",
-            countQuery = "SELECT COUNT(*) FROM companies WHERE companies.phone_number IS NOT NULL", nativeQuery = true)
-    Page<Company> findRandomCompanies(Pageable pageable);
-
     Page<Company> findAllByIdIn(List<Long> ids, Pageable pageable);
 
-    @Query(value = "SELECT c.* FROM companies c WHERE NOT EXISTS " +
-            "(SELECT 1 FROM company_seen_company_ids csci JOIN company_seen cs ON csci.company_seen_id = cs.id " +
-            "WHERE csci.company_ids = c.id AND cs.user_id = :userId) AND c.phone_number IS NOT NULL",
-            countQuery = "SELECT COUNT(*) FROM companies c WHERE NOT EXISTS " +
-                    "(SELECT 1 FROM company_seen_company_ids csci JOIN company_seen cs ON csci.company_seen_id = cs.id " +
-                    "WHERE csci.company_ids = c.id AND cs.user_id = :userId) AND c.phone_number IS NOT NULL", nativeQuery = true)
-    Page<Company> findRandomSeenCompanies(@Param("userId") String userId, Pageable pageable);
-
+    // Specification
     Page<Company> findAll(Specification<Company> specification, Pageable pageable);
 
-    @Query(value = "SELECT c.* FROM companies c JOIN company_seen_company_ids csci ON c.id = csci.company_ids " +
-            "JOIN company_seen cs ON csci.company_seen_id = cs.id WHERE cs.user_id = :userId",
-            countQuery = "SELECT COUNT(c.id) FROM companies c JOIN company_seen_company_ids csci ON c.id = csci.company_ids " +
-                    "JOIN company_seen cs ON csci.company_seen_id = cs.id WHERE cs.user_id = :userId", nativeQuery = true)
-    Page<Company> findCompaniesSeenByUser(String userId, Pageable pageable);
+    @Query(value = "SELECT c.* FROM companies c " +
+            "WHERE c.phone_number IS NOT NULL AND NOT " +
+            "EXISTS (SELECT 1 FROM user_company_status ucs " +
+            "WHERE ucs.company_id = c.id AND ucs.user_id = :userId)",
+            nativeQuery = true)
+    Page<Company> findRandomUnseenCompanies(@Param("userId") String userId, Pageable pageable);
+
+    @Query(value = "SELECT c.* FROM companies c " +
+            "INNER JOIN user_company_status ucs ON c.id = ucs.company_id " +
+            "WHERE ucs.user_id = :userId", nativeQuery = true)
+    Page<Company> findCompaniesSeenByUser(@Param("userId") String userId, Pageable pageable);
 }

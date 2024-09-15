@@ -1,12 +1,11 @@
 package com.example.spring.specification;
 
 import com.example.spring.model.Company;
-import com.example.spring.model.CompanySeen;
-import com.example.spring.repository.CompanySeenRepository;
+import com.example.spring.model.UserCompanyStatus;
+import com.example.spring.repository.UserCompanyStatusRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CompanySpecification {
@@ -89,16 +88,15 @@ public class CompanySpecification {
         };
     }
 
-    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId, CompanySeenRepository companySeenRepository) {
+    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId, UserCompanyStatusRepository userCompanyStatusRepository) {
         return (root, query, builder) -> {
             if (!isCompanySeen || userId == null || userId.isEmpty()) {
                 return null;
             }
 
             // Fetch the CompanySeen object for the given userId
-            List<Long> seenCompanyIds = companySeenRepository.findByUserId(userId)
-                    .map(CompanySeen::getCompanyIds)
-                    .orElse(new ArrayList<>());
+            List<Long> seenCompanyIds = userCompanyStatusRepository.findByUserId(userId)
+                    .stream().map(UserCompanyStatus::getCompanyId).toList();
 
             // If the user has seen companies, exclude those from the results
             if (!seenCompanyIds.isEmpty()) {
