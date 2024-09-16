@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface CityRepository extends JpaRepository<City, Long> {
 
-    @Query("SELECT c FROM City c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("SELECT c FROM City c " +
+            "WHERE LOWER(c.name) " +
+            "LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "ORDER BY c.name " +
+            "ASC LIMIT 25")
     List<City> findByNameContainingIgnoreCase(String query);
 }

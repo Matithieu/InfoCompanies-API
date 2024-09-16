@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface IndustrySectorRepository extends JpaRepository<IndustrySector, Long> {
 
-    @Query("SELECT c FROM IndustrySector c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("SELECT c FROM IndustrySector c " +
+            "WHERE LOWER(c.name) " +
+            "LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "ORDER BY c.name " +
+            "ASC LIMIT 20")
     List<IndustrySector> findByNameContainingIgnoreCase(String query);
 }
