@@ -22,5 +22,6 @@ public class User {
     private String country;
     private TierUser tier;
     private boolean isVerified;
+    private boolean hasCompletedOnboarding;
 }
 

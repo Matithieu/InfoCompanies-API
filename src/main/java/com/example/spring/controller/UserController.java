@@ -23,6 +23,13 @@ public class UserController {
         return userResource.getUserById(userId);
     }
 
+    @PostMapping("/completeOnboarding")
+    public Response completeOnboarding() {
+        String userId = parseUserFromHeader();
+        userResource.completeOnboarding(userId);
+        return Response.ok().build();
+    }
+
     @PutMapping("/update-user")
     public Response updateUser(@RequestBody User user) {
         String id = parseUserFromHeader();

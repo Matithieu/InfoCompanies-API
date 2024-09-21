@@ -90,6 +90,7 @@ public class WebHookController {
             User user = userResource.getUserByEmail(customer.getEmail());
             user.setTier(tierUser);
             user.setVerified(true);
+            user.setHasCompletedOnboarding(false);
 
             roleResource.addRoleToUser(user.getId(), "verified");
             userResource.updateUser(user);

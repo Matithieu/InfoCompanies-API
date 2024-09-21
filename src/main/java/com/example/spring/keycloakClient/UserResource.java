@@ -95,6 +95,15 @@ public class UserResource {
         return Response.ok().build();
     }
 
+    public void completeOnboarding(String userId) {
+        User user = getUserById(userId);
+
+        if (!user.isHasCompletedOnboarding()) {
+            user.setHasCompletedOnboarding(true);
+            updateUser(user);
+        }
+    }
+
 	/*
     public String returnRegistrationEndpoint() {
         return keycloakUtil.returnRegistrationPage();
@@ -126,6 +135,7 @@ public class UserResource {
         user.setCountry(getAttributeValue(userRep.getAttributes(), "country"));
         user.setTier(getQuotaBasedOnTier(getAttributeValue(userRep.getAttributes(), "tier")));
         user.setVerified(convertStringToBoolean(getAttributeValue(userRep.getAttributes(), "isVerified")));
+        user.setHasCompletedOnboarding(convertStringToBoolean(getAttributeValue(userRep.getAttributes(), "hasCompletedOnboarding")));
         return user;
     }
 
@@ -144,6 +154,8 @@ public class UserResource {
         userRep.setAttributes(updateAttributes(userRep.getAttributes(), "country", user.getCountry()));
         userRep.setAttributes(updateAttributes(userRep.getAttributes(), "tier", String.valueOf(user.getTier())));
         userRep.setAttributes(updateAttributes(userRep.getAttributes(), "isVerified", convertBooleanToString(user.isVerified())));
+        userRep.setAttributes(updateAttributes(userRep.getAttributes(), "hasCompletedOnboarding", convertBooleanToString(user.isHasCompletedOnboarding())));
+
         userRep.setEnabled(true);
         userRep.setEmailVerified(true);
         List<CredentialRepresentation> creds = new ArrayList<>();
