@@ -53,9 +53,9 @@ public class UserQuotaUtil {
 
     public static int getRemainingSearchesBasedOnUserTier(User user) {
         return switch (user.getTier()) {
-            case FREE -> 20;
+            case FREE -> 15;
             case TIER1 -> 100;
-            case TIER2 -> 500;
+            case TIER2 -> 200;
             case ENTERPRISE -> 10_000;
             case UNLIMITED -> Integer.MAX_VALUE;
         };

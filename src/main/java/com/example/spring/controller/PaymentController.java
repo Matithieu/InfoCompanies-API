@@ -149,7 +149,7 @@ public class PaymentController {
                 return ResponseEntity.ok(session.getUrl());
 
             } else if (user != null && user.isVerified()) {
-                return ResponseEntity.ok("User is already verified");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("User is already verified");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
             }
