@@ -1,10 +1,12 @@
 package com.example.spring.model;
 
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -119,10 +121,15 @@ public class Company {
     private String phoneNumber;
     @Column(length = 3000)
     private String website;
-    @Column(length = 10000)
+
+    @Type(JsonBinaryType.class)
+    @Column(length = 100000, columnDefinition = "jsonb")
     private String reviews;
-    @Column(length = 100000)
+
+    @Type(JsonBinaryType.class)
+    @Column(length = 100000, columnDefinition = "jsonb")
     private String schedule;
+
     @Column(length = 10000)
     private String instagram;
     @Column(length = 3000)

@@ -40,6 +40,9 @@ dependencies {
     // GSON
     implementation 'com.google.code.gson:gson:2.11.0'
 
+    // Hibernate JSONB
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.8.2'
+
     // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
