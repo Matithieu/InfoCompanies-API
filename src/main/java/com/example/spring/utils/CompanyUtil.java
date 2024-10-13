@@ -1,6 +1,8 @@
 package com.example.spring.utils;
 
+import com.example.spring.DTO.CompanyWithStatusDTO;
 import com.example.spring.model.Company;
+import com.example.spring.model.UserCompanyStatus;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,5 +44,29 @@ public class CompanyUtil {
         if (jsonNode.hasNonNull(fieldName) && !jsonNode.get(fieldName).asText().isEmpty()) {
             setter.accept(jsonNode.get(fieldName).asText());
         }
+    }
+
+    public static Page<CompanyWithStatusDTO> fillPageCompanyWithStatusDto(Page<Company> companiesPage, List<UserCompanyStatus> userCompanyStatuses) {
+        // Fill the CompanyWithStatusDTO with the company and its status
+        Page<CompanyWithStatusDTO> companyWithStatusDTOS;
+
+        if (userCompanyStatuses.isEmpty()) {
+            companyWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
+                    .map(company -> new CompanyWithStatusDTO(company, null))
+                    .collect(Collectors.toList()), companiesPage.getPageable(), companiesPage.getTotalElements());
+        } else {
+            companyWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
+                    .map(company -> new CompanyWithStatusDTO(company, userCompanyStatuses.stream()
+                            .filter(userCompanyStatus -> userCompanyStatus.getCompanyId().equals(company.getId()))
+                            .findFirst()
+                            .orElse(null)))
+                    .collect(Collectors.toList()), companiesPage.getPageable(), companiesPage.getTotalElements());
+        }
+
+        return companyWithStatusDTOS;
+    }
+
+    public static CompanyWithStatusDTO fillCompanyWithStatusDto(Company company, UserCompanyStatus userCompanyStatus) {
+        return new CompanyWithStatusDTO(company, userCompanyStatus);
     }
 }

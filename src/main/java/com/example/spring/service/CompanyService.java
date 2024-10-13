@@ -3,7 +3,6 @@ package com.example.spring.service;
 import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
-import com.example.spring.repository.UserCompanyStatusRepository;
 import com.example.spring.specification.CompanySpecification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,15 +31,8 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @Autowired
-    private UserCompanyStatusRepository userCompanyStatusRepository;
-
     public Company getCompanyById(Long id) {
         return companyRepository.findCompanyById(id);
-    }
-
-    public Page<Company> getCompaniesByAListOfIds(List<Long> ids, Pageable pageable) {
-        return companyRepository.findAllByIdIn(ids, pageable);
     }
 
     public Page<Company> getCompaniesSeenByUser(String userId, Pageable pageable) {
@@ -63,7 +55,7 @@ public class CompanyService {
                 .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
                 .and(CompanySpecification.socialMediaNotNull(socials))
                 .and(CompanySpecification.contactInfoNotNull(contacts))
-                .and(CompanySpecification.notSeenByUser(isCompanySeen, userId, userCompanyStatusRepository));
+                .and(CompanySpecification.notSeenByUser(isCompanySeen, userId));
 
         return companyRepository.findAll(specification, pageable);
     }

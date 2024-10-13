@@ -10,8 +10,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
-
 public interface CompanyRepository extends JpaRepository<Company, Long>, JpaSpecificationExecutor<Company> {
 
     Company findCompanyById(Long id);
@@ -20,7 +18,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long>, JpaSpec
             "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT(:companyName, '%'))")
     Page<CompanyDetails> findCompanyDetailsByCompanyName(@Param("companyName") String companyName, Pageable pageable);
 
-    Page<Company> findAllByIdIn(List<Long> ids, Pageable pageable);
 
     // Specification
     Page<Company> findAll(Specification<Company> specification, Pageable pageable);

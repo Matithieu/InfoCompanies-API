@@ -1,8 +1,11 @@
 package com.example.spring.controller;
 
 import com.example.spring.DTO.CompanyDetails;
+import com.example.spring.DTO.CompanyWithStatusDTO;
 import com.example.spring.model.Company;
+import com.example.spring.model.UserCompanyStatus;
 import com.example.spring.service.CompanyService;
+import com.example.spring.service.UserCompanyStatusService;
 import com.example.spring.utils.CompanyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -24,31 +27,35 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
+    @Autowired
+    private UserCompanyStatusService userCompanyStatusService;
+
     // Example: http://localhost:8080/api/v1/company/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    public ResponseEntity<Company> getCompanyById(@PathVariable("id") Long id) {
+    public CompanyWithStatusDTO getCompanyById(@PathVariable("id") Long id) {
+        String userId = parseUserFromHeader();
         Company company = companyService.getCompanyById(id);
-        return new ResponseEntity<>(company, HttpStatus.OK);
-    }
+        UserCompanyStatus userCompanyStatus = userCompanyStatusService
+                .getUserCompanyStatusByUserIdAndCompanyId(userId, id);
 
-    // Example: http://localhost:8080/api/v1/company/get-by-ids?ids=1,2,3&page=0
-    // For the To-Do
-    @GetMapping("/get-by-ids")
-    public ResponseEntity<Page<Company>> getCompaniesByIds(@RequestParam List<Long> ids,
-                                                           @RequestParam(defaultValue = "0") int page,
-                                                           @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Company> result = companyService.getCompaniesByAListOfIds(ids, pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return CompanyUtil.fillCompanyWithStatusDto(company, userCompanyStatus);
     }
 
     // Example: http://localhost:8080/api/v1/company/get-seen-by-user?page=0
     @GetMapping("/get-seen-by-user")
-    public Page<Company> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
-                                                @RequestParam(defaultValue = "10") int size) {
+    public Page<CompanyWithStatusDTO> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
+                                                             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserFromHeader();
-        return companyService.getCompaniesSeenByUser(userId, pageable);
+        Page<Company> companies = companyService.getCompaniesSeenByUser(userId, pageable);
+
+        List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
+                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                        .stream()
+                        .map(Company::getId)
+                        .toList());
+
+        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
@@ -62,7 +69,7 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
     @GetMapping("/filter-by-parameters")
-    public Page<Company> getCompaniesByFilters(
+    public Page<CompanyWithStatusDTO> getCompaniesByFilters(
             @RequestParam(required = false) List<String> regions,
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
@@ -75,27 +82,34 @@ public class CompanyController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        // Cache and retrieve the total count
-        long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts);
-
         String userId = parseUserFromHeader();
         Pageable pageable = PageRequest.of(page, size);
-        Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
+        Page<Company> companies = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
                 comparator, numberOfEmployee, socials, contacts, isCompanySeen, userId, pageable);
 
-        // Optionally set total elements manually (though Page already manages it)
-        return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
+        List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
+                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                        .stream()
+                        .map(Company::getId)
+                        .toList());
+
+        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
     @GetMapping("/random-unseen")
-    public ResponseEntity<Page<Company>> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
-                                                                  @RequestParam(defaultValue = "10") int size) {
+    public Page<CompanyWithStatusDTO> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserFromHeader();
-        Page<Company> result = companyService.findRandomUnseenCompanies(userId, pageable);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        Page<Company> companies = companyService.findRandomUnseenCompanies(userId, pageable);
+        List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
+                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                        .stream()
+                        .map(Company::getId)
+                        .toList());
+
+        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Make a request to the scrap API

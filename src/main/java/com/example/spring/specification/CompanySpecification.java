@@ -2,8 +2,7 @@ package com.example.spring.specification;
 
 import com.example.spring.model.Company;
 import com.example.spring.model.UserCompanyStatus;
-import com.example.spring.repository.UserCompanyStatusRepository;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -88,23 +87,20 @@ public class CompanySpecification {
         };
     }
 
-    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId, UserCompanyStatusRepository userCompanyStatusRepository) {
+    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId) {
         return (root, query, builder) -> {
             if (!isCompanySeen || userId == null || userId.isEmpty()) {
                 return null;
             }
 
-            // Fetch the CompanySeen object for the given userId
-            List<Long> seenCompanyIds = userCompanyStatusRepository.findByUserId(userId)
-                    .stream().map(UserCompanyStatus::getCompanyId).toList();
+            // Create subquery to select company IDs that have been seen by the user
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<UserCompanyStatus> userCompanyStatusRoot = subquery.from(UserCompanyStatus.class);
+            subquery.select(userCompanyStatusRoot.get("companyId"))
+                    .where(builder.equal(userCompanyStatusRoot.get("userId"), userId));
 
-            // If the user has seen companies, exclude those from the results
-            if (!seenCompanyIds.isEmpty()) {
-                return builder.not(root.get("id").in(seenCompanyIds));
-            }
-
-            // If the user hasn't seen any companies, return null (no exclusion needed)
-            return null;
+            // Return companies not in the subquery result (i.e., companies not seen by the user)
+            return builder.not(root.get("id").in(subquery));
         };
     }
 }

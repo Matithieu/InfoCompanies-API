@@ -2,11 +2,8 @@ package com.example.spring.service;
 
 import com.example.spring.enums.Status;
 import com.example.spring.model.UserCompanyStatus;
-import com.example.spring.model.UserCompanyStatusId;
 import com.example.spring.repository.UserCompanyStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,25 +14,40 @@ public class UserCompanyStatusService {
     @Autowired
     private UserCompanyStatusRepository userCompanyStatusRepository;
 
-    @Cacheable(value = "statuses", key = "#userId")
-    public List<UserCompanyStatus> getCompaniesStatusesForUser(String userId) {
-        return userCompanyStatusRepository.findByUserId(userId);
+    public UserCompanyStatus getUserCompanyStatusByUserIdAndCompanyId(String userId, Long companyId) {
+        return userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
     }
 
-    @CacheEvict(value = "statuses", key = "#userId")
+    public List<UserCompanyStatus> getAllUserCompanyStatusByUserIdAndCompanyId(String userId, List<Long> companyId) {
+        return userCompanyStatusRepository.findByUserIdAndCompanyIdIn(userId, companyId);
+    }
+
+    //@CacheEvict(value = "statuses", key = "#userId")
     public void updateCompanyStatus(String userId, Long companyId, Status status) {
-        UserCompanyStatusId id = new UserCompanyStatusId(userId, companyId);
+        UserCompanyStatus uc = userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
 
-        UserCompanyStatus ucs = userCompanyStatusRepository.findById(id).orElse(new UserCompanyStatus());
-        ucs.setUserId(userId);
-        ucs.setCompanyId(companyId);
+        if (uc == null) {
+            if (status == Status.NOT_DONE) {
+                return;
+            }
 
-        if (status == Status.NOT_DONE) {
-            userCompanyStatusRepository.delete(ucs);
+            UserCompanyStatus userCompanyStatus = UserCompanyStatus.builder()
+                    .userId(userId)
+                    .status(status)
+                    .companyId(companyId)
+                    .build();
+            userCompanyStatusRepository.save(userCompanyStatus);
             return;
         }
 
-        ucs.setStatus(status); // Set the status here
-        userCompanyStatusRepository.save(ucs);
+        if (uc.getCompanyId().equals(companyId)) {
+            if (status == Status.NOT_DONE) {
+                userCompanyStatusRepository.delete(uc);
+                return;
+            }
+
+            uc.setStatus(status);
+            userCompanyStatusRepository.save(uc);
+        }
     }
 }
