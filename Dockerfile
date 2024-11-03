@@ -5,7 +5,7 @@ FROM gradle:jdk21 AS build
 WORKDIR /home/gradle/src
 
 # Copy only the necessary files to the container to minimize cache invalidation
-COPY InfoCompanies-API /home/gradle/src
+COPY . /home/gradle/src
 
 # Build the project without the Gradle daemon to avoid cache issues
 RUN gradle clean build --no-daemon

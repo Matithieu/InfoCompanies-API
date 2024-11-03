@@ -1,9 +1,7 @@
 package com.example.spring.controller;
 
 import com.example.spring.DTO.User;
-import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
-import com.example.spring.service.UserQuotaService;
 import com.example.spring.utils.CustomerUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -30,17 +28,11 @@ import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/v1/stripe")
+@RequestMapping("/api/v1/stripe")
 public class PaymentController {
 
     @Autowired
     private UserResource userResource;
-
-    @Autowired
-    RoleResource roleResource;
-
-    @Autowired
-    UserQuotaService userQuotaService;
 
     @Value("${STRIPE_API_KEY}")
     private String STRIPE_API_KEY;

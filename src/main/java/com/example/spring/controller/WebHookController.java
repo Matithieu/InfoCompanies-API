@@ -21,7 +21,7 @@ import static com.example.spring.utils.UserQuotaUtil.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/v1/stripe")
+@RequestMapping("/api/v1/stripe")
 public class WebHookController {
 
     @Autowired

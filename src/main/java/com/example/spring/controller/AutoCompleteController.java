@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/autocomplete")
+@RequestMapping("/api/v1/autocomplete")
 public class AutoCompleteController {
 
     @Autowired

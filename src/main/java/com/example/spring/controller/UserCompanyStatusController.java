@@ -11,7 +11,7 @@ import java.util.Map;
 import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
 
 @RestController
-@RequestMapping("/v1/companies-status")
+@RequestMapping("/api/v1/companies-status")
 public class UserCompanyStatusController {
 
     @Autowired

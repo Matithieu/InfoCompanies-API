@@ -15,21 +15,21 @@ public class HeadersUtil {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;
         HttpServletRequest request = sra.getRequest();
-        return request.getHeader("X-Email");
+        return request.getHeader("X-Auth-Request-Email");
     }
 
     public static String parseUserFromHeader() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;
         HttpServletRequest request = sra.getRequest();
-        return request.getHeader("X-User");
+        return request.getHeader("X-Auth-Request-User");
     }
 
     public static String parseTokenFromHeader() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;
         HttpServletRequest request = sra.getRequest();
-        return request.getHeader("X-Access-Token");
+        return request.getHeader("X-Auth-Request-Access-Token");
     }
 
     // Function to display all headers
