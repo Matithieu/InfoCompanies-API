@@ -25,7 +25,7 @@ COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
 #RUN keytool -importcert -file /app/config/cert1.pem -alias myalias -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
 
 # Expose the application's port
-EXPOSE 8080
+EXPOSE 8083
 
 # Set JVM options to handle memory issues
 ENV JAVA_OPTS="-Xms1g -Xmx4g"
