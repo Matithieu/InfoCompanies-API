@@ -11,10 +11,10 @@ public class KeycloakSecurityUtil {
 
     Keycloak keycloak;
 
-    @Value("${server-url}")
+    @Value("${KEYCLOAK_URL}")
     private String serverUrl;
 
-    @Value("${realm}")
+    @Value("${KEYCLOAK_REALM}")
     private String realm;
 
     @Value("${client-id}")
@@ -23,21 +23,11 @@ public class KeycloakSecurityUtil {
     @Value("${grant-type}")
     private String grantType;
 
-    @Value("${name}")
+    @Value("${KEYCLOAK_ADMIN_CLI}")
     private String username;
 
-    @Value("${password}")
+    @Value("${KEYCLOAK_ADMIN_CLI_PASSWORD}")
     private String password;
-
-    @Value("${REDIRECT_URI}")
-    private String redirectUri;
-
-    @Value("${REGISTER_CLIENT_ID}")
-    private String registerClientId;
-
-    @Value("${FULL_DOMAIN}")
-    private String fullDomain;
-
 
     public Keycloak getKeycloakInstance() {
         if (keycloak == null) {
@@ -52,16 +42,4 @@ public class KeycloakSecurityUtil {
         }
         return keycloak;
     }
-
-	/*
-	public String returnRegistrationPage() {
-        return String.format(
-				"%s/auth/realms/%s/protocol/openid-connect/registrations?client_id=%s&response_type=code&scope=openid&redirect_uri=%s",
-				fullDomain,
-				realm,
-				registerClientId,
-				redirectUri
-		);
-	}
-	 */
 }

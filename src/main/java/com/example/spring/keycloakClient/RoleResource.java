@@ -1,19 +1,19 @@
 package com.example.spring.keycloakClient;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.example.spring.DTO.Role;
 import com.example.spring.utils.KeycloakSecurityUtil;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.ws.rs.core.Response;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @RestController
 public class RoleResource {
@@ -21,7 +21,7 @@ public class RoleResource {
 	@Autowired
 	KeycloakSecurityUtil keycloakUtil;
 	
-	@Value("${realm}")
+	@Value("${KEYCLOAK_REALM}")
 	private String realm;
 	
 	public List<Role> getRoles() {

@@ -3,7 +3,6 @@ package com.example.spring.keycloakClient;
 import com.example.spring.DTO.Role;
 import com.example.spring.DTO.TierUser;
 import com.example.spring.DTO.User;
-import com.example.spring.service.UserQuotaService;
 import com.example.spring.utils.KeycloakSecurityUtil;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
@@ -26,10 +25,7 @@ public class UserResource {
     @Autowired
     KeycloakSecurityUtil keycloakUtil;
 
-    @Autowired
-    UserQuotaService userQuotaService;
-
-    @Value("${realm}")
+    @Value("${KEYCLOAK_REALM}")
     private String realm;
 
     public List<User> getUsers() {
