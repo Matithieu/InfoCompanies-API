@@ -19,14 +19,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        //.requestMatchers(HttpMethod.GET, "api/v1/company/test").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/company/landing-filter").permitAll()
-                        .requestMatchers("/v1/company/**").hasRole("verified")
-                        .requestMatchers("/v1/company-seen/**").hasRole("verified")
-                        .requestMatchers(HttpMethod.POST, "/v1/stripe/webhook").permitAll()
+                        // Landing page
+                        .requestMatchers(HttpMethod.GET, "/api/v1/company/landing-filter").permitAll()
+                        // Company
+                        .requestMatchers("/api/v1/company/**").hasRole("verified")
+                        .requestMatchers("/api/v1/companies-status/**").hasRole("verified")
+                        // Stripe
+                        .requestMatchers(HttpMethod.POST, "/api/v1/stripe/webhook").permitAll()
                         // AutoComplete
-                        .requestMatchers(HttpMethod.GET, "/v1/autocomplete/industry-sector").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/autocomplete/city").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/autocomplete/industry-sector").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/autocomplete/city").permitAll()
                         .anyRequest().permitAll())
 
                 .cors(Customizer.withDefaults())
