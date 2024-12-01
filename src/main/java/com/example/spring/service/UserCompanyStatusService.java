@@ -14,11 +14,11 @@ public class UserCompanyStatusService {
     @Autowired
     private UserCompanyStatusRepository userCompanyStatusRepository;
 
-    public UserCompanyStatus getUserCompanyStatusByUserIdAndCompanyId(String userId, Long companyId) {
+    public UserCompanyStatus getOneUserCompanyStatusByUserIdAndCompanyId(String userId, Long companyId) {
         return userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
     }
 
-    public List<UserCompanyStatus> getAllUserCompanyStatusByUserIdAndCompanyId(String userId, List<Long> companyId) {
+    public List<UserCompanyStatus> getMultipleUserCompanyStatusByUserIdAndCompanyIds(String userId, List<Long> companyId) {
         return userCompanyStatusRepository.findByUserIdAndCompanyIdIn(userId, companyId);
     }
 

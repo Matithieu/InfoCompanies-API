@@ -36,7 +36,7 @@ public class CompanyController {
         String userId = parseUserFromHeader();
         Company company = companyService.getCompanyById(id);
         UserCompanyStatus userCompanyStatus = userCompanyStatusService
-                .getUserCompanyStatusByUserIdAndCompanyId(userId, id);
+                .getOneUserCompanyStatusByUserIdAndCompanyId(userId, id);
 
         return CompanyUtil.fillCompanyWithStatusDto(company, userCompanyStatus);
     }
@@ -50,7 +50,7 @@ public class CompanyController {
         Page<Company> companies = companyService.getCompaniesSeenByUser(userId, pageable);
 
         List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
-                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                .getMultipleUserCompanyStatusByUserIdAndCompanyIds(userId, companies.getContent()
                         .stream()
                         .map(Company::getId)
                         .toList());
@@ -88,7 +88,7 @@ public class CompanyController {
                 comparator, numberOfEmployee, socials, contacts, isCompanySeen, userId, pageable);
 
         List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
-                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                .getMultipleUserCompanyStatusByUserIdAndCompanyIds(userId, companies.getContent()
                         .stream()
                         .map(Company::getId)
                         .toList());
@@ -104,7 +104,7 @@ public class CompanyController {
         String userId = parseUserFromHeader();
         Page<Company> companies = companyService.findRandomUnseenCompanies(userId, pageable);
         List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
-                .getAllUserCompanyStatusByUserIdAndCompanyId(userId, companies.getContent()
+                .getMultipleUserCompanyStatusByUserIdAndCompanyIds(userId, companies.getContent()
                         .stream()
                         .map(Company::getId)
                         .toList());
