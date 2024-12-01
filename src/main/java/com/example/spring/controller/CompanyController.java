@@ -154,21 +154,24 @@ public class CompanyController {
             @RequestParam(required = false) List<String> industrySectors,
             @RequestParam(required = false) List<String> legalForms,
             @RequestParam(required = false) String comparator,
-            @RequestParam(required = false) Integer numberOfEmployee,
-            @RequestParam(required = false) List<String> socials,
-            @RequestParam(required = false) List<String> contacts
+            @RequestParam(required = false) Integer numberOfEmployee
     ) {
 
+        List<String> contacts = List.of("phone", "website");
+        List<String> socials = List.of("facebook");
         Pageable pageable = PageRequest.of(0, 10);
-        // Cache and retrieve the total count
-        long totalCompanies = companyService.countCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts);
 
-        String userId = "";
         Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts, false, userId, pageable);
+                comparator, numberOfEmployee, socials, contacts, false, "", pageable);
+
+        if (companiesPage.getTotalElements() < 7) {
+            contacts = List.of();
+            socials = List.of();
+            companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
+                    comparator, numberOfEmployee, socials, contacts, true, "", pageable);
+        }
 
         companiesPage = CompanyUtil.obstructCompanies(companiesPage);
-        return new PageImpl<>(companiesPage.getContent(), pageable, totalCompanies);
+        return new PageImpl<>(companiesPage.getContent(), pageable, 10);
     }
 }
