@@ -3,6 +3,7 @@ package com.example.spring.controller;
 import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.utils.CustomerUtil;
+import com.example.spring.utils.LogUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -19,10 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.Objects;
 
 import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
-import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 // https://kinsta.com/blog/stripe-java-api/
 
@@ -50,15 +52,13 @@ public class PaymentController {
         String clientBaseURL = "https://" + HOSTNAME + "/ui";
         String priceId = request.getHeader("X-priceId");
         String email = parseEmailFromHeader();
-        String userId = parseUserFromHeader();
-        //System.out.println("Headers: " + getAllHeaders());
+        String userId = parseUserIdFromHeader();
 
         // Find the user record from the database
         User user = userResource.getUserById(userId);
 
         try {
             if (user != null && !user.isVerified()) {
-                System.out.println("User trying to subscribe: " + user.getEmail());
                 Customer customer = CustomerUtil.findOrCreateCustomer(user);
 
                 // Next, create a checkout session by adding the details of the checkout
@@ -137,6 +137,11 @@ public class PaymentController {
                         .build();
 
                 Session session = Session.create(paramsBuilder.build());
+
+                LogUtil.info("User subscribed: ", Map.of(
+                        "userId", user.getId(),
+                        "priceId", priceId
+                ));
 
                 return ResponseEntity.ok(session.getUrl());
 

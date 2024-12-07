@@ -8,12 +8,11 @@ import com.stripe.net.RequestOptions;
 import com.stripe.param.CustomerCreateParams;
 import com.stripe.param.CustomerSearchParams;
 
-import java.util.concurrent.Semaphore;
+import java.util.Map;
 
 public class CustomerUtil {
-    private static final Semaphore mutex = new Semaphore(1);
 
-    public static Customer retrieveCustomer(String customerId) throws StripeException {
+    public static Customer retrieveCustomerById(String customerId) throws StripeException {
         return Customer.retrieve(customerId);
     }
 
@@ -30,7 +29,6 @@ public class CustomerUtil {
     }
 
     public static Customer findOrCreateCustomer(User user) throws Exception {
-        mutex.acquire();
         try {
             CustomerSearchParams params =
                     CustomerSearchParams
@@ -63,17 +61,18 @@ public class CustomerUtil {
                         .setIdempotencyKey(user.getId())
                         .build();
 
-                // Sometimes, to debug remove the idempotency key
+                // To debug remove the idempotency key if set
                 customer = Customer.create(customerCreateParams, requestOptions);
-                System.out.println("Customer created: " + customer.getId());
+                LogUtil.info("Customer created: ", Map.of(
+                        "customer_id", customer.getId(),
+                        "user_id", user.getId()
+                ));
             } else {
                 customer = result.getData().get(0);
             }
             return customer;
         } catch (StripeException e) {
             throw new Exception("Error during the creation or the retrieve of the stripe account ", e);
-        } finally {
-            mutex.release();
         }
     }
 }

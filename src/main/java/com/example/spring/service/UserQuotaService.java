@@ -4,6 +4,7 @@ import com.example.spring.model.Config;
 import com.example.spring.model.UserQuota;
 import com.example.spring.repository.ConfigRepository;
 import com.example.spring.repository.UserQuotaRepository;
+import com.example.spring.utils.LogUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.PostConstruct;
@@ -20,14 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @EnableScheduling
 @Service
 public class UserQuotaService {
-
-    private static final Logger LOGGER = Logger.getLogger(UserQuotaService.class.getName());
 
     @Autowired
     ConfigRepository configRepository;
@@ -41,7 +38,9 @@ public class UserQuotaService {
     private final Lock writeLock;
 
     @Autowired
-    public UserQuotaService() {
+    public UserQuotaService(ConfigRepository configRepository, UserQuotaRepository userQuotaRepository) {
+        this.configRepository = configRepository;
+        this.userQuotaRepository = userQuotaRepository;
         long cacheExpireAfterWrite = 30;
         long cacheMaximumSize = 1000;
         this.quotaCache = Caffeine.newBuilder()
@@ -87,20 +86,23 @@ public class UserQuotaService {
 
     @Scheduled(fixedRate = 1000 * 60 * 3) // Every 3 minutes
     public void flushQuotas() {
-        LOGGER.info("Scheduled task running...");
+        double loggingScale = 0.2;
         writeLock.lock();
         try {
             if (!dirtyQuotas.isEmpty()) {
-                LOGGER.info("Flushing quotas...");
+                if (LogUtil.shouldLog(loggingScale)) { // Log at 20% scale
+                    LogUtil.info("Flushing quotas...", Map.of());
+                }
                 userQuotaRepository.saveAll(dirtyQuotas.values());
                 dirtyQuotas.clear();
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to flush quotas", e);
+            LogUtil.error("Failed to flush quotas:", e);
         } finally {
             writeLock.unlock();
         }
     }
+
 
     @Scheduled(cron = "0 0 0 * * *") // Reset every day at midnight
     public void resetMonthlyQuotas() {
@@ -111,7 +113,10 @@ public class UserQuotaService {
         LocalDate now = LocalDate.now(ZoneId.systemDefault());
         LocalDate lastResetDate = configRepository.findTopByOrderByIdDesc().get().getLastResetQuotaDate();
         Iterable<UserQuota> allQuotas = userQuotaRepository.findAll();
-        LOGGER.info("Resetting all quotas. Last reset date: " + lastResetDate);
+        LogUtil.info("Resetting all quotas. Last reset date: ", Map.of(
+                "last_reset_date", lastResetDate
+        ));
+
         writeLock.lock();
         try {
             // Check if it has already been this day
@@ -131,7 +136,7 @@ public class UserQuotaService {
 
     @PreDestroy
     public void onShutdown() {
-        LOGGER.info("Shutting down, flushing quotas...");
+        LogUtil.info("Shutting down, flushing quotas.", Map.of());
         flushQuotas();
     }
 

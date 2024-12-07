@@ -5,6 +5,7 @@ import com.example.spring.DTO.User;
 import com.example.spring.keycloakClient.RoleResource;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.service.UserQuotaService;
+import com.example.spring.utils.LogUtil;
 import com.google.gson.JsonSyntaxException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -16,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.spring.utils.CustomerUtil.retrieveCustomer;
+import java.util.Map;
+
+import static com.example.spring.utils.CustomerUtil.retrieveCustomerById;
 import static com.example.spring.utils.UserQuotaUtil.*;
 
 @RestController
@@ -43,10 +46,10 @@ public class WebHookController {
         try {
             event = Webhook.constructEvent(payload, sigHeader, STRIPE_WEBHOOK_SECRET);
         } catch (JsonSyntaxException e) {
-            System.out.println("⚠️  Webhook error while parsing basic request: " + e.getMessage());
+            LogUtil.warn("⚠️ Webhook error while parsing basic request: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payload");
         } catch (SignatureVerificationException e) {
-            System.out.println("⚠️  Webhook error: invalid signature: " + e.getMessage());
+            LogUtil.warn("⚠️ Webhook error: invalid signature: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
 
@@ -64,14 +67,16 @@ public class WebHookController {
                 handleSubscriptionDeleted(event);
                 break;
             default:
-                System.out.println("Unhandled event type: " + event.getType());
+                LogUtil.warn("Unhandled event type: " + event.getType());
         }
 
         return ResponseEntity.ok("Received");
     }
 
     private void handleChargeSucceeded(Event event) {
-        System.out.println("Charge succeeded: " + event);
+        LogUtil.info("Charge succeeded: ", Map.of(
+                "event_id", event.getId()
+        ));
     }
 
     private void handleSubscriptionCreated(Event event) throws StripeException {
@@ -80,13 +85,17 @@ public class WebHookController {
         if (dataObjectDeserializer.getObject().isPresent()) {
             stripeObject = dataObjectDeserializer.getObject().get();
             Subscription subscription = (Subscription) stripeObject;
-            System.out.println("Subscription created: " + subscription.getCustomer());
+
+            LogUtil.info("Subscription created: ", Map.of(
+                    "subscription_id", subscription.getId(),
+                    "customer_id", subscription.getCustomer()
+            ));
 
             String stripePlanId = subscription.getItems().getData().getFirst().getPlan().getId();
             String tier = getTierBasedOnPriceId(stripePlanId);
             TierUser tierUser = getQuotaBasedOnTier(tier);
 
-            Customer customer = retrieveCustomer(subscription.getCustomer());
+            Customer customer = retrieveCustomerById(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
             user.setTier(tierUser);
             user.setVerified(true);
@@ -96,15 +105,20 @@ public class WebHookController {
             userResource.updateUser(user);
             userQuotaService.createQuotaForUser(user.getId(), getRemainingSearchesBasedOnUserTier(user));
         } else {
-            System.out.println("Failed to get subscription object");
+            LogUtil.warn("Sub Created: Failed to get subscription object for event: " + event.getId());
         }
     }
 
     private void handleSubscriptionUpdated(Event event) throws StripeException {
         Subscription subscription = (Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
         if (subscription != null) {
-            System.out.println("Subscription updated: " + subscription.getCustomer());
-            Customer customer = retrieveCustomer(subscription.getCustomer());
+            LogUtil.info("Sub Updated: ", Map.of(
+                    "subscription_id", subscription.getId(),
+                    "customer_id", subscription.getCustomer(),
+                    "status", subscription.getStatus()
+            ));
+
+            Customer customer = retrieveCustomerById(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
 
             switch (subscription.getStatus()) {
@@ -123,25 +137,29 @@ public class WebHookController {
                     break;
                 case null:
                 default:
-                    System.out.println("Unhandled event type: " + event.getType());
+                    LogUtil.warn("Sub Updated: Unhandled event type: " + event.getType());
                     break;
             }
         } else {
-            System.out.println("Failed to get subscription object");
+            LogUtil.warn("Sub Updated: Failed to get subscription object for event: " + event.getId());
         }
     }
 
     public void handleSubscriptionDeleted(Event event) throws StripeException {
         Subscription subscription = (Subscription) event.getDataObjectDeserializer().getObject().orElse(null);
         if (subscription != null) {
-            System.out.println("Subscription deleted: " + subscription.getCustomer());
-            Customer customer = retrieveCustomer(subscription.getCustomer());
+            LogUtil.info("Subscription deleted: ", Map.of(
+                    "subscription_id", subscription.getId(),
+                    "customer_id", subscription.getCustomer()
+            ));
+
+            Customer customer = retrieveCustomerById(subscription.getCustomer());
             User user = userResource.getUserByEmail(customer.getEmail());
             roleResource.removeRoleFromUser(user.getId(), "verified");
             user.setVerified(false);
             userResource.updateUser(user);
         } else {
-            System.out.println("Failed to get subscription object");
+            LogUtil.warn("Sub Deleted: Failed to get subscription object");
         }
     }
 }
