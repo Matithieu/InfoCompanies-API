@@ -6,7 +6,7 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @CrossOrigin
 @RestController
@@ -19,20 +19,20 @@ public class UserController {
 
     @GetMapping("/user")
     public User getUser() {
-        String userId = parseUserFromHeader();
+        String userId = parseUserIdFromHeader();
         return userResource.getUserById(userId);
     }
 
     @PostMapping("/completeOnboarding")
     public Response completeOnboarding() {
-        String userId = parseUserFromHeader();
+        String userId = parseUserIdFromHeader();
         userResource.completeOnboarding(userId);
         return Response.ok().build();
     }
 
     @PutMapping("/update-user")
     public Response updateUser(@RequestBody User user) {
-        String id = parseUserFromHeader();
+        String id = parseUserIdFromHeader();
         User existingUser = userResource.getUserById(id);
 
         if (existingUser != null) {

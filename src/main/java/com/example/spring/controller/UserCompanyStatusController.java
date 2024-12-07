@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @RestController
 @RequestMapping("/api/v1/companies-status")
@@ -21,7 +21,7 @@ public class UserCompanyStatusController {
     public ResponseEntity<?> updateStatus(@PathVariable Long companyId,
                                           @RequestBody Map<String, String> body) {
 
-        String userId = parseUserFromHeader();
+        String userId = parseUserIdFromHeader();
         String statusValue = body.get("status");
         Status status = Status.valueOf(statusValue);
 

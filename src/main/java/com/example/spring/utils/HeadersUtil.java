@@ -18,7 +18,7 @@ public class HeadersUtil {
         return request.getHeader("X-Auth-Request-Email");
     }
 
-    public static String parseUserFromHeader() {
+    public static String parseUserIdFromHeader() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;
         HttpServletRequest request = sra.getRequest();
@@ -32,7 +32,6 @@ public class HeadersUtil {
         return request.getHeader("X-Auth-Request-Access-Token");
     }
 
-    // Function to display all headers
     public static Map<String, String> getAllHeaders() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;

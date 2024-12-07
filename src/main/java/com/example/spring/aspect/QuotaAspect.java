@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import static com.example.spring.utils.HeadersUtil.parseUserFromHeader;
+import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @Aspect
 @Component
@@ -27,7 +27,6 @@ public class QuotaAspect {
     // Pointcut that matches the excluded methods
     @Pointcut("execution(* com.example.spring.controller.CompanyController.searchCompaniesByName(..)) || " +
             "execution(* com.example.spring.controller.CompanyController.scrapCompany(..)) || " +
-            "execution(* com.example.spring.controller.CompanyController.getCompaniesByIds(..)) || " +
             "execution(* com.example.spring.controller.CompanyController.getCompaniesOnLandingByFilters(..))")
     public void excludedMethods() {}
 
@@ -37,7 +36,7 @@ public class QuotaAspect {
 
     @Around("allMethodsExceptExcluded()")
     public Object checkQuota(ProceedingJoinPoint joinPoint) throws Throwable {
-        String userId = parseUserFromHeader();
+        String userId = parseUserIdFromHeader();
 
         UserQuota userQuota = userQuotaService.getQuotaForUser(userId);
 
