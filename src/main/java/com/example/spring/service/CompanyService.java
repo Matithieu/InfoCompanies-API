@@ -4,8 +4,10 @@ import com.example.spring.DTO.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
 import com.example.spring.specification.CompanySpecification;
+import com.example.spring.utils.LogUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -80,6 +82,7 @@ public class CompanyService {
         return companyRepository.findRandomUnseenCompanies(userId, pageable);
     }
 
+    @RateLimiter(name = "scrapService")
     public Company scrapCompany(Company company) {
         try {
             HttpResponse<String> response;
@@ -120,6 +123,7 @@ public class CompanyService {
             return companyScrapped;
 
         } catch (Exception e) {
+            LogUtil.error("Failed to scrap company information: ", e);
             throw new RuntimeException("Failed to scrap company information: ", e);
         }
     }

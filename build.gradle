@@ -34,6 +34,9 @@ dependencies {
     implementation 'org.keycloak:keycloak-policy-enforcer:25.0.6'
     implementation 'org.keycloak:keycloak-admin-client:25.0.6'
 
+    // resilience4j
+    implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.0'
+
     // Stripe
     implementation 'com.stripe:stripe-java:25.13.0'
 
