@@ -13,6 +13,9 @@ RUN gradle clean build --no-daemon
 # Final Stage: Create a minimal Docker image with just the JAR file
 FROM openjdk:21-jdk-slim
 
+# Install curl for debugging purposes
+RUN apt update && apt install -y curl
+
 # Set the working directory inside the container
 WORKDIR /app
 
