@@ -30,7 +30,7 @@ import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/v1/stripe")
+@RequestMapping("/v1/stripe")
 public class PaymentController {
 
     @Autowired

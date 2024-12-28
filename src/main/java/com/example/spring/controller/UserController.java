@@ -10,7 +10,7 @@ import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/v1/")
 
 public class UserController {
 

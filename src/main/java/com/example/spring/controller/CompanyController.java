@@ -21,7 +21,7 @@ import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/v1/company")
+@RequestMapping("/v1/company")
 public class CompanyController {
 
     @Autowired
