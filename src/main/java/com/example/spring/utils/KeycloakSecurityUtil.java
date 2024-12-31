@@ -17,7 +17,7 @@ public class KeycloakSecurityUtil {
     @Value("${KEYCLOAK_REALM}")
     private String realm;
 
-    @Value("${client-id}")
+    @Value("${KEYCLOAK_ADMIN_CLI_REALM}")
     private String clientId;
 
     @Value("${grant-type}")
