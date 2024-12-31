@@ -26,8 +26,8 @@ public class LeaderController {
     }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-siren?siren=exemple
-    @GetMapping("/get-by-siren")
-    public List<Leader> getLeaderBySiren(@RequestParam("siren") String siren) {
+    @GetMapping("/get-by-siren/{siren}")
+    public List<Leader> getLeaderBySiren(@PathVariable("siren") String siren) {
         return leaderService.getLeadersBySirens(siren);
     }
 
