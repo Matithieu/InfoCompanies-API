@@ -3,9 +3,11 @@ package com.example.spring.controller;
 import com.example.spring.model.AutoComplete.City;
 import com.example.spring.model.AutoComplete.IndustrySector;
 import com.example.spring.model.AutoComplete.LegalForm;
+import com.example.spring.model.AutoComplete.Region;
 import com.example.spring.service.AutoComplete.CityService;
 import com.example.spring.service.AutoComplete.IndustrySectorService;
 import com.example.spring.service.AutoComplete.LegalFormService;
+import com.example.spring.service.AutoComplete.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,9 @@ public class AutoCompleteController {
     @Autowired
     private LegalFormService legalFormService;
 
+    @Autowired
+    private RegionService regionService;
+
     // Example: http://localhost:8080/api/v1/autocomplete/city?query=New
     @GetMapping("/city")
     public List<City> autocompleteCity(@RequestParam String query) {
@@ -43,5 +48,11 @@ public class AutoCompleteController {
     @GetMapping("/legal-form")
     public List<LegalForm> autocompleteLegalForm(@RequestParam String query) {
         return legalFormService.searchLegalForm(query);
+    }
+
+    // Example: http://localhost:8080/api/v1/autocomplete/region?query=New
+    @GetMapping("/region")
+    public List<Region> autocompleteRegion(@RequestParam String query) {
+        return regionService.searchRegions(query);
     }
 }
