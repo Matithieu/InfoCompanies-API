@@ -28,10 +28,14 @@ public class Company {
     private String legalForm;
     @Column(name = "ape_code")
     private String apeCode;
+    private String apeLabel;
     private String address;
     private String postalCode;
+    private String departmentNumber;
+    private String department;
     private String city;
     private String region;
+    private String tradeName;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate registrationDate;
