@@ -1,6 +1,6 @@
 package com.example.spring.controller;
 
-import com.example.spring.DTO.User;
+import com.example.spring.dto.User;
 import com.example.spring.keycloakClient.UserResource;
 import com.example.spring.utils.CustomerUtil;
 import com.example.spring.utils.LogUtil;

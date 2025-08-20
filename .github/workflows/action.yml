@@ -1,0 +1,33 @@
+name: Build Java App
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXUS_DOCKER_URL: ${{ secrets.NEXUS_DOCKER_URL }}
+      NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+      NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+      DOCKER_API_NAME: 'infocompanies-api'
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Build and push API image
+        run: |
+          DOCKER_TAG=$(date +%Y%m%d%H%M%S)
+
+          IMAGE="${NEXUS_DOCKER_URL}/${DOCKER_API_NAME}-${{ inputs.environment }}:${DOCKER_TAG}"
+          docker build -f Dockerfile -t $IMAGE .
+
+          echo "${NEXUS_PASSWORD}" | docker login "${NEXUS_DOCKER_URL}" -u "${NEXUS_USERNAME}" --password-stdin
+          docker push $IMAGE
+          docker logout "${NEXUS_DOCKER_URL}"

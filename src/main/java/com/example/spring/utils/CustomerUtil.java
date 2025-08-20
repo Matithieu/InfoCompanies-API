@@ -1,6 +1,6 @@
 package com.example.spring.utils;
 
-import com.example.spring.DTO.User;
+import com.example.spring.dto.User;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.CustomerSearchResult;
@@ -16,6 +16,7 @@ public class CustomerUtil {
         return Customer.retrieve(customerId);
     }
 
+    @SuppressWarnings("unused")
     public static Customer findCustomerByEmail(String email) throws StripeException {
         CustomerSearchParams params =
                 CustomerSearchParams

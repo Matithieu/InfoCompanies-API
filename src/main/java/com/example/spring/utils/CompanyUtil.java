@@ -1,6 +1,7 @@
 package com.example.spring.utils;
 
-import com.example.spring.DTO.CompanyWithStatusDTO;
+import com.example.spring.dto.CompanyDtoWithStatusDTO;
+import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.Company;
 import com.example.spring.model.UserCompanyStatus;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.PageImpl;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static mapper.CompanyMapper.toCompanyDTO;
 
 public class CompanyUtil {
 
@@ -46,27 +49,27 @@ public class CompanyUtil {
         }
     }
 
-    public static Page<CompanyWithStatusDTO> fillPageCompanyWithStatusDto(Page<Company> companiesPage, List<UserCompanyStatus> userCompanyStatuses) {
+    public static Page<CompanyDtoWithStatusDTO> fillPaginationCompanyDtoWithStatusDto(Page<Company> companiesPage, List<UserCompanyStatus> userCompanyStatuses) {
         // Fill the CompanyWithStatusDTO with the company and its status
-        Page<CompanyWithStatusDTO> companyWithStatusDTOS;
+        Page<CompanyDtoWithStatusDTO> companyDTOWithStatusDTOS;
 
         if (userCompanyStatuses.isEmpty()) {
-            companyWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
-                    .map(company -> new CompanyWithStatusDTO(company, null))
+            companyDTOWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
+                    .map(company -> new CompanyDtoWithStatusDTO(toCompanyDTO(company), null))
                     .collect(Collectors.toList()), companiesPage.getPageable(), companiesPage.getTotalElements());
         } else {
-            companyWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
-                    .map(company -> new CompanyWithStatusDTO(company, userCompanyStatuses.stream()
+            companyDTOWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
+                    .map(company -> new CompanyDtoWithStatusDTO(toCompanyDTO(company), userCompanyStatuses.stream()
                             .filter(userCompanyStatus -> userCompanyStatus.getCompanyId().equals(company.getId()))
                             .findFirst()
                             .orElse(null)))
                     .collect(Collectors.toList()), companiesPage.getPageable(), companiesPage.getTotalElements());
         }
 
-        return companyWithStatusDTOS;
+        return companyDTOWithStatusDTOS;
     }
 
-    public static CompanyWithStatusDTO fillCompanyWithStatusDto(Company company, UserCompanyStatus userCompanyStatus) {
-        return new CompanyWithStatusDTO(company, userCompanyStatus);
+    public static CompanyDtoWithStatusDTO fillCompanyDtoWithStatusDto(CompanyDTO companyDTO, UserCompanyStatus userCompanyStatus) {
+        return new CompanyDtoWithStatusDTO(companyDTO, userCompanyStatus);
     }
 }

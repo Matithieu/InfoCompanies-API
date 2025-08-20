@@ -1,7 +1,8 @@
 package com.example.spring.controller;
 
-import com.example.spring.DTO.CompanyDetails;
-import com.example.spring.DTO.CompanyWithStatusDTO;
+import com.example.spring.dto.CompanyDetails;
+import com.example.spring.dto.CompanyDtoWithStatusDTO;
+import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.Company;
 import com.example.spring.model.UserCompanyStatus;
 import com.example.spring.service.CompanyService;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
+import static mapper.CompanyMapper.toCompanyDTO;
 
 
 @CrossOrigin
@@ -32,18 +34,18 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    public CompanyWithStatusDTO getCompanyById(@PathVariable("id") Long id) {
+    public CompanyDtoWithStatusDTO getCompanyById(@PathVariable("id") Long id) {
         String userId = parseUserIdFromHeader();
-        Company company = companyService.getCompanyById(id);
+        CompanyDTO companyDto = toCompanyDTO(companyService.getCompanyById(id));
         UserCompanyStatus userCompanyStatus = userCompanyStatusService
                 .getOneUserCompanyStatusByUserIdAndCompanyId(userId, id);
 
-        return CompanyUtil.fillCompanyWithStatusDto(company, userCompanyStatus);
+        return CompanyUtil.fillCompanyDtoWithStatusDto(companyDto, userCompanyStatus);
     }
 
     // Example: http://localhost:8080/api/v1/company/get-seen-by-user?page=0
     @GetMapping("/get-seen-by-user")
-    public Page<CompanyWithStatusDTO> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
+    public Page<CompanyDtoWithStatusDTO> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
                                                              @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserIdFromHeader();
@@ -55,7 +57,7 @@ public class CompanyController {
                         .map(Company::getId)
                         .toList());
 
-        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
+        return CompanyUtil.fillPaginationCompanyDtoWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
@@ -69,7 +71,7 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
     @GetMapping("/filter-by-parameters")
-    public Page<CompanyWithStatusDTO> getCompaniesByFilters(
+    public Page<CompanyDtoWithStatusDTO> getCompaniesByFilters(
             @RequestParam(required = false) List<String> regions,
             @RequestParam(required = false) List<String> cities,
             @RequestParam(required = false) List<String> industrySectors,
@@ -93,12 +95,12 @@ public class CompanyController {
                         .map(Company::getId)
                         .toList());
 
-        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
+        return CompanyUtil.fillPaginationCompanyDtoWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
     @GetMapping("/random-unseen")
-    public Page<CompanyWithStatusDTO> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
+    public Page<CompanyDtoWithStatusDTO> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserIdFromHeader();
@@ -109,7 +111,7 @@ public class CompanyController {
                         .map(Company::getId)
                         .toList());
 
-        return CompanyUtil.fillPageCompanyWithStatusDto(companies, userCompanyStatuses);
+        return CompanyUtil.fillPaginationCompanyDtoWithStatusDto(companies, userCompanyStatuses);
     }
 
     // Make a request to the scrap API

@@ -1,7 +1,7 @@
 package com.example.spring.utils;
 
-import com.example.spring.DTO.TierUser;
-import com.example.spring.DTO.User;
+import com.example.spring.dto.TierUser;
+import com.example.spring.dto.User;
 import com.example.spring.config.StripeConfig;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
