@@ -8,14 +8,13 @@ import org.keycloak.common.util.CollectionUtil;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@RestController
+@Component
 public class RoleResource {
 
 	@Autowired
@@ -30,7 +29,7 @@ public class RoleResource {
 		return mapRoles(roleRepresentations);
     }
 	
-	public Role getRole(@RequestBody String roleName) {
+	public Role getRole(String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		return mapRole(keycloak.realm(realm).roles().get(roleName).toRepresentation());
     }
@@ -49,19 +48,19 @@ public class RoleResource {
 		return Response.ok(role).build();
 	}
 	
-	public Response deleteUser(@RequestBody String roleName) {
+	public Response deleteUser(String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).roles().deleteRole(roleName);
 		return Response.ok().build();
 	}
 
-	public void addRoleToUser(@RequestBody String userId, @RequestBody String roleName) {
+	public void addRoleToUser(String userId, String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).users().get(userId).roles().realmLevel().add(Collections.singletonList(keycloak.realm(realm).roles().get(roleName).toRepresentation()));
 		Response.ok().build();
 	}
 
-	public void removeRoleFromUser(@RequestBody String userId, @RequestBody String roleName) {
+	public void removeRoleFromUser(String userId, String roleName) {
 		Keycloak keycloak = keycloakUtil.getKeycloakInstance();
 		keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Collections.singletonList(keycloak.realm(realm).roles().get(roleName).toRepresentation()));
 		Response.ok().build();
