@@ -1,5 +1,6 @@
 package com.example.spring.utils;
 
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,9 +20,6 @@ public class KeycloakSecurityUtil {
     @Value("${KEYCLOAK_ADMIN_CLI_REALM}")
     private String clientId;
 
-    @Value("${GRANT_TYPE}")
-    private String grantType;
-
     @Value("${KEYCLOAK_ADMIN_CLI}")
     private String username;
 
@@ -34,7 +32,7 @@ public class KeycloakSecurityUtil {
                     serverUrl(serverUrl)
                     .realm(realm)
                     .clientId(clientId)
-                    .grantType(grantType)
+                    .grantType(OAuth2Constants.PASSWORD)
                     .username(username)
                     .password(password)
                     .build();
