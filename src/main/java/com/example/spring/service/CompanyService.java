@@ -1,6 +1,6 @@
 package com.example.spring.service;
 
-import com.example.spring.DTO.CompanyDetails;
+import com.example.spring.dto.CompanyDetails;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
 import com.example.spring.specification.CompanySpecification;

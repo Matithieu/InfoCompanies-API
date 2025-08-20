@@ -1,5 +1,5 @@
 # Build Stage
-FROM gradle:jdk21 AS build
+FROM gradle:8.13-jdk21 AS build
 
 # Set the working directory inside the container
 WORKDIR /home/gradle/src
@@ -22,16 +22,11 @@ WORKDIR /app
 # Copy the built jar from the build stage
 COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
 
-# Optionally, if you have SSL certificates, uncomment the following lines
-# and handle them securely
-#COPY --from=build /home/gradle/src/config/certs /app/config
-#RUN keytool -importcert -file /app/config/cert1.pem -alias myalias -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt
-
 # Expose the application's port
 EXPOSE 8083
 
 # Set JVM options to handle memory issues
-ENV JAVA_OPTS="-Xms1g -Xmx4g"
+ENV JAVA_OPTS="-Xms2g -Xmx4g"
 
 # Command to run the application
 CMD ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]

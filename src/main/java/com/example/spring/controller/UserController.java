@@ -1,6 +1,6 @@
 package com.example.spring.controller;
 
-import com.example.spring.DTO.User;
+import com.example.spring.dto.User;
 import com.example.spring.keycloakClient.UserResource;
 import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;

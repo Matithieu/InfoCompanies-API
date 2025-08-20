@@ -1,6 +1,6 @@
-package com.example.spring.DTO;
+package com.example.spring.dto;
 
-import com.example.spring.model.Company;
+import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.UserCompanyStatus;
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompanyWithStatusDTO implements Serializable {
-    private Company company;
+public class CompanyDtoWithStatusDTO implements Serializable {
+    private CompanyDTO companyDTO;
     private UserCompanyStatus userCompanyStatus;
 }

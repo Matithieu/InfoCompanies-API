@@ -1,8 +1,8 @@
 package com.example.spring.keycloakClient;
 
-import com.example.spring.DTO.Role;
-import com.example.spring.DTO.TierUser;
-import com.example.spring.DTO.User;
+import com.example.spring.dto.Role;
+import com.example.spring.dto.TierUser;
+import com.example.spring.dto.User;
 import com.example.spring.utils.KeycloakSecurityUtil;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
