@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface LegalFormRepository extends JpaRepository<LegalForm, Long> {
+public interface LegalFormRepository extends JpaRepository<LegalForm, Integer> {
 
     @Query("SELECT c FROM LegalForm c " +
             "WHERE LOWER(c.name) " +

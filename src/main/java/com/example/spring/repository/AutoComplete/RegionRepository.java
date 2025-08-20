@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface RegionRepository extends JpaRepository<Region, Long> {
+public interface RegionRepository extends JpaRepository<Region, Integer> {
 
     @Query("SELECT c FROM Region c " +
             "WHERE LOWER(c.name) " +

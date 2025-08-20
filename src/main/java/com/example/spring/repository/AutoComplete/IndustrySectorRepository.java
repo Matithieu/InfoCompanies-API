@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface IndustrySectorRepository extends JpaRepository<IndustrySector, Long> {
+public interface IndustrySectorRepository extends JpaRepository<IndustrySector, Integer> {
 
     @Query("SELECT c FROM IndustrySector c " +
             "WHERE LOWER(c.name) " +
