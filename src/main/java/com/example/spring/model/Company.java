@@ -10,17 +10,18 @@ import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "Companies")
+@Table(name = "companies")
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String companyName;
     private String sirenNumber;
@@ -128,7 +129,7 @@ public class Company {
 
     @Type(JsonBinaryType.class)
     @Column(length = 100000, columnDefinition = "jsonb")
-    private String reviews;
+    private Map<String, Object> reviews;
 
     @Type(JsonBinaryType.class)
     @Column(length = 100000, columnDefinition = "jsonb")

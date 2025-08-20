@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface LeaderRepository extends JpaRepository<Leader, Long> {
-    Leader findLeaderById(Long id);
+public interface LeaderRepository extends JpaRepository<Leader, Integer> {
+    Leader findLeaderById(Integer id);
     List<Leader> findAllBySiren(String siren);
     Page<Leader> findByFirstNameLikeAndLastNameLike(String firstName, String lastName, Pageable pageable);
 }

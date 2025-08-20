@@ -8,13 +8,14 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class CompanyDTO {
-    private Long id;
+    private Integer id;
     private String companyName;
     private String sirenNumber;
     private String nicNumber;
@@ -33,7 +34,7 @@ public class CompanyDTO {
     private String industrySector;
     private String phoneNumber;
     private String website;
-    private String reviews;
+    private Map<String, Object> reviews;
     private String schedule;
     private String instagram;
     private String facebook;

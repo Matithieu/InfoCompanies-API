@@ -3,10 +3,10 @@ name: Build Java App
 on:
   push:
     branches:
-      - master
+      - develop
   pull_request:
     branches:
-      - master
+      - develop
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         run: |
           DOCKER_TAG=$(date +%Y%m%d%H%M%S)
 
-          IMAGE="${NEXUS_DOCKER_URL}/${DOCKER_API_NAME}-${{ inputs.environment }}:${DOCKER_TAG}"
+          IMAGE="${NEXUS_DOCKER_URL}/${DOCKER_API_NAME}${{ inputs.environment }}:${DOCKER_TAG}"
           docker build -f Dockerfile -t $IMAGE .
 
           echo "${NEXUS_PASSWORD}" | docker login "${NEXUS_DOCKER_URL}" -u "${NEXUS_USERNAME}" --password-stdin

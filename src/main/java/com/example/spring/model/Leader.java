@@ -5,10 +5,11 @@ import lombok.Data;
 
 @Data
 @Entity
+@Table(name = "leaders")
 public class Leader {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private long id;
+    private Integer id;
     private String siren;
     private String role;
     private String lastName;

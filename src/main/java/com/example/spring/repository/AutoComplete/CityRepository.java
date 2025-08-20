@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CityRepository extends JpaRepository<City, Long> {
+public interface CityRepository extends JpaRepository<City, Integer> {
 
     @Query("SELECT c FROM City c " +
             "WHERE LOWER(c.name) " +

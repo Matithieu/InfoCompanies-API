@@ -20,9 +20,6 @@ public class KeycloakSecurityUtil {
     @Value("${KEYCLOAK_ADMIN_CLI_REALM}")
     private String clientId;
 
-    @Value("${grant-type}")
-    private String grantType;
-
     @Value("${KEYCLOAK_ADMIN_CLI}")
     private String username;
 

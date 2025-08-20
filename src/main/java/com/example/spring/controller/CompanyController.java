@@ -34,7 +34,7 @@ public class CompanyController {
 
     // Example: http://localhost:8080/api/v1/company/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    public CompanyDtoWithStatusDTO getCompanyById(@PathVariable("id") Long id) {
+    public CompanyDtoWithStatusDTO getCompanyById(@PathVariable("id") Integer id) {
         String userId = parseUserIdFromHeader();
         CompanyDTO companyDto = toCompanyDTO(companyService.getCompanyById(id));
         UserCompanyStatus userCompanyStatus = userCompanyStatusService
@@ -117,7 +117,7 @@ public class CompanyController {
     // Make a request to the scrap API
     // Example: http://localhost:8080/api/v1/company/scrap?companyId=1
     @GetMapping("/scrap")
-    public ResponseEntity<?> scrapCompany(@RequestParam Long companyId) {
+    public ResponseEntity<?> scrapCompany(@RequestParam Integer companyId) {
         try {
             Company company = companyService.getCompanyById(companyId);
 

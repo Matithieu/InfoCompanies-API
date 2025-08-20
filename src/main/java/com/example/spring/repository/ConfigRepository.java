@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
 
-public interface ConfigRepository extends CrudRepository<Config, Long> {
+public interface ConfigRepository extends CrudRepository<Config, Integer> {
     Optional<Config> findTopByOrderByIdDesc();
 }

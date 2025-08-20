@@ -12,7 +12,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompanyDetails implements Serializable {
-    private Long id;
+    private Integer id;
     private String companyName;
     private String industrySector;
     private String city;

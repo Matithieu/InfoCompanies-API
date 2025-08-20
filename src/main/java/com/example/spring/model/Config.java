@@ -13,6 +13,6 @@ import java.time.LocalDate;
 public class Config {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private long id;
+    private Integer id;
     private LocalDate lastResetQuotaDate;
 }

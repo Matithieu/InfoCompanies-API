@@ -18,12 +18,10 @@ import java.io.Serializable;
 public class UserCompanyStatus implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private Integer id;
     private String userId;
 
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    private Long companyId;
+    private Integer companyId;
 }

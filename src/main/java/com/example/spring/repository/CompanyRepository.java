@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface CompanyRepository extends JpaRepository<Company, Long>, JpaSpecificationExecutor<Company> {
+public interface CompanyRepository extends JpaRepository<Company, Integer>, JpaSpecificationExecutor<Company> {
 
-    Company findCompanyById(Long id);
+    Company findCompanyById(Integer id);
 
     @Query("SELECT new com.example.spring.dto.CompanyDetails(c.id, c.companyName, c.industrySector, c.city, c.region) " +
             "FROM Company c WHERE LOWER(c.companyName) LIKE LOWER(CONCAT(:companyName, '%'))")

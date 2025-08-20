@@ -15,7 +15,6 @@ public class UserQuota {
     private int quotaAllocated;
     private int quotaUsed;
 
-
     public UserQuota() {}
 
     public UserQuota(String userId, int quotaAllocated, int quotaUsed) {

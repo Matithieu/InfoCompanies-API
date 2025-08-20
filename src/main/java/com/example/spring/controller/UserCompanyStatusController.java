@@ -18,7 +18,7 @@ public class UserCompanyStatusController {
     private UserCompanyStatusService userCompanyStatusService;
 
     @PostMapping("/{companyId}")
-    public ResponseEntity<?> updateStatus(@PathVariable Long companyId,
+    public ResponseEntity<?> updateStatus(@PathVariable Integer companyId,
                                           @RequestBody Map<String, String> body) {
 
         String userId = parseUserIdFromHeader();

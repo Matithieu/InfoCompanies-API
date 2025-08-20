@@ -5,6 +5,7 @@ import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
 import com.example.spring.specification.CompanySpecification;
 import com.example.spring.utils.LogUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -24,6 +25,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.spring.utils.CompanyUtil.setIfNotEmpty;
 
@@ -33,7 +35,7 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
-    public Company getCompanyById(Long id) {
+    public Company getCompanyById(Integer id) {
         return companyRepository.findCompanyById(id);
     }
 
@@ -117,7 +119,7 @@ public class CompanyService {
             setIfNotEmpty(jsonNode, "youtube", companyScrapped::setYoutube);
             setIfNotEmpty(jsonNode, "email", companyScrapped::setEmail);
             setIfNotEmpty(jsonNode, "scrapingDate", (value) -> companyScrapped.setScrapingDate(LocalDate.parse(value)));
-            setIfNotEmpty(jsonNode, "reviews", companyScrapped::setReviews);
+            setIfNotEmpty(jsonNode, "reviews", (value) -> companyScrapped.setReviews(new ObjectMapper().convertValue(jsonNode.get("reviews"), new TypeReference<Map<String, Object>>() {})));
             setIfNotEmpty(jsonNode, "schedule", companyScrapped::setSchedule);
 
             return companyScrapped;
@@ -134,7 +136,7 @@ public class CompanyService {
     }
 
     @CacheEvict(value = "companyCounts", allEntries = true)
-    public void deleteCompany(Long id) {
+    public void deleteCompany(Integer id) {
         companyRepository.deleteById(id);
     }
 }
