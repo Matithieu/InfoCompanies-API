@@ -16,7 +16,7 @@ public class LeaderService {
     @Autowired
     private LeaderRepository leaderRepository;
 
-    public Leader getLeaderById(Long id) {
+    public Leader getLeaderById(Integer id) {
         return leaderRepository.findLeaderById(id);
     }
 

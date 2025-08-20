@@ -21,7 +21,7 @@ public class LeaderController {
 
     // Example: http://localhost:8080/api/v1/leader/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    public Leader getLeaderById(@PathVariable("id") Long id) {
+    public Leader getLeaderById(@PathVariable("id") Integer id) {
         return leaderService.getLeaderById(id);
     }
 
