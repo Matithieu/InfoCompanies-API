@@ -25,5 +25,5 @@ public class UserCompanyStatus implements Serializable {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private Long companyId;
+    private Integer companyId;
 }

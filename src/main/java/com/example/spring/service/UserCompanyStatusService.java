@@ -14,16 +14,16 @@ public class UserCompanyStatusService {
     @Autowired
     private UserCompanyStatusRepository userCompanyStatusRepository;
 
-    public UserCompanyStatus getOneUserCompanyStatusByUserIdAndCompanyId(String userId, Long companyId) {
+    public UserCompanyStatus getOneUserCompanyStatusByUserIdAndCompanyId(String userId, Integer companyId) {
         return userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
     }
 
-    public List<UserCompanyStatus> getMultipleUserCompanyStatusByUserIdAndCompanyIds(String userId, List<Long> companyId) {
+    public List<UserCompanyStatus> getMultipleUserCompanyStatusByUserIdAndCompanyIds(String userId, List<Integer> companyId) {
         return userCompanyStatusRepository.findByUserIdAndCompanyIdIn(userId, companyId);
     }
 
     //@CacheEvict(value = "statuses", key = "#userId")
-    public void updateCompanyStatus(String userId, Long companyId, Status status) {
+    public void updateCompanyStatus(String userId, Integer companyId, Status status) {
         UserCompanyStatus uc = userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
 
         if (uc == null) {

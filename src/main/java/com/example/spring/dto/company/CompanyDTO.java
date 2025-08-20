@@ -15,7 +15,7 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 public class CompanyDTO {
-    private Long id;
+    private Integer id;
     private String companyName;
     private String sirenNumber;
     private String nicNumber;

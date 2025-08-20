@@ -35,7 +35,7 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
-    public Company getCompanyById(Long id) {
+    public Company getCompanyById(Integer id) {
         return companyRepository.findCompanyById(id);
     }
 
@@ -136,7 +136,7 @@ public class CompanyService {
     }
 
     @CacheEvict(value = "companyCounts", allEntries = true)
-    public void deleteCompany(Long id) {
+    public void deleteCompany(Integer id) {
         companyRepository.deleteById(id);
     }
 }
