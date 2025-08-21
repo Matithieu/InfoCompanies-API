@@ -1,4 +1,4 @@
-package mapper;
+package com.example.spring.mapper;
 
 import com.example.spring.dto.company.financial.FinancialPeriod;
 import com.example.spring.dto.company.financial.FinancialPeriodDTO;
@@ -37,7 +37,6 @@ public class FinancialPeriodMapper {
             }
         }
 
-        validatePeriods(periods);
         return periods;
     }
 
@@ -51,23 +50,6 @@ public class FinancialPeriodMapper {
         } catch (Exception e) {
             // Other reflection errors
             throw new RuntimeException("Failed to invoke method: " + methodName, e);
-        }
-    }
-
-    private static void validatePeriods(List<FinancialPeriodDTO> periods) {
-        boolean hasValidPeriod = false;
-
-        for (FinancialPeriodDTO period : periods) {
-            if (period.getClosingDate() != null &&
-                    period.getRevenue() != null &&
-                    period.getTurnover() != null) {
-                hasValidPeriod = true;
-                break;
-            }
-        }
-
-        if (!hasValidPeriod) {
-            throw new IllegalStateException("All financial periods for all years are missing data");
         }
     }
 }

@@ -1,11 +1,11 @@
-package mapper;
+package com.example.spring.mapper;
 
 import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.Company;
 
 import java.util.List;
 
-import static mapper.FinancialPeriodMapper.toFinancialPeriodDTOList;
+import static com.example.spring.mapper.FinancialPeriodMapper.toFinancialPeriodDTOList;
 
 
 public class CompanyMapper {

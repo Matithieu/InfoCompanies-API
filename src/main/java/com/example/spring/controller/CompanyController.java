@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
-import static mapper.CompanyMapper.toCompanyDTO;
+import static com.example.spring.mapper.CompanyMapper.toCompanyDTO;
 
 
 @CrossOrigin

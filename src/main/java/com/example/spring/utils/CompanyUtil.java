@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static mapper.CompanyMapper.toCompanyDTO;
+import static com.example.spring.mapper.CompanyMapper.toCompanyDTO;
 
 public class CompanyUtil {
 
