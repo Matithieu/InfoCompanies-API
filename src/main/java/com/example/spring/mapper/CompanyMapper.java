@@ -1,11 +1,9 @@
-package mapper;
+package com.example.spring.mapper;
 
 import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.Company;
 
-import java.util.List;
-
-import static mapper.FinancialPeriodMapper.toFinancialPeriodDTOList;
+import static com.example.spring.mapper.FinancialPeriodMapper.toFinancialPeriodDTOList;
 
 
 public class CompanyMapper {
@@ -46,11 +44,5 @@ public class CompanyMapper {
                 .companyCategory(company.getCompanyCategory())
                 .financialPeriods(toFinancialPeriodDTOList(company))
                 .build();
-    }
-
-    public static List<CompanyDTO> toCompanyDTOList(List<Company> companies) {
-        return companies.stream()
-                .map(CompanyMapper::toCompanyDTO)
-                .toList();
     }
 }
