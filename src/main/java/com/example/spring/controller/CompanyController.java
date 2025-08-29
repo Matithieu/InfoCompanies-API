@@ -2,6 +2,7 @@ package com.example.spring.controller;
 
 import com.example.spring.dto.CompanyDetails;
 import com.example.spring.dto.CompanyDtoWithStatusDTO;
+import com.example.spring.dto.CompanyFilterRequest;
 import com.example.spring.dto.company.CompanyDTO;
 import com.example.spring.model.Company;
 import com.example.spring.model.UserCompanyStatus;
@@ -11,14 +12,14 @@ import com.example.spring.utils.CompanyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
-import static com.example.spring.mapper.CompanyMapper.toCompanyDTO;
 
 
 @CrossOrigin
@@ -36,7 +37,7 @@ public class CompanyController {
     @GetMapping("/get-by-id/{id}")
     public CompanyDtoWithStatusDTO getCompanyById(@PathVariable("id") Integer id) {
         String userId = parseUserIdFromHeader();
-        CompanyDTO companyDto = toCompanyDTO(companyService.getCompanyById(id));
+        CompanyDTO companyDto = companyService.getCompanyById(id).toCompanyDTO();
         UserCompanyStatus userCompanyStatus = userCompanyStatusService
                 .getOneUserCompanyStatusByUserIdAndCompanyId(userId, id);
 
@@ -46,7 +47,7 @@ public class CompanyController {
     // Example: http://localhost:8080/api/v1/company/get-seen-by-user?page=0
     @GetMapping("/get-seen-by-user")
     public Page<CompanyDtoWithStatusDTO> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
-                                                             @RequestParam(defaultValue = "10") int size) {
+                                                                @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserIdFromHeader();
         Page<Company> companies = companyService.getCompaniesSeenByUser(userId, pageable);
@@ -70,24 +71,24 @@ public class CompanyController {
     }
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
-    @GetMapping("/filter-by-parameters")
+    @PostMapping("/filter-by-parameters")
     public Page<CompanyDtoWithStatusDTO> getCompaniesByFilters(
-            @RequestParam(required = false) List<String> regions,
-            @RequestParam(required = false) List<String> cities,
-            @RequestParam(required = false) List<String> industrySectors,
-            @RequestParam(required = false) List<String> legalForms,
-            @RequestParam(required = false) String comparator,
-            @RequestParam(required = false) Integer numberOfEmployee,
-            @RequestParam(required = false) List<String> socials,
-            @RequestParam(required = false) List<String> contacts,
-            @RequestParam(required = false) boolean isCompanySeen,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-
+            @RequestBody(required = false) CompanyFilterRequest filterRequest) {
         String userId = parseUserIdFromHeader();
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Company> companies = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts, isCompanySeen, userId, pageable);
+        Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize());
+
+        Page<Company> companies = companyService.findCompaniesByFilters(
+                filterRequest.getRegionNames(),
+                filterRequest.getCityNames(),
+                filterRequest.getIndustrySectorNames(),
+                filterRequest.getLegalFormNames(),
+                filterRequest.getNumberOfEmployeeFilter(),
+                filterRequest.getSocials(),
+                filterRequest.getContacts(),
+                filterRequest.getIsCompanySeen(),
+                userId,
+                pageable
+        );
 
         List<UserCompanyStatus> userCompanyStatuses = userCompanyStatusService
                 .getMultipleUserCompanyStatusByUserIdAndCompanyIds(userId, companies.getContent()
@@ -101,7 +102,7 @@ public class CompanyController {
     // Example: http://localhost:8080/api/v1/company/random-unseen?page=0
     @GetMapping("/random-unseen")
     public Page<CompanyDtoWithStatusDTO> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "10") int size) {
+                                                                  @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         String userId = parseUserIdFromHeader();
         Page<Company> companies = companyService.findRandomUnseenCompanies(userId, pageable);
@@ -117,63 +118,57 @@ public class CompanyController {
     // Make a request to the scrap API
     // Example: http://localhost:8080/api/v1/company/scrap?companyId=1
     @GetMapping("/scrap")
-    public ResponseEntity<?> scrapCompany(@RequestParam Integer companyId) {
-        try {
-            Company company = companyService.getCompanyById(companyId);
-
-            // If the scrapping date is older than 1 day, then scrap the company again
-            if ((company.getScrapingDate() == null) || (company.getScrapingDate().isBefore(LocalDate.now().minusDays(1)))) {
-                Company companyScraped = companyService.scrapCompany(company);
-
-                company.setPhoneNumber(companyScraped.getPhoneNumber());
-                company.setWebsite(companyScraped.getWebsite());
-                company.setInstagram(companyScraped.getInstagram());
-                company.setFacebook(companyScraped.getFacebook());
-                company.setTwitter(companyScraped.getTwitter());
-                company.setLinkedin(companyScraped.getLinkedin());
-                company.setYoutube(companyScraped.getYoutube());
-                company.setEmail(companyScraped.getEmail());
-                company.setScrapingDate(companyScraped.getScrapingDate());
-                company.setReviews(companyScraped.getReviews());
-                company.setSchedule(companyScraped.getSchedule());
-
-                companyService.saveCompany(company);
-
-                return new ResponseEntity<>(company, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("The company was scrapped less than 1 day ago", HttpStatus.TOO_EARLY);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to scrap company information: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public CompanyDTO scrapCompany(@RequestParam Integer companyId) {
+        Company company = companyService.getCompanyById(companyId);
+        if (company == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found");
         }
+
+        boolean needsScraping = company.getScrapingDate() == null ||
+                company.getScrapingDate().isBefore(LocalDate.now().minusDays(1));
+
+        if (!needsScraping) {
+            throw new ResponseStatusException(HttpStatus.TOO_EARLY, "The company was scrapped less than 1 day ago");
+        }
+
+        Company companyScraped = companyService.scrapCompany(company);
+        company.updateFrom(companyScraped);
+        companyService.saveCompany(company);
+
+        return company.toCompanyDTO();
     }
+
 
     // Example: http://localhost:8080/api/v1/company/filter-by-parameters?regions=region1,region2&cities=city1,city2&industrySectors=sector1,sector2&legalForms=form1,form2&page=0
     @GetMapping("/landing-filter")
-    public Page<Company> getCompaniesOnLandingByFilters(
-            @RequestParam(required = false) List<String> regions,
-            @RequestParam(required = false) List<String> cities,
-            @RequestParam(required = false) List<String> industrySectors,
-            @RequestParam(required = false) List<String> legalForms,
-            @RequestParam(required = false) String comparator,
-            @RequestParam(required = false) Integer numberOfEmployee
+    public Page<CompanyDTO> getCompaniesOnLandingByFilters(
+            //@RequestParam(required = false) List<String> regions,
+            @RequestParam(required = false) List<String> cityNames,
+            @RequestParam(required = false) List<String> industrySectorNames
+            //@RequestParam(required = false) List<String> legalForms,
+            //@RequestParam(required = false) String comparator,
+            //@RequestParam(required = false) Integer numberOfEmployee
     ) {
 
-        List<String> contacts = List.of("phone", "website");
-        List<String> socials = List.of("facebook");
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Company> companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                comparator, numberOfEmployee, socials, contacts, false, "", pageable);
+        // First try to get companies that the user has not seen yet
+        Page<Company> companiesPage = companyService.findCompaniesByFilters(null, cityNames, industrySectorNames, null,
+                null, null, null, false, null, pageable);
 
+        // If there are not enough unseen companies, get seen companies to fill the page
         if (companiesPage.getTotalElements() < 7) {
-            contacts = List.of();
-            socials = List.of();
-            companiesPage = companyService.findCompaniesByFilters(regions, cities, industrySectors, legalForms,
-                    comparator, numberOfEmployee, socials, contacts, true, "", pageable);
+            companiesPage = companyService.findCompaniesByFilters(null, cityNames, industrySectorNames, null,
+                    null, null, null, true, null, pageable);
         }
 
-        companiesPage = CompanyUtil.obstructCompanies(companiesPage);
-        return new PageImpl<>(companiesPage.getContent(), pageable, 10);
+        return new PageImpl<>(
+                companiesPage.getContent().stream()
+                        .peek(Company::obstructCompany)
+                        .map(Company::toCompanyDTO)
+                        .collect(Collectors.toList()),
+                companiesPage.getPageable(),
+                companiesPage.getTotalElements()
+        );
     }
 }

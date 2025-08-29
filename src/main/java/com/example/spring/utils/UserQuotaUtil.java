@@ -28,8 +28,8 @@ public class UserQuotaUtil {
         priceIdToTierMap.put(stripeConfig.getStripePriceIdFree(), "FREE");
         priceIdToTierMap.put(stripeConfig.getStripePriceIdBasic(), "TIER1");
         priceIdToTierMap.put(stripeConfig.getStripePriceIdPremium(), "TIER2");
-        priceIdToTierMap.put("UNLIMITED", "UNLIMITED");
         priceIdToTierMap.put("ENTERPRISE", "ENTERPRISE");
+        priceIdToTierMap.put("UNLIMITED", "UNLIMITED");
     }
 
     public static TierUser getQuotaBasedOnTier(String tier) {
@@ -51,7 +51,7 @@ public class UserQuotaUtil {
         }
     }
 
-    public static int getRemainingSearchesBasedOnUserTier(User user) {
+    public static Integer getRemainingSearchesBasedOnUserTier(User user) {
         return switch (user.getTier()) {
             case FREE -> 15;
             case TIER1 -> 100;

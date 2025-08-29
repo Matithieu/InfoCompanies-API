@@ -23,12 +23,12 @@ public class UserCompanyStatusService {
     }
 
     //@CacheEvict(value = "statuses", key = "#userId")
-    public void updateCompanyStatus(String userId, Integer companyId, Status status) {
+    public UserCompanyStatus updateCompanyStatus(String userId, Integer companyId, Status status) {
         UserCompanyStatus uc = userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);
 
         if (uc == null) {
             if (status == Status.NOT_DONE) {
-                return;
+                return null; // nothing to persist
             }
 
             UserCompanyStatus userCompanyStatus = UserCompanyStatus.builder()
@@ -36,18 +36,16 @@ public class UserCompanyStatusService {
                     .status(status)
                     .companyId(companyId)
                     .build();
-            userCompanyStatusRepository.save(userCompanyStatus);
-            return;
+
+            return userCompanyStatusRepository.save(userCompanyStatus);
         }
 
-        if (uc.getCompanyId().equals(companyId)) {
-            if (status == Status.NOT_DONE) {
-                userCompanyStatusRepository.delete(uc);
-                return;
-            }
-
-            uc.setStatus(status);
-            userCompanyStatusRepository.save(uc);
+        if (status == Status.NOT_DONE) {
+            userCompanyStatusRepository.delete(uc);
+            return null; // deleted
         }
+
+        uc.setStatus(status);
+        return userCompanyStatusRepository.save(uc);
     }
 }

@@ -14,4 +14,8 @@ public interface CityRepository extends JpaRepository<City, Integer> {
             "ORDER BY c.name " +
             "ASC LIMIT 25")
     List<City> findByNameContainingIgnoreCase(String query);
+
+    List<City> findByNameIn(List<String> names);
+
+    List<City> findByIdIn(List<Integer> ids);
 }

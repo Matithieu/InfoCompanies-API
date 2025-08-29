@@ -32,16 +32,10 @@ public class CompanyDTO {
     private LocalDate registrationDate;
     private LocalDate deregistrationDate;
     private String industrySector;
-    private String phoneNumber;
-    private String website;
     private Map<String, Object> reviews;
     private String schedule;
-    private String instagram;
-    private String facebook;
-    private String twitter;
-    private String linkedin;
-    private String youtube;
-    private String email;
+    private SocialMedia socialMedia;
+    private Contact contact;
     private LocalDate scrapingDate;
     private LocalDate dateCreation;
     private LocalDate lastProcessingDate;

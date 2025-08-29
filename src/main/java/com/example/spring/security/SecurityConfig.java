@@ -18,19 +18,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        // Landing page
-                        .requestMatchers(HttpMethod.GET, "/api/v1/company/landing-filter").permitAll()
-                        // Company
-                        .requestMatchers("/api/v1/company/**").hasRole("verified")
-                        .requestMatchers("/api/v1/companies-status/**").hasRole("verified")
-                        // Stripe
-                        .requestMatchers(HttpMethod.POST, "/api/v1/stripe/webhook").permitAll()
-                        // AutoComplete
-                        .requestMatchers(HttpMethod.GET, "/api/v1/autocomplete/industry-sector").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/autocomplete/city").permitAll()
-                        .anyRequest().permitAll())
+                .authorizeHttpRequests(authorize -> {
+                    // Public endpoints are enabled through the OAuth proxy with allowed endpoints
+                    // Landing page
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/company/landing-filter").permitAll();
+                    // AutoComplete
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/industrySector").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/industrySectors").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/city").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/cities").permitAll();
 
+                    // Stripe
+                    authorize.requestMatchers(HttpMethod.POST, "/v1/stripe/webhook").permitAll();
+                    // Health check
+                    authorize.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll();
+
+                    // Private endpoints are protected by the JWT authentication filter
+                    // Company
+                    authorize.requestMatchers("/v1/company/**").hasRole("verified");
+                    authorize.requestMatchers("/v1/companies-status/**").hasRole("verified");
+                    // Leader
+                    authorize.requestMatchers("/v1/leader/**").hasRole("verified");
+
+                    // Swagger + OpenAPI - only in dev
+                    // To access Swagger UI and OpenAPI documentation on Docker
+                    // Fill the search bar at the top with: https://localhost/api/v3/api-docs
+                    authorize.requestMatchers("/swagger-ui/**", "/api/v3/api-docs").hasRole("admin");
+
+                    // permitAll() is used here because the OAuth proxy handles the authentication
+                    // and the user is already authenticated before reaching this point.
+                    // This means that all requests are allowed, but the user must be authenticated
+                    authorize.anyRequest().permitAll();
+                })
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)

@@ -1,5 +1,6 @@
 package com.example.spring.model;
 
+import com.example.spring.dto.company.CompanyDTO;
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 import java.util.Map;
 
+import static com.example.spring.mapper.FinancialPeriodMapper.toFinancialPeriodDTOList;
+import static com.example.spring.utils.CompanyUtil.maskData;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,7 +26,6 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String companyName;
     private String sirenNumber;
     private String nicNumber;
@@ -157,4 +160,74 @@ public class Company {
     private LocalDate lastProcessingDate;
     private Integer numberOfEmployee;
     private String companyCategory;
+
+    public void updateFrom(Company other) {
+        this.phoneNumber = other.getPhoneNumber();
+        this.website = other.getWebsite();
+        this.instagram = other.getInstagram();
+        this.facebook = other.getFacebook();
+        this.twitter = other.getTwitter();
+        this.linkedin = other.getLinkedin();
+        this.youtube = other.getYoutube();
+        this.email = other.getEmail();
+        this.scrapingDate = other.getScrapingDate();
+        this.reviews = other.getReviews();
+        this.schedule = other.getSchedule();
+    }
+
+    public void obstructCompany() {
+        this.email = maskData(this.getEmail());
+        this.phoneNumber = maskData(this.getPhoneNumber());
+        this.instagram = maskData(this.getInstagram());
+        this.facebook = maskData(this.getFacebook());
+        this.twitter = maskData(this.getTwitter());
+        this.linkedin = maskData(this.getLinkedin());
+        this.youtube = maskData(this.getYoutube());
+    }
+
+    public CompanyDTO toCompanyDTO() {
+        return CompanyDTO.builder()
+                .id(this.getId())
+                .companyName(this.getCompanyName())
+                .sirenNumber(this.getSirenNumber())
+                .nicNumber(this.getNicNumber())
+                .legalForm(this.getLegalForm())
+                .apeCode(this.getApeCode())
+                .apeLabel(this.getApeLabel())
+                .address(this.getAddress())
+                .postalCode(this.getPostalCode())
+                .departmentNumber(this.getDepartmentNumber())
+                .department(this.getDepartment())
+                .city(this.getCity())
+                .region(this.getRegion())
+                .tradeName(this.getTradeName())
+                .registrationDate(this.getRegistrationDate())
+                .deregistrationDate(this.getDeregistrationDate())
+                .industrySector(this.getIndustrySector())
+                .reviews(this.getReviews())
+                .schedule(this.getSchedule())
+                .socialMedia(
+                        com.example.spring.dto.company.SocialMedia.builder()
+                                .instagram(this.getInstagram())
+                                .facebook(this.getFacebook())
+                                .twitter(this.getTwitter())
+                                .linkedin(this.getLinkedin())
+                                .youtube(this.getYoutube())
+                                .build()
+                )
+                .contact(
+                        com.example.spring.dto.company.Contact.builder()
+                                .email(this.getEmail())
+                                .phoneNumber(this.getPhoneNumber())
+                                .website(this.getWebsite())
+                                .build()
+                )
+                .scrapingDate(this.getScrapingDate())
+                .dateCreation(this.getDateCreation())
+                .lastProcessingDate(this.getLastProcessingDate())
+                .numberOfEmployee(this.getNumberOfEmployee())
+                .companyCategory(this.getCompanyCategory())
+                .financialPeriods(toFinancialPeriodDTOList(this))
+                .build();
+    }
 }

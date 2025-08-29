@@ -29,4 +29,4 @@ EXPOSE 8083
 ENV JAVA_OPTS="-Xms2g -Xmx4g"
 
 # Command to run the application
-CMD ["java", "-jar", "-Dspring.profiles.active=prod", "app.jar"]
+CMD ["java", "-jar", "app.jar"]

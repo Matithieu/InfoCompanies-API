@@ -8,11 +8,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             JsonNode jsonNode = objectMapper.readTree(payload);
             JsonNode rolesNode = jsonNode.path("realm_access").path("roles");
             if (rolesNode.isArray()) {
-                return objectMapper.convertValue(rolesNode, new TypeReference<List<String>>() {});
+                return objectMapper.convertValue(rolesNode, new TypeReference<>() {});
             }
             return null;
         } catch (IOException e) {

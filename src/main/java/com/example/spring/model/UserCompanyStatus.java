@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
 
@@ -22,6 +24,8 @@ public class UserCompanyStatus implements Serializable {
     private String userId;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "status")
     private Status status;
     private Integer companyId;
 }

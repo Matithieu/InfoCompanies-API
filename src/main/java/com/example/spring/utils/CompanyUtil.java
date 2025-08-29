@@ -12,31 +12,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.example.spring.mapper.CompanyMapper.toCompanyDTO;
-
 public class CompanyUtil {
-
-    public static Page<Company> obstructCompanies(Page<Company> companies) {
-        List<Company> obstructedCompanies = companies.getContent().stream()
-                .map(CompanyUtil::obstructCompany)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(obstructedCompanies, companies.getPageable(), companies.getTotalElements());
-    }
-
-    private static Company obstructCompany(Company company) {
-        company.setEmail(maskData(company.getEmail()));
-        company.setPhoneNumber(maskData(company.getPhoneNumber()));
-        company.setInstagram(maskData(company.getInstagram()));
-        company.setFacebook(maskData(company.getFacebook()));
-        company.setTwitter(maskData(company.getTwitter()));
-        company.setLinkedin(maskData(company.getLinkedin()));
-        company.setYoutube(maskData(company.getYoutube()));
-
-        return company;
-    }
-
-    private static String maskData(String data) {
+    public static String maskData(String data) {
         if (data == null) {
             return null;
         }
@@ -55,11 +32,11 @@ public class CompanyUtil {
 
         if (userCompanyStatuses.isEmpty()) {
             companyDTOWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
-                    .map(company -> new CompanyDtoWithStatusDTO(toCompanyDTO(company), null))
+                    .map(company -> new CompanyDtoWithStatusDTO(company.toCompanyDTO(), null))
                     .collect(Collectors.toList()), companiesPage.getPageable(), companiesPage.getTotalElements());
         } else {
             companyDTOWithStatusDTOS = new PageImpl<>(companiesPage.getContent().stream()
-                    .map(company -> new CompanyDtoWithStatusDTO(toCompanyDTO(company), userCompanyStatuses.stream()
+                    .map(company -> new CompanyDtoWithStatusDTO(company.toCompanyDTO(), userCompanyStatuses.stream()
                             .filter(userCompanyStatus -> userCompanyStatus.getCompanyId().equals(company.getId()))
                             .findFirst()
                             .orElse(null)))
