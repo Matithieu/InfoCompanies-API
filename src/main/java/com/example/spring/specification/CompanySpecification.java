@@ -1,95 +1,107 @@
 package com.example.spring.specification;
 
+import com.example.spring.dto.NumberOfEmployeeFilter;
+import com.example.spring.dto.company.Contact;
+import com.example.spring.dto.company.SocialMedia;
+import com.example.spring.enums.SignComparator;
 import com.example.spring.model.Company;
 import com.example.spring.model.UserCompanyStatus;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 
 public class CompanySpecification {
 
-    public static Specification<Company> regionIn(List<String> regions) {
+    public static Specification<Company> regionsIn(List<String> regionNames) {
         return (root, query, builder) ->
-                (regions == null || regions.isEmpty()) ? null : root.get("region").in(regions);
+                (regionNames == null || regionNames.isEmpty()) ? null : root.get("region").in(regionNames);
     }
 
-    public static Specification<Company> cityIn(List<String> cities) {
+    public static Specification<Company> citiesIn(List<String> cityNames) {
         return (root, query, builder) ->
-                (cities == null || cities.isEmpty()) ? null : root.get("city").in(cities);
+                (cityNames == null || cityNames.isEmpty()) ? null : root.get("city").in(cityNames);
     }
 
-    public static Specification<Company> industrySectorIn(List<String> industrySectors) {
+    public static Specification<Company> industrySectorsIn(List<String> industrySectorNames) {
         return (root, query, builder) ->
-                (industrySectors == null || industrySectors.isEmpty()) ? null : root.get("industrySector").in(industrySectors);
+                (industrySectorNames == null || industrySectorNames.isEmpty()) ? null : root.get("industrySector").in(industrySectorNames);
     }
 
-    public static Specification<Company> legalFormIn(List<String> legalForms) {
+    public static Specification<Company> legalFormsIn(List<String> legalFormNames) {
         return (root, query, builder) ->
-                (legalForms == null || legalForms.isEmpty()) ? null : root.get("legalForm").in(legalForms);
+                (legalFormNames == null || legalFormNames.isEmpty()) ? null : root.get("legalForm").in(legalFormNames);
     }
 
-    public static Specification<Company> employeeComparator(String comparator, Integer numberOfEmployee) {
+    public static Specification<Company> employeeComparator(NumberOfEmployeeFilter numberOfEmployeeFilter) {
         return (root, query, builder) -> {
-            if (comparator == null || numberOfEmployee == null) {
+            if (numberOfEmployeeFilter == null) {
                 return null;
             }
-            return switch (comparator) {
-                case ">" -> builder.greaterThan(root.get("numberOfEmployee"), numberOfEmployee);
-                case "<" -> builder.lessThan(root.get("numberOfEmployee"), numberOfEmployee);
-                case "=" -> builder.equal(root.get("numberOfEmployee"), numberOfEmployee);
-                default -> null;
+
+            Integer numberOfEmployee = numberOfEmployeeFilter.getNumberOfEmployee();
+            SignComparator signComparator = numberOfEmployeeFilter.getSignComparator();
+
+
+            return switch (signComparator) {
+                case SignComparator.LOWER_THAN -> builder.lessThan(root.get("numberOfEmployee"), numberOfEmployee);
+                case SignComparator.GREATER_THAN -> builder.greaterThan(root.get("numberOfEmployee"), numberOfEmployee);
+                case SignComparator.EQUAL -> builder.equal(root.get("numberOfEmployee"), numberOfEmployee);
             };
         };
     }
 
-    public static Specification<Company> socialMediaNotNull(List<String> socials) {
+    public static Specification<Company> socialMediaNotNull(SocialMedia socials) {
         return (root, query, builder) -> {
-            if (socials == null || socials.isEmpty()) {
+            if (socials == null) {
                 return null;
             }
+
             Predicate predicate = builder.conjunction();
-            if (socials.contains("linkedin")) {
+            if (socials.getLinkedin() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("linkedin")));
             }
-            if (socials.contains("youtube")) {
+            if (socials.getYoutube() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("youtube")));
             }
-            if (socials.contains("facebook")) {
+            if (socials.getFacebook() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("facebook")));
             }
-            if (socials.contains("instagram")) {
+            if (socials.getInstagram() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("instagram")));
             }
-            if (socials.contains("twitter")) {
+            if (socials.getTwitter() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("twitter")));
             }
             return predicate;
         };
     }
 
-    public static Specification<Company> contactInfoNotNull(List<String> contacts) {
+    public static Specification<Company> contactInfoNotNull(Contact contacts) {
         return (root, query, builder) -> {
-            if (contacts == null || contacts.isEmpty()) {
+            if (contacts == null) {
                 return null;
             }
+
             Predicate predicate = builder.conjunction();
-            if (contacts.contains("phone")) {
+            if (contacts.getPhoneNumber() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("phoneNumber")));
             }
-            if (contacts.contains("email")) {
+            if (contacts.getEmail() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("email")));
             }
-            if (contacts.contains("website")) {
+            if (contacts.getWebsite() != null) {
                 predicate = builder.and(predicate, builder.isNotNull(root.get("website")));
             }
             return predicate;
         };
     }
 
-    public static Specification<Company> notSeenByUser(boolean isCompanySeen, String userId) {
+    public static Specification<Company> notSeenByUser(Boolean isCompanySeen, String userId) {
         return (root, query, builder) -> {
-            if (!isCompanySeen || userId == null || userId.isEmpty()) {
+            if (isCompanySeen == null || userId == null) {
                 return null;
             }
 

@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @PutMapping("/update-user")
-    public Response updateUser(@RequestBody User user) {
+    public Response updateUser(@RequestParam User user) {
         String id = parseUserIdFromHeader();
         User existingUser = userResource.getUserById(id);
 

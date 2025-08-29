@@ -13,7 +13,15 @@ public class IndustrySectorService {
     @Autowired
     private IndustrySectorRepository industrySectorRepository;
 
-    public List<IndustrySector> searchIndustrySector(String query) {
+    public List<IndustrySector> searchIndustrySectorsByName(String query) {
         return industrySectorRepository.findByNameContainingIgnoreCase(query);
+    }
+
+    public List<IndustrySector> searchIndustrySectorsByNames(List<String> query) {
+        return industrySectorRepository.findByNameIn(query);
+    }
+
+    public List<IndustrySector> searchIndustrySectorsByIds(List<Integer> query) {
+        return industrySectorRepository.findByIdIn(query);
     }
 }

@@ -62,7 +62,7 @@ public class UserQuotaService {
         }
     }
 
-    public void createQuotaForUser(String userId, int quotaAllocated) {
+    public void createQuotaForUser(String userId, Integer quotaAllocated) {
         UserQuota userQuota = new UserQuota(userId, quotaAllocated, 0);
         userQuotaRepository.save(userQuota);
         quotaCache.put(userId, userQuota);
@@ -72,7 +72,7 @@ public class UserQuotaService {
         return userQuotaRepository.findByUserId(userId).orElse(null);
     }
 
-    public void updateQuotaForUser(String userId, int quotaUsed) {
+    public void updateQuotaForUser(String userId, Integer quotaUsed) {
         writeLock.lock();
         try {
             UserQuota userQuota = getQuotaForUser(userId);

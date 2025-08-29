@@ -1,6 +1,9 @@
 package com.example.spring.service;
 
 import com.example.spring.dto.CompanyDetails;
+import com.example.spring.dto.NumberOfEmployeeFilter;
+import com.example.spring.dto.company.Contact;
+import com.example.spring.dto.company.SocialMedia;
 import com.example.spring.model.Company;
 import com.example.spring.repository.CompanyRepository;
 import com.example.spring.specification.CompanySpecification;
@@ -48,15 +51,15 @@ public class CompanyService {
         return companyRepository.findCompanyDetailsByCompanyName(companyName, pageable);
     }
 
-    public Page<Company> findCompaniesByFilters(List<String> regions, List<String> cities, List<String> industrySectors, List<String> legalForms,
-                                                String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts, boolean isCompanySeen,
+    public Page<Company> findCompaniesByFilters(List<String> regionNames, List<String> cityNames, List<String> industrySectorNames, List<String> legalFormNames,
+                                                NumberOfEmployeeFilter numberOfEmployeeFilter, SocialMedia socials, Contact contacts, Boolean isCompanySeen,
                                                 String userId, Pageable pageable) {
 
-        Specification<Company> specification = Specification.where(CompanySpecification.regionIn(regions))
-                .and(CompanySpecification.cityIn(cities))
-                .and(CompanySpecification.industrySectorIn(industrySectors))
-                .and(CompanySpecification.legalFormIn(legalForms))
-                .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
+        Specification<Company> specification = Specification.where(CompanySpecification.regionsIn(regionNames))
+                .and(CompanySpecification.citiesIn(cityNames))
+                .and(CompanySpecification.industrySectorsIn(industrySectorNames))
+                .and(CompanySpecification.legalFormsIn(legalFormNames))
+                .and(CompanySpecification.employeeComparator(numberOfEmployeeFilter))
                 .and(CompanySpecification.socialMediaNotNull(socials))
                 .and(CompanySpecification.contactInfoNotNull(contacts))
                 .and(CompanySpecification.notSeenByUser(isCompanySeen, userId));
@@ -64,15 +67,15 @@ public class CompanyService {
         return companyRepository.findAll(specification, pageable);
     }
 
-    @Cacheable(value = "companyCounts", key = "#root.methodName + #regions + #cities + #industrySectors + #legalForms + #comparator + #numberOfEmployee + #socials + #contacts")
-    public long countCompaniesByFilters(List<String> regions, List<String> cities, List<String> industrySectors, List<String> legalForms,
-                                        String comparator, Integer numberOfEmployee, List<String> socials, List<String> contacts) {
+    @Cacheable(value = "companyCounts", key = "#root.methodName + #regionNames + #cityNames + #industrySectorNames + #legalFormNames + #numberOfEmployeeFilter + #socials + #contacts")
+    public long countCompaniesByFilters(List<String> regionNames, List<String> cityNames, List<String> industrySectorNames, List<String> legalFormNames,
+                                        NumberOfEmployeeFilter numberOfEmployeeFilter, SocialMedia socials, Contact contacts) {
 
-        Specification<Company> specification = Specification.where(CompanySpecification.regionIn(regions))
-                .and(CompanySpecification.cityIn(cities))
-                .and(CompanySpecification.industrySectorIn(industrySectors))
-                .and(CompanySpecification.legalFormIn(legalForms))
-                .and(CompanySpecification.employeeComparator(comparator, numberOfEmployee))
+        Specification<Company> specification = Specification.where(CompanySpecification.regionsIn(regionNames))
+                .and(CompanySpecification.citiesIn(cityNames))
+                .and(CompanySpecification.industrySectorsIn(industrySectorNames))
+                .and(CompanySpecification.legalFormsIn(legalFormNames))
+                .and(CompanySpecification.employeeComparator(numberOfEmployeeFilter))
                 .and(CompanySpecification.socialMediaNotNull(socials))
                 .and(CompanySpecification.contactInfoNotNull(contacts));
 
@@ -109,6 +112,7 @@ public class CompanyService {
 
             Company companyScrapped = new Company();
 
+            // TODO: Verify what's ifNotEmpty means. Currently it still updates the values even if they are empty in the response
             setIfNotEmpty(jsonNode, "companyName", companyScrapped::setCompanyName);
             setIfNotEmpty(jsonNode, "phoneNumber", companyScrapped::setPhoneNumber);
             setIfNotEmpty(jsonNode, "website", companyScrapped::setWebsite);

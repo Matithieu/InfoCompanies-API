@@ -10,20 +10,15 @@ import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.spring.utils.HeadersUtil.parseEmailFromHeader;
 import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
 
 // https://kinsta.com/blog/stripe-java-api/
@@ -46,12 +41,10 @@ public class PaymentController {
     private String STRIPE_PRICE_ID_FREE;
 
     @PostMapping("/subscriptions/trial")
-    public ResponseEntity<String> newSubscriptionWithTrial(HttpServletRequest request) throws Exception {
+    public ResponseEntity<String> newSubscriptionWithTrial(@RequestHeader("X-priceId") String priceId) throws Exception {
         Stripe.apiKey = STRIPE_API_KEY;
 
         String clientBaseURL = "https://" + HOSTNAME + "/ui";
-        String priceId = request.getHeader("X-priceId");
-        String email = parseEmailFromHeader();
         String userId = parseUserIdFromHeader();
 
         // Find the user record from the database

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.example.spring.utils.UserQuotaUtil.getRemainingSearchesBasedOnUserTier;
+
 @EnableScheduling
 @Service
 public class UserService {
@@ -36,12 +38,15 @@ public class UserService {
                 if (userQuota.isEmpty()) {
                     UserQuota newUserQuota = new UserQuota();
                     newUserQuota.setUserId(user.getId());
-                    newUserQuota.setQuotaAllocated(100);
+                    Integer quotaAllocated = getRemainingSearchesBasedOnUserTier(user);
+
+                    newUserQuota.setQuotaAllocated(quotaAllocated);
                     newUserQuota.setQuotaUsed(0);
                     userQuotaRepository.save(newUserQuota);
 
-                    LogUtil.info("Assigned new quota to user: ", Map.of(
-                            "userId", user.getId()
+                    LogUtil.info("Assigned new quota to user", Map.of(
+                            "userId", user.getId(),
+                            "quotaAllocated", quotaAllocated
                     ));
                 }
             }

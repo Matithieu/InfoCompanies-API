@@ -14,4 +14,8 @@ public interface IndustrySectorRepository extends JpaRepository<IndustrySector, 
             "ORDER BY c.name " +
             "ASC LIMIT 20")
     List<IndustrySector> findByNameContainingIgnoreCase(String query);
+
+    List<IndustrySector> findByNameIn(List<String> names);
+
+    List<IndustrySector> findByIdIn(List<Integer> ids);
 }

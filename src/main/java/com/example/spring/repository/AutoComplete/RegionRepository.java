@@ -14,4 +14,8 @@ public interface RegionRepository extends JpaRepository<Region, Integer> {
             "ORDER BY c.name " +
             "ASC LIMIT 25")
     List<Region> findByNameContainingIgnoreCase(String query);
+
+    List<Region> findByNameIn(List<String> names);
+
+    List<Region> findByIdIn(List<Integer> ids);
 }

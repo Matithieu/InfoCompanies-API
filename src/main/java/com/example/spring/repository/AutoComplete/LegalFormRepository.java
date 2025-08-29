@@ -14,4 +14,8 @@ public interface LegalFormRepository extends JpaRepository<LegalForm, Integer> {
             "ORDER BY c.name " +
             "ASC LIMIT 20")
     List<LegalForm> findByNameContainingIgnoreCase(String query);
+
+    List<LegalForm> findByNameIn(List<String> names);
+
+    List<LegalForm> findByIdIn(List<Integer> ids);
 }

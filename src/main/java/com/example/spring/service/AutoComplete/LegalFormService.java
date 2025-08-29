@@ -13,7 +13,15 @@ public class LegalFormService {
     @Autowired
     private LegalFormRepository legalFormRepository;
 
-    public List<LegalForm> searchLegalForm(String query) {
+    public List<LegalForm> searchLegalFormsByName(String query) {
         return legalFormRepository.findByNameContainingIgnoreCase(query);
+    }
+
+    public List<LegalForm> searchLegalFormsByNames(List<String> query) {
+        return legalFormRepository.findByNameIn(query);
+    }
+
+    public List<LegalForm> searchLegalFormsByIds(List<Integer> query) {
+        return legalFormRepository.findByIdIn(query);
     }
 }
