@@ -16,7 +16,7 @@ public class ConfigurationController {
     }
 
     @Cacheable(value = "configCache", unless = "#result == null")
-    @GetMapping("/config")
+    @GetMapping("/configuration")
     public Configuration getEnv() {
         return Configuration.builder()
                 .oauthBaseUrl(envConfig.getOAUTH_BASE_URL())
