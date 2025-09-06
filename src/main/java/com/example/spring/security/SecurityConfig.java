@@ -20,6 +20,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> {
                     // Public endpoints are enabled through the OAuth proxy with allowed endpoints
+                    // TOOD: Set a limit on the endpoint to avoid spamming
                     // Landing page
                     authorize.requestMatchers(HttpMethod.GET, "/v1/company/landing-filter").permitAll();
                     // AutoComplete
@@ -27,6 +28,8 @@ public class SecurityConfig {
                     authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/industrySectors").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/city").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/cities").permitAll();
+                    // Env
+                    authorize.requestMatchers(HttpMethod.GET, "/env").permitAll();
 
                     // Stripe
                     authorize.requestMatchers(HttpMethod.POST, "/v1/stripe/webhook").permitAll();
