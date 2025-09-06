@@ -4,10 +4,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Builder
-public class Configuration {
+public class Configuration implements Serializable {
     private String oauthBaseUrl;
     private String oauthSignInUrl;
     private String oauthSignOutUrl;

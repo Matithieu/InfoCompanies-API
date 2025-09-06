@@ -29,7 +29,7 @@ public class SecurityConfig {
                     authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/city").permitAll();
                     authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/cities").permitAll();
                     // Env
-                    authorize.requestMatchers(HttpMethod.GET, "/env").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/configuration").permitAll();
 
                     // Stripe
                     authorize.requestMatchers(HttpMethod.POST, "/v1/stripe/webhook").permitAll();
