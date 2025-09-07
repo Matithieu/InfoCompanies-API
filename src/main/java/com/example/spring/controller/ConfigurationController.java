@@ -15,6 +15,7 @@ public class ConfigurationController {
         this.envConfig = envConfig;
     }
 
+    // Make sure to flush the cache when updating the env variables
     @Cacheable(value = "configCache", unless = "#result == null")
     @GetMapping("/configuration")
     public Configuration getEnv() {
@@ -28,6 +29,8 @@ public class ConfigurationController {
                 .stripePriceIdBasic(envConfig.getSTRIPE_PRICE_ID_BASIC())
                 .stripePriceIdPremium(envConfig.getSTRIPE_PRICE_ID_PREMIUM())
                 .stripeBillingPortalCode(envConfig.getSTRIPE_BILLING_PORTAL_CODE())
+                .publicPostHogKey(envConfig.getPUBLIC_POSTHOG_KEY())
+                .publicPostHogHost(envConfig.getPUBLIC_POSTHOG_HOST())
                 .build();
     }
 }

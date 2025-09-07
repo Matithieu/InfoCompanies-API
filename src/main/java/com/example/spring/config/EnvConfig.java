@@ -24,4 +24,6 @@ public class EnvConfig {
     @Value("${STRIPE_PRICE_ID_BASIC}") private String STRIPE_PRICE_ID_BASIC;
     @Value("${STRIPE_PRICE_ID_PREMIUM}") private String STRIPE_PRICE_ID_PREMIUM;
     @Value("${STRIPE_BILLING_PORTAL_CODE}") private String STRIPE_BILLING_PORTAL_CODE;
+    @Value("${PUBLIC_POSTHOG_KEY:}") private String PUBLIC_POSTHOG_KEY;
+    @Value("${PUBLIC_POSTHOG_HOST:}") private String PUBLIC_POSTHOG_HOST;
 }

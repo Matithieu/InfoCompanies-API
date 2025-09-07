@@ -19,4 +19,6 @@ public class Configuration implements Serializable {
     private String stripePriceIdBasic;
     private String stripePriceIdPremium;
     private String stripeBillingPortalCode;
+    private String publicPostHogKey;
+    private String publicPostHogHost;
 }
