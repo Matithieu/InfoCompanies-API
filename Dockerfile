@@ -1,32 +1,24 @@
 # Build Stage
 FROM gradle:8.13-jdk21 AS build
-
-# Set the working directory inside the container
 WORKDIR /home/gradle/src
-
-# Copy only the necessary files to the container to minimize cache invalidation
-COPY . /home/gradle/src
-
-# Build the project without the Gradle daemon to avoid cache issues
+COPY . .
 RUN gradle clean build --no-daemon
 
-# Final Stage: Create a minimal Docker image with just the JAR file
-FROM openjdk:21-jdk-slim
-
-# Install curl for debugging purposes
-RUN apt update && apt install -y curl
-
-# Set the working directory inside the container
+# Runtime Stage (JRE only)
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the built jar from the build stage
-COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
 
-# Expose the application's port
+# Copy the built jar from the build stage
+COPY --from=build /home/gradle/src/build/libs/*.jar /app/app.jar
+
 EXPOSE 8083
 
-# Set JVM options to handle memory issues
-ENV JAVA_OPTS="-Xms2g -Xmx4g"
+# JVM options (optional)
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75"
 
-# Command to run the application
-CMD ["java", "-jar", "app.jar"]
+# Use a shell form to expand JAVA_OPTS
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

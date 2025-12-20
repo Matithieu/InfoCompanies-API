@@ -45,8 +45,9 @@ public class SecurityConfig {
 
                     // Swagger + OpenAPI - only in dev
                     // To access Swagger UI and OpenAPI documentation on Docker
+                    // Swagger UI: http://localhost:8080/swagger-ui/index.html
                     // Fill the search bar at the top with: https://localhost/api/v3/api-docs
-                    authorize.requestMatchers("/swagger-ui/**", "/api/v3/api-docs").hasRole("admin");
+                    authorize.requestMatchers("/swagger-ui/index.html", "/v3/api-docs").hasRole("admin");
 
                     // permitAll() is used here because the OAuth proxy handles the authentication
                     // and the user is already authenticated before reaching this point.
