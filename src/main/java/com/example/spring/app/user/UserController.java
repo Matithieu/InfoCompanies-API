@@ -1,0 +1,56 @@
+package com.example.spring.app.user;
+
+import com.example.spring.core.keycloakClient.UserResource;
+import jakarta.ws.rs.core.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
+
+@CrossOrigin
+@RestController
+@RequestMapping("/v1/")
+
+public class UserController {
+
+    @Autowired
+    UserResource userResource;
+
+    @GetMapping("/user")
+    public UserDTO getUser() {
+        String userId = parseUserIdFromHeader();
+        return userResource.getUserById(userId);
+    }
+
+    @PostMapping("/completeOnboarding")
+    public Response completeOnboarding() {
+        String userId = parseUserIdFromHeader();
+        userResource.completeOnboarding(userId);
+        return Response.ok().build();
+    }
+
+    @PutMapping("/update-user")
+    public Response updateUser(@RequestParam UserDTO user) {
+        String id = parseUserIdFromHeader();
+        UserDTO existingUser = userResource.getUserById(id);
+
+        if (existingUser != null) {
+            // Ensure that the user's ID and verified status are not changed
+            user.setId(existingUser.getId());
+            user.setVerified(existingUser.isVerified());
+            user.setTier(existingUser.getTier());
+
+            userResource.updateUser(user);
+            return Response.ok().build();
+        }
+
+        return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    /*
+    @GetMapping("/register")
+    public String registerEndpoint() {
+        return userResource.returnRegistrationEndpoint();
+    }
+     */
+}
