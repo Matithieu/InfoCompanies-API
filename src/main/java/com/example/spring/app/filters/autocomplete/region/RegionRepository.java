@@ -1,0 +1,20 @@
+package com.example.spring.app.filters.autocomplete.region;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface RegionRepository extends JpaRepository<Region, Integer> {
+
+    @Query("SELECT c FROM Region c " +
+            "WHERE LOWER(c.name) " +
+            "LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "ORDER BY c.name " +
+            "ASC LIMIT 25")
+    List<Region> findByNameContainingIgnoreCase(String query);
+
+    List<Region> findByNameIn(List<String> names);
+
+    List<Region> findByIdIn(List<Integer> ids);
+}
