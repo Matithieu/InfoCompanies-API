@@ -2,7 +2,7 @@ package com.example.spring.app.stripe;
 
 import com.example.spring.app.user.UserDTO;
 import com.example.spring.core.keycloakClient.UserResource;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
 
 // https://kinsta.com/blog/stripe-java-api/
 
@@ -44,7 +44,7 @@ public class PaymentController {
         Stripe.apiKey = STRIPE_API_KEY;
 
         String clientBaseURL = "https://" + HOSTNAME + "/ui";
-        String userId = parseUserIdFromHeader();
+        String userId = extractUserIdFromToken();
 
         // Find the user record from the database
         UserDTO user = userResource.getUserById(userId);

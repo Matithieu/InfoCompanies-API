@@ -1,4 +1,4 @@
-package com.example.spring.utils;
+package com.example.spring.common.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,6 @@ public class LogUtil {
 
     public static void error(String message, Throwable throwable) {
         logger.error(message, throwable);
-    }
-
-    public static void debug(String message) {
-        logger.debug(message);
     }
 
     private static String formatContext(Map<String, Object> context) {

@@ -1,7 +1,7 @@
 package com.example.spring.app.stripe;
 
 import com.example.spring.app.user.UserDTO;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.CustomerSearchResult;

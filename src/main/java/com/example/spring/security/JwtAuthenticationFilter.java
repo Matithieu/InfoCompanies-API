@@ -18,11 +18,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.spring.utils.HeadersUtil.parseTokenFromHeader;
+import static com.example.spring.common.utils.HeadersUtil.parseTokenFromHeader;
+import static com.example.spring.common.utils.JwtUtil.decodePayload;
+import static com.example.spring.common.utils.JwtUtil.splitToken;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -31,11 +32,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = parseTokenFromHeader();
 
-        if (token != null && StringUtils.hasText(token)) {
+        if (StringUtils.hasText(token)) {
             // Decode the JWT token
-            String[] parts = token.split("\\.");
+            String[] parts = splitToken(token);
             if (parts.length == 3) {
-                String payload = new String(Base64.getDecoder().decode(parts[1]));
+                String payload = decodePayload(token);
 
                 // Extract roles from the decoded payload
                 List<String> roles = getRolesFromToken(payload);

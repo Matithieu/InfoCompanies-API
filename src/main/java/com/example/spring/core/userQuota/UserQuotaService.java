@@ -2,7 +2,7 @@ package com.example.spring.core.userQuota;
 
 import com.example.spring.core.appSettings.AppSettings;
 import com.example.spring.core.appSettings.AppSettingsRepository;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.annotation.PostConstruct;

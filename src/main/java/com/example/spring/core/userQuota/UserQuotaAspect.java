@@ -17,7 +17,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
 
 @Aspect
 @Component
@@ -68,7 +68,7 @@ public class UserQuotaAspect {
 
     @Around("allMethodsExceptExcluded()")
     public Object checkQuota(ProceedingJoinPoint joinPoint) throws Throwable {
-        String userId = parseUserIdFromHeader();
+        String userId = extractUserIdFromToken();
 
         // Get or create lock for this specific user
         ReentrantLock userLock = userLocks.computeIfAbsent(userId, k -> new ReentrantLock());

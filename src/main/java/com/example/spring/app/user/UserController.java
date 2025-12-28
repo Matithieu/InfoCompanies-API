@@ -5,7 +5,7 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.spring.utils.HeadersUtil.parseUserIdFromHeader;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
 
 @CrossOrigin
 @RestController
@@ -18,20 +18,20 @@ public class UserController {
 
     @GetMapping("/user")
     public UserDTO getUser() {
-        String userId = parseUserIdFromHeader();
+        String userId = extractUserIdFromToken();
         return userResource.getUserById(userId);
     }
 
     @PostMapping("/completeOnboarding")
     public Response completeOnboarding() {
-        String userId = parseUserIdFromHeader();
+        String userId = extractUserIdFromToken();
         userResource.completeOnboarding(userId);
         return Response.ok().build();
     }
 
     @PutMapping("/update-user")
     public Response updateUser(@RequestParam UserDTO user) {
-        String id = parseUserIdFromHeader();
+        String id = extractUserIdFromToken();
         UserDTO existingUser = userResource.getUserById(id);
 
         if (existingUser != null) {
@@ -46,11 +46,4 @@ public class UserController {
 
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
-
-    /*
-    @GetMapping("/register")
-    public String registerEndpoint() {
-        return userResource.returnRegistrationEndpoint();
-    }
-     */
 }
