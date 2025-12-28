@@ -4,7 +4,7 @@ import com.example.spring.app.company.dto.CompanyDetails;
 import com.example.spring.app.company.dto.NumberOfEmployeeFilterDTO;
 import com.example.spring.app.company.objects.ContactDTO;
 import com.example.spring.app.company.objects.SocialMediaDTO;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

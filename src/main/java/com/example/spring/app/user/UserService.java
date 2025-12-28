@@ -3,7 +3,7 @@ package com.example.spring.app.user;
 import com.example.spring.core.keycloakClient.UserResource;
 import com.example.spring.core.userQuota.UserQuotaModel;
 import com.example.spring.core.userQuota.UserQuotaRepository;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;

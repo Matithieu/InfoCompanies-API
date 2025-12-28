@@ -1,4 +1,4 @@
-package com.example.spring.utils;
+package com.example.spring.common.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -11,20 +11,6 @@ import java.util.Map;
 public class HeadersUtil {
 
     // Find the corresponding header of nginx: proxy_set_header X-User $user;
-    public static String parseEmailFromHeader() {
-        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert sra != null;
-        HttpServletRequest request = sra.getRequest();
-        return request.getHeader("X-Auth-Request-Email");
-    }
-
-    public static String parseUserIdFromHeader() {
-        ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert sra != null;
-        HttpServletRequest request = sra.getRequest();
-        return request.getHeader("X-Auth-Request-User");
-    }
-
     public static String parseTokenFromHeader() {
         ServletRequestAttributes sra = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert sra != null;

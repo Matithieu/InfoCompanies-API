@@ -5,7 +5,7 @@ import com.example.spring.app.user.UserDTO;
 import com.example.spring.core.keycloakClient.RoleResource;
 import com.example.spring.core.keycloakClient.UserResource;
 import com.example.spring.core.userQuota.UserQuotaService;
-import com.example.spring.utils.LogUtil;
+import com.example.spring.common.utils.LogUtil;
 import com.google.gson.JsonSyntaxException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
@@ -81,7 +81,7 @@ public class WebHookController {
 
     private void handleSubscriptionCreated(Event event) throws StripeException {
         EventDataObjectDeserializer dataObjectDeserializer = event.getDataObjectDeserializer();
-        StripeObject stripeObject = null;
+        StripeObject stripeObject;
         if (dataObjectDeserializer.getObject().isPresent()) {
             stripeObject = dataObjectDeserializer.getObject().get();
             Subscription subscription = (Subscription) stripeObject;
