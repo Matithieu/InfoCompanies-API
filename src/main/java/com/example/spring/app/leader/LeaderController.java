@@ -19,13 +19,13 @@ public class LeaderController {
 
     // Example: http://localhost:8080/api/v1/leader/get-by-id/123
     @GetMapping("/get-by-id/{id}")
-    public LeaderModel getLeaderById(@PathVariable("id") Integer id) {
+    public LeaderModel getLeaderById(@PathVariable Integer id) {
         return leaderService.getLeaderById(id);
     }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-siren?siren=exemple
     @GetMapping("/get-by-siren/{siren}")
-    public List<LeaderModel> getLeaderBySiren(@PathVariable("siren") String siren) {
+    public List<LeaderModel> getLeaderBySiren(@PathVariable String siren) {
         return leaderService.getLeadersBySirens(siren);
     }
 

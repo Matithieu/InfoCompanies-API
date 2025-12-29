@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @CrossOrigin
 @RestController
@@ -32,7 +32,7 @@ public class CompanyController {
     // Example: http://localhost:8080/api/v1/company/get-by-id/123
     @GetMapping("/get-by-id/{id}")
     public CompanyDtoWithStatusDTO getCompanyById(@PathVariable("id") Integer id) {
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         CompanyDTO companyDto = companyService.getCompanyById(id).toCompanyDTO();
         UserCompanyStatusModel userCompanyStatus = userCompanyStatusService
                 .getOneUserCompanyStatusByUserIdAndCompanyId(userId, id);
@@ -45,7 +45,7 @@ public class CompanyController {
     public Page<CompanyDtoWithStatusDTO> getCompaniesSeenByUser(@RequestParam(defaultValue = "0") int page,
                                                                 @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         Page<CompanyModel> companies = companyService.getCompaniesSeenByUser(userId, pageable);
 
         List<UserCompanyStatusModel> userCompanyStatuses = userCompanyStatusService
@@ -70,7 +70,7 @@ public class CompanyController {
     @PostMapping("/filter-by-parameters")
     public Page<CompanyDtoWithStatusDTO> getCompaniesByFilters(
             @RequestBody(required = false) CompanyFilterRequest filterRequest) {
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         Pageable pageable = PageRequest.of(filterRequest.getPage(), filterRequest.getSize());
 
         Page<CompanyModel> companies = companyService.findCompaniesByFilters(
@@ -100,7 +100,7 @@ public class CompanyController {
     public Page<CompanyDtoWithStatusDTO> getRandomUnseenCompanies(@RequestParam(defaultValue = "0") int page,
                                                                   @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         Page<CompanyModel> companies = companyService.findRandomUnseenCompanies(userId, pageable);
         List<UserCompanyStatusModel> userCompanyStatuses = userCompanyStatusService
                 .getMultipleUserCompanyStatusByUserIdAndCompanyIds(userId, companies.getContent()

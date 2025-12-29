@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @RestController
 @RequestMapping("/v1/companies-status")
@@ -20,7 +20,7 @@ public class UserCompanyStatusController {
     @PostMapping("/update-status")
     public ResponseEntity<UserCompanyStatusModel> updateStatus(@RequestParam Integer companyId,
                                                                @RequestParam Status status) {
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         UserCompanyStatusModel updated = userCompanyStatusService.updateCompanyStatus(userId, companyId, status);
 
         if (updated == null) {

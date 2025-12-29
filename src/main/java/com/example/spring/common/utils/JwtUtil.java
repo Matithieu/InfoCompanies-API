@@ -18,7 +18,7 @@ public class JwtUtil {
         return new String(Base64.getDecoder().decode(parts[1]));
     }
 
-    public static String extractUserIdFromToken() {
+    public static String extractUserIdFromHeader() {
         String token = parseTokenFromHeader();
         String payload = decodePayload(token);
 
