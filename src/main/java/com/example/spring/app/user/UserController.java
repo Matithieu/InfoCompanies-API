@@ -5,33 +5,33 @@ import jakarta.ws.rs.core.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/v1/user")
 
 public class UserController {
 
     @Autowired
     UserResource userResource;
 
-    @GetMapping("/user")
+    @GetMapping("/get-user")
     public UserDTO getUser() {
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         return userResource.getUserById(userId);
     }
 
-    @PostMapping("/completeOnboarding")
+    @PostMapping("/complete-onboarding")
     public Response completeOnboarding() {
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
         userResource.completeOnboarding(userId);
         return Response.ok().build();
     }
 
     @PutMapping("/update-user")
     public Response updateUser(@RequestParam UserDTO user) {
-        String id = extractUserIdFromToken();
+        String id = extractUserIdFromHeader();
         UserDTO existingUser = userResource.getUserById(id);
 
         if (existingUser != null) {

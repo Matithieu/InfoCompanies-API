@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.example.spring.common.utils.JwtUtil.extractUserIdFromToken;
+import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 // https://kinsta.com/blog/stripe-java-api/
 
@@ -44,7 +44,7 @@ public class PaymentController {
         Stripe.apiKey = STRIPE_API_KEY;
 
         String clientBaseURL = "https://" + HOSTNAME + "/ui";
-        String userId = extractUserIdFromToken();
+        String userId = extractUserIdFromHeader();
 
         // Find the user record from the database
         UserDTO user = userResource.getUserById(userId);
