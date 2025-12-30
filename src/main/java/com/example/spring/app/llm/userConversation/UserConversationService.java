@@ -26,4 +26,14 @@ public class UserConversationService {
     public List<UserConversationModel> getAllConversationsForUser(String userId) {
         return userConversationRepository.findAllByUserId(userId);
     }
+
+    public void deleteUserConversation(String conversationId, String userId) {
+        UserConversationModel conversation = getUserConversation(conversationId, userId);
+        if (conversation != null) {
+            userConversationRepository.delete(conversation);
+            return;
+        }
+
+        throw new RuntimeException("Conversation not found for user. Mismatched user or conversation ID.");
+    }
 }

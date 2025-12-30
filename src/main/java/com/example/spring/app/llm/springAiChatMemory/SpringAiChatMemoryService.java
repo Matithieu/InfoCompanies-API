@@ -1,5 +1,6 @@
 package com.example.spring.app.llm.springAiChatMemory;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,5 +13,10 @@ public class SpringAiChatMemoryService {
 
     public List<SpringAiChatMemoryModel> findAllByConversationId(String conversationId) {
         return userConversationRepository.findAllByConversationId(conversationId);
+    }
+
+    @Transactional
+    public void deleteAllByConversationId(String conversationId) {
+        userConversationRepository.deleteAllByConversationId(conversationId);
     }
 }

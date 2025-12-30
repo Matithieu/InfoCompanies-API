@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SpringAiChatMemoryRepository extends JpaRepository<SpringAiChatMemoryModel, Integer> {
     List<SpringAiChatMemoryModel> findAllByConversationId(String conversationId);
+    void deleteAllByConversationId(String conversationId);
 }
