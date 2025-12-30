@@ -69,6 +69,14 @@ public class LLMController {
                 .toList();
     }
 
+    // Issue with open-api generator which generates ENUM, and values are the sames
+    @DeleteMapping("/conversation/delete/{conversationId}")
+    public void deleteConversation(@PathVariable String conversationId) {
+        String userId = extractUserIdFromHeader();
+        springAiChatMemoryService.deleteAllByConversationId(conversationId);
+        userConversationService.deleteUserConversation(conversationId, userId);
+    }
+
     @GetMapping("/conversation/all")
     public List<ConversationDTO> getAllUserConversations() {
         String userId = extractUserIdFromHeader();
