@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
+import static com.example.spring.app.llm.LLMUtils.parseConversationTitle;
+
 @Service
 public class UserConversationService {
     @Autowired
@@ -15,10 +17,15 @@ public class UserConversationService {
         return userConversationRepository.findByConversationIdAndUserId(conversationId, userId);
     }
 
-    public UserConversationModel createNewConversationForUser(String userId) {
+    public UserConversationModel createNewConversationForUser(String userId, String conversationTitle) {
         UserConversationModel newConversation = new UserConversationModel();
-        newConversation.setUserId(userId);
+
+        String parsedTitle = parseConversationTitle(conversationTitle);
+        newConversation.setTitle(parsedTitle);
+
         String conversationId = UUID.randomUUID().toString();
+
+        newConversation.setUserId(userId);
         newConversation.setConversationId(conversationId);
         return userConversationRepository.save(newConversation);
     }
