@@ -51,6 +51,24 @@ public class LLMConfig {
     }
 
     @Bean
+    public ChatClient titleClient(ChatClient.Builder titleClientBuilder) {
+        return titleClientBuilder
+                .defaultSystem(
+                        """
+                                You generate a short title for a chat conversation.
+                                
+                                Rules:
+                                - Output exactly ONE line (no quotes, no punctuation, no line breaks).
+                                - Max 6 words.
+                                - No lists, no categories.
+                                - If the conversation is generic small talk (e.g., greetings, “how are you”, “what’s up”), output: "Small talk".
+                                - Do not guess topics like weather unless explicitly discussed.
+                                """
+                )
+                .build();
+    }
+
+    @Bean
     public ChatMemory jdbcChatMemory(JdbcTemplate jdbcTemplate) {
         ChatMemoryRepository chatMemoryRepository = JdbcChatMemoryRepository.builder()
                 .jdbcTemplate(jdbcTemplate)
@@ -59,7 +77,7 @@ public class LLMConfig {
 
         return MessageWindowChatMemory.builder()
                 .chatMemoryRepository(chatMemoryRepository)
-                .maxMessages(10)
+                .maxMessages(20)
                 .build();
     }
 }

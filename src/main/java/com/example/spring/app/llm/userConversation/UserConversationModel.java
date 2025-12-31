@@ -12,6 +12,7 @@ public class UserConversationModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    private String title;
     private String conversationId;
     private String userId;
 }
