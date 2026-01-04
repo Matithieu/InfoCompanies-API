@@ -15,7 +15,6 @@ import reactor.core.publisher.Flux;
 import java.time.Instant;
 import java.util.List;
 
-import static com.example.spring.app.llm.LLMUtils.wrapUserInputWithConversationContext;
 import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @CrossOrigin
@@ -81,10 +80,9 @@ public class LLMController {
     @PostMapping(value = "/{conversationId}/messages", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ChatStreamResponseDTO> streamGeneration(@PathVariable String conversationId, @RequestBody LLMRequest request) {
         String userId = extractUserIdFromHeader();
-        String userInput = wrapUserInputWithConversationContext(request.userInput());
         boolean isNewConversation = conversationId.equals("new");
         String conversationTitle = isNewConversation
-                ? titleClient.prompt().user(userInput).call().content()
+                ? titleClient.prompt().user(request.userInput()).call().content()
                 : null;
 
         UserConversationModel conversation =
@@ -97,8 +95,10 @@ public class LLMController {
         }
 
         return chatClient.prompt()
-                .user(userSpec -> userSpec.text(userInput))
-                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, conversation.getConversationId()))
+                .user(userSpec -> userSpec.text(request.userInput()))
+                .advisors(advisor -> advisor
+                        .param(ChatMemory.CONVERSATION_ID, conversation.getConversationId())
+                )
                 .stream()
                 .chatResponse()
                 .map(chatResponse -> new ChatStreamResponseDTO(conversation.getConversationId(), chatResponse, Instant.now().toEpochMilli()));

@@ -1,13 +1,6 @@
 package com.example.spring.app.llm;
 
 public class LLMUtils {
-    public static String wrapUserInputWithConversationContext(String userInput) {
-        return """
-                Conversation:
-                %s
-                """.formatted(userInput);
-    }
-
     /**
      * Parse conversation title to limit to max 6 words.
      * If more than 6 words, append "..." at the end.
