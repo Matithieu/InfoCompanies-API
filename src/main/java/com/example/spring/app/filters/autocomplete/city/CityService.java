@@ -11,15 +11,15 @@ public class CityService {
     @Autowired
     private CityRepository cityRepository;
 
-    public List<City> searchCitiesByName(String query) {
-        return cityRepository.findByNameContainingIgnoreCase(query);
+    public List<CityModel> searchCitiesByNameContainingIgnoreCaseAny(List<String> query) {
+        if (query.size() > 1) {
+            return cityRepository.findByNameIn(query);
+        }
+
+        return cityRepository.findByNameContainingIgnoreCase(query.getFirst());
     }
 
-    public List<City> searchCitiesByNames(List<String> query) {
-        return cityRepository.findByNameIn(query);
-    }
-
-    public List<City> searchCitiesByIds(List<Integer> query) {
+    public List<CityModel> searchCitiesByIds(List<Integer> query) {
         return cityRepository.findByIdIn(query);
     }
 }

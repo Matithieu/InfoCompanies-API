@@ -2,19 +2,20 @@ package com.example.spring.app.filters.autocomplete.legalForm;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface LegalFormRepository extends JpaRepository<LegalForm, Integer> {
+public interface LegalFormRepository extends JpaRepository<LegalFormModel, Integer> {
 
-    @Query("SELECT c FROM LegalForm c " +
-            "WHERE LOWER(c.name) " +
+    @Query("SELECT l FROM LegalFormModel l " +
+            "WHERE LOWER(l.name) " +
             "LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "ORDER BY c.name " +
-            "ASC LIMIT 20")
-    List<LegalForm> findByNameContainingIgnoreCase(String query);
+            "ORDER BY l.name " +
+            "ASC LIMIT 25")
+    List<LegalFormModel> findByNameContainingIgnoreCase(String query);
 
-    List<LegalForm> findByNameIn(List<String> names);
+    List<LegalFormModel> findByNameIn(List<String> names);
 
-    List<LegalForm> findByIdIn(List<Integer> ids);
+    List<LegalFormModel> findByIdIn(List<Integer> ids);
 }

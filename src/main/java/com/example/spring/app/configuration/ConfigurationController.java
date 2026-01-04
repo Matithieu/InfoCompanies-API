@@ -3,9 +3,11 @@ package com.example.spring.app.configuration;
 import com.example.spring.config.EnvConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/v1/configuration")
 public class ConfigurationController {
 
     private final EnvConfig envConfig;
@@ -16,7 +18,7 @@ public class ConfigurationController {
 
     // Make sure to flush the cache when updating the env variables
     @Cacheable(value = "configCache", unless = "#result == null")
-    @GetMapping("/configuration")
+    @GetMapping("/")
     public ConfigurationDTO getEnv() {
         return ConfigurationDTO.builder()
                 .oauthBaseUrl(envConfig.getOAUTH_BASE_URL())

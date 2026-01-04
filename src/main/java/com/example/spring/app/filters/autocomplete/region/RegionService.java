@@ -11,15 +11,15 @@ public class RegionService {
     @Autowired
     private RegionRepository regionRepository;
 
-    public List<Region> searchRegionsByName(String query) {
-        return regionRepository.findByNameContainingIgnoreCase(query);
+    public List<RegionModel> searchRegionsByNamesContainingIgnoreCase(List<String> query) {
+        if (query.size() > 1) {
+            return regionRepository.findByNameIn(query);
+        }
+
+        return regionRepository.findByNameContainingIgnoreCase(query.getFirst());
     }
 
-    public List<Region> searchRegionsByNames(List<String> query) {
-        return regionRepository.findByNameIn(query);
-    }
-
-    public List<Region> searchRegionsByIds(List<Integer> query) {
+    public List<RegionModel> searchRegionsByIds(List<Integer> query) {
         return regionRepository.findByIdIn(query);
     }
 }

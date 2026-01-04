@@ -5,16 +5,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface RegionRepository extends JpaRepository<Region, Integer> {
+public interface RegionRepository extends JpaRepository<RegionModel, Integer> {
 
-    @Query("SELECT c FROM Region c " +
-            "WHERE LOWER(c.name) " +
+    @Query("SELECT r FROM RegionModel r " +
+            "WHERE LOWER(r.name) " +
             "LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "ORDER BY c.name " +
+            "ORDER BY r.name " +
             "ASC LIMIT 25")
-    List<Region> findByNameContainingIgnoreCase(String query);
+    List<RegionModel> findByNameContainingIgnoreCase(String query);
 
-    List<Region> findByNameIn(List<String> names);
+    List<RegionModel> findByNameIn(List<String> names);
 
-    List<Region> findByIdIn(List<Integer> ids);
+    List<RegionModel> findByIdIn(List<Integer> ids);
 }

@@ -24,7 +24,7 @@ import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/v1/stripe")
+@RequestMapping("/v1/payments")
 public class PaymentController {
 
     @Autowired

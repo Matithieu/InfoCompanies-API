@@ -11,15 +11,15 @@ public class LegalFormService {
     @Autowired
     private LegalFormRepository legalFormRepository;
 
-    public List<LegalForm> searchLegalFormsByName(String query) {
-        return legalFormRepository.findByNameContainingIgnoreCase(query);
+    public List<LegalFormModel> searchLegalFormsByNamesContainingIgnoreCase(List<String> query) {
+        if (query.size() > 1) {
+            return legalFormRepository.findByNameIn(query);
+        }
+
+        return legalFormRepository.findByNameContainingIgnoreCase(query.getFirst());
     }
 
-    public List<LegalForm> searchLegalFormsByNames(List<String> query) {
-        return legalFormRepository.findByNameIn(query);
-    }
-
-    public List<LegalForm> searchLegalFormsByIds(List<Integer> query) {
+    public List<LegalFormModel> searchLegalFormsByIds(List<Integer> query) {
         return legalFormRepository.findByIdIn(query);
     }
 }

@@ -11,26 +11,26 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/v1/leader")
+@RequestMapping("/v1/leaders")
 public class LeaderController {
 
     @Autowired
     private LeaderService leaderService;
 
     // Example: http://localhost:8080/api/v1/leader/get-by-id/123
-    @GetMapping("/get-by-id/{id}")
-    public LeaderModel getLeaderById(@PathVariable Integer id) {
-        return leaderService.getLeaderById(id);
+    @GetMapping("/{id}")
+    public LeaderModel getLeaderById(@PathVariable("id") Integer leaderId) {
+        return leaderService.getLeaderById(leaderId);
     }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-siren?siren=exemple
-    @GetMapping("/get-by-siren/{siren}")
+    @GetMapping("/by-siren/{siren}")
     public List<LeaderModel> getLeaderBySiren(@PathVariable String siren) {
         return leaderService.getLeadersBySirens(siren);
     }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-first-and-last-name?firstName=exemple&lastName=exemple&page=0
-    @GetMapping("/get-by-first-and-last-name")
+    @GetMapping("/search")
     public Page<LeaderModel> getLeadersByName(@RequestParam("firstName") String firstName,
                                               @RequestParam("lastName") String lastName,
                                               @RequestParam(defaultValue = "0") int page,

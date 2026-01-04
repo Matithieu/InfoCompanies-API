@@ -24,7 +24,7 @@ import static com.example.spring.core.userQuota.UserQuotaUtil.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/v1/stripe")
+@RequestMapping("/webhook")
 public class WebHookController {
 
     @Autowired
@@ -39,7 +39,7 @@ public class WebHookController {
     @Value("${STRIPE_WEBHOOK_SECRET}")
     private String STRIPE_WEBHOOK_SECRET;
 
-    @PostMapping("/webhook")
+    @PostMapping("/stripe")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws StripeException {
         Event event;
 

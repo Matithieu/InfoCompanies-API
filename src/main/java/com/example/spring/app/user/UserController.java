@@ -9,14 +9,14 @@ import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping("/v1/users")
 
 public class UserController {
 
     @Autowired
     UserResource userResource;
 
-    @GetMapping("/get-user")
+    @GetMapping("/me")
     public UserDTO getUser() {
         String userId = extractUserIdFromHeader();
         return userResource.getUserById(userId);
@@ -29,7 +29,7 @@ public class UserController {
         return Response.ok().build();
     }
 
-    @PutMapping("/update-user")
+    @PutMapping("/me")
     public Response updateUser(@RequestParam UserDTO user) {
         String id = extractUserIdFromHeader();
         UserDTO existingUser = userResource.getUserById(id);
