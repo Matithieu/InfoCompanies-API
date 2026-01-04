@@ -1,7 +1,9 @@
 package com.example.spring.app.filters.autocomplete.city;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -9,8 +11,11 @@ import java.util.List;
 @RequestMapping("/v1/autocomplete/cities")
 public class CityController {
 
-    @Autowired
-    private CityService cityService;
+    private final CityService cityService;
+
+    public CityController(CityService cityService) {
+        this.cityService = cityService;
+    }
 
     @PostMapping("/ids")
     public List<CityModel> autocompleteCitiesByIds(@RequestBody List<Integer> query) {

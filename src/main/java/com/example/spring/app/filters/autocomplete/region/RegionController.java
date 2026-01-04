@@ -1,7 +1,9 @@
 package com.example.spring.app.filters.autocomplete.region;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -9,8 +11,11 @@ import java.util.List;
 @RequestMapping("/v1/autocomplete/regions")
 public class RegionController {
 
-    @Autowired
-    private RegionService regionService;
+    private final RegionService regionService;
+
+    public RegionController(RegionService regionService) {
+        this.regionService = regionService;
+    }
 
     @PostMapping("/ids")
     public List<RegionModel> autocompleteRegionsByIds(@RequestBody List<Integer> query) {

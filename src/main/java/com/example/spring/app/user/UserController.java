@@ -2,7 +2,6 @@ package com.example.spring.app.user;
 
 import com.example.spring.core.keycloakClient.UserResource;
 import jakarta.ws.rs.core.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
@@ -13,8 +12,11 @@ import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 
 public class UserController {
 
-    @Autowired
-    UserResource userResource;
+    private final UserResource userResource;
+
+    public UserController(UserResource userResource) {
+        this.userResource = userResource;
+    }
 
     @GetMapping("/me")
     public UserDTO getUser() {

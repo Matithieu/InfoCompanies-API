@@ -1,6 +1,5 @@
 package com.example.spring.app.llm.userConversation;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,8 +9,12 @@ import static com.example.spring.app.llm.LLMUtils.parseConversationTitle;
 
 @Service
 public class UserConversationService {
-    @Autowired
-    private UserConversationRepository userConversationRepository;
+
+    private final UserConversationRepository userConversationRepository;
+
+    public UserConversationService(UserConversationRepository userConversationRepository) {
+        this.userConversationRepository = userConversationRepository;
+    }
 
     public UserConversationModel getUserConversation(String conversationId, String userId) {
         return userConversationRepository.findByConversationIdAndUserId(conversationId, userId);

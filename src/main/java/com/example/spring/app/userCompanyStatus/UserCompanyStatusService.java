@@ -1,7 +1,6 @@
 package com.example.spring.app.userCompanyStatus;
 
 import com.example.spring.app.company.enums.Status;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,8 +8,11 @@ import java.util.List;
 @Service
 public class UserCompanyStatusService {
 
-    @Autowired
-    private UserCompanyStatusRepository userCompanyStatusRepository;
+    private final UserCompanyStatusRepository userCompanyStatusRepository;
+
+    public UserCompanyStatusService(UserCompanyStatusRepository userCompanyStatusRepository) {
+        this.userCompanyStatusRepository = userCompanyStatusRepository;
+    }
 
     public UserCompanyStatusModel getOneUserCompanyStatusByUserIdAndCompanyId(String userId, Integer companyId) {
         return userCompanyStatusRepository.findUserCompanyStatusByUserIdAndCompanyId(userId, companyId);

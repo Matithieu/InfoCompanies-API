@@ -1,7 +1,9 @@
 package com.example.spring.app.filters.autocomplete.industrySector;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -9,8 +11,11 @@ import java.util.List;
 @RequestMapping("/v1/autocomplete/industry-sectors")
 public class IndustrySectorController {
     
-    @Autowired
-    private IndustrySectorService industrySectorService;
+    private final IndustrySectorService industrySectorService;
+
+    public IndustrySectorController(IndustrySectorService industrySectorService) {
+        this.industrySectorService = industrySectorService;
+    }
 
     @PostMapping("/ids")
     public List<IndustrySectorModel> autocompleteIndustrySectorsByIds(@RequestBody List<Integer> query) {

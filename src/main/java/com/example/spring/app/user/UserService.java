@@ -1,10 +1,9 @@
 package com.example.spring.app.user;
 
+import com.example.spring.common.utils.LogUtil;
 import com.example.spring.core.keycloakClient.UserResource;
 import com.example.spring.core.userQuota.UserQuotaModel;
 import com.example.spring.core.userQuota.UserQuotaRepository;
-import com.example.spring.common.utils.LogUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,11 +19,13 @@ import static com.example.spring.core.userQuota.UserQuotaUtil.getRemainingSearch
 @Service
 public class UserService {
 
-    @Autowired
-    private UserResource userResource;
+    private final UserResource userResource;
+    private final UserQuotaRepository userQuotaRepository;
 
-    @Autowired
-    private UserQuotaRepository userQuotaRepository;
+    public UserService(UserQuotaRepository userQuotaRepository, UserResource userResource) {
+        this.userQuotaRepository = userQuotaRepository;
+        this.userResource = userResource;
+    }
 
     @Scheduled(fixedRate = 1000 * 60 * 15) // 15 minutes
     @Transactional

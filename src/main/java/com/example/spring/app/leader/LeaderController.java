@@ -1,6 +1,5 @@
 package com.example.spring.app.leader;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +13,11 @@ import java.util.List;
 @RequestMapping("/v1/leaders")
 public class LeaderController {
 
-    @Autowired
-    private LeaderService leaderService;
+    private final LeaderService leaderService;
+
+    public LeaderController(LeaderService leaderService) {
+        this.leaderService = leaderService;
+    }
 
     // Example: http://localhost:8080/api/v1/leader/get-by-id/123
     @GetMapping("/{id}")

@@ -1,13 +1,12 @@
 package com.example.spring.app.stripe;
 
 import com.example.spring.app.user.UserDTO;
-import com.example.spring.core.keycloakClient.UserResource;
 import com.example.spring.common.utils.LogUtil;
+import com.example.spring.core.keycloakClient.UserResource;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.checkout.Session;
-import com.stripe.net.RequestOptions;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -124,9 +123,11 @@ public class PaymentController {
                     );
                 }
 
+                /*
                 RequestOptions requestOptions = RequestOptions.builder()
                         .setIdempotencyKey(user.getId())
                         .build();
+                 */
 
                 Session session = Session.create(paramsBuilder.build());
 

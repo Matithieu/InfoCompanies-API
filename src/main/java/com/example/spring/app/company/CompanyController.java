@@ -7,7 +7,6 @@ import com.example.spring.app.company.dto.CompanyFilterRequest;
 import com.example.spring.app.company.enums.Status;
 import com.example.spring.app.userCompanyStatus.UserCompanyStatusModel;
 import com.example.spring.app.userCompanyStatus.UserCompanyStatusService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,14 @@ import static com.example.spring.common.utils.JwtUtil.extractUserIdFromHeader;
 @RequestMapping("/v1/companies")
 public class CompanyController {
 
-    @Autowired
-    private CompanyService companyService;
+    private final CompanyService companyService;
+    private final UserCompanyStatusService userCompanyStatusService;
 
-    @Autowired
-    private UserCompanyStatusService userCompanyStatusService;
+    public CompanyController(CompanyService companyService,
+                             UserCompanyStatusService userCompanyStatusService) {
+        this.companyService = companyService;
+        this.userCompanyStatusService = userCompanyStatusService;
+    }
 
     // Example: http://localhost:8080/api/v1/company/search-by-name?companyName=ExampleCompany&page=0
     @GetMapping("/")
