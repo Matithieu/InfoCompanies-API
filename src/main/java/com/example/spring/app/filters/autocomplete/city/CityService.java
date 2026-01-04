@@ -1,6 +1,5 @@
 package com.example.spring.app.filters.autocomplete.city;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -8,18 +7,21 @@ import java.util.List;
 @Service
 public class CityService {
 
-    @Autowired
-    private CityRepository cityRepository;
+    private final CityRepository cityRepository;
 
-    public List<City> searchCitiesByName(String query) {
-        return cityRepository.findByNameContainingIgnoreCase(query);
+    public CityService(CityRepository cityRepository) {
+        this.cityRepository = cityRepository;
     }
 
-    public List<City> searchCitiesByNames(List<String> query) {
-        return cityRepository.findByNameIn(query);
+    public List<CityModel> searchCitiesByNameContainingIgnoreCaseAny(List<String> query) {
+        if (query.size() > 1) {
+            return cityRepository.findByNameIn(query);
+        }
+
+        return cityRepository.findByNameContainingIgnoreCase(query.getFirst());
     }
 
-    public List<City> searchCitiesByIds(List<Integer> query) {
+    public List<CityModel> searchCitiesByIds(List<Integer> query) {
         return cityRepository.findByIdIn(query);
     }
 }

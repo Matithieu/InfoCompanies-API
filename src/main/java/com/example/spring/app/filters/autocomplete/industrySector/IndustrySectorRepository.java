@@ -5,16 +5,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface IndustrySectorRepository extends JpaRepository<IndustrySector, Integer> {
+public interface IndustrySectorRepository extends JpaRepository<IndustrySectorModel, Integer> {
 
-    @Query("SELECT c FROM IndustrySector c " +
-            "WHERE LOWER(c.name) " +
+    @Query("SELECT i FROM IndustrySectorModel i " +
+            "WHERE LOWER(i.name) " +
             "LIKE LOWER(CONCAT('%', :query, '%')) " +
-            "ORDER BY c.name " +
-            "ASC LIMIT 20")
-    List<IndustrySector> findByNameContainingIgnoreCase(String query);
+            "ORDER BY i.name " +
+            "ASC LIMIT 25")
+    List<IndustrySectorModel> findByNameContainingIgnoreCase(String query);
 
-    List<IndustrySector> findByNameIn(List<String> names);
+    List<IndustrySectorModel> findByNameIn(List<String> names);
 
-    List<IndustrySector> findByIdIn(List<Integer> ids);
+    List<IndustrySectorModel> findByIdIn(List<Integer> ids);
 }

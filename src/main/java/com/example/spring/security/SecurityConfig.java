@@ -20,28 +20,25 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> {
                     // Public endpoints are enabled through the OAuth proxy with allowed endpoints
-                    // TOOD: Set a limit on the endpoint to avoid spamming
+                    // TODO: Set a limit on the endpoint to avoid spamming with resilience4j.ratelimiter
                     // Landing page
-                    authorize.requestMatchers(HttpMethod.GET, "/v1/company/landing-filter").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/companies/filter").permitAll();
                     // AutoComplete
-                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/industrySector").permitAll();
-                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/industrySectors").permitAll();
-                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/city").permitAll();
-                    authorize.requestMatchers(HttpMethod.GET, "/v1/autocomplete/cities").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/v1/autocomplete/industry-sectors/**").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/v1/autocomplete/cities/**").permitAll();
                     // Env
-                    authorize.requestMatchers(HttpMethod.GET, "/configuration").permitAll();
+                    authorize.requestMatchers(HttpMethod.GET, "/v1/configuration/").permitAll();
 
                     // Stripe
-                    authorize.requestMatchers(HttpMethod.POST, "/v1/stripe/webhook").permitAll();
+                    authorize.requestMatchers(HttpMethod.POST, "/webhook/stripe").permitAll();
                     // Health check
                     authorize.requestMatchers(HttpMethod.GET, "/actuator/health").permitAll();
 
                     // Private endpoints are protected by the JWT authentication filter
                     // Company
-                    authorize.requestMatchers("/v1/company/**").hasRole("verified");
-                    authorize.requestMatchers("/v1/companies-status/**").hasRole("verified");
+                    authorize.requestMatchers("/v1/companies/**").hasRole("verified");
                     // Leader
-                    authorize.requestMatchers("/v1/leader/**").hasRole("verified");
+                    authorize.requestMatchers("/v1/leaders/**").hasRole("verified");
 
                     // Swagger + OpenAPI - only in dev
                     // To access Swagger UI and OpenAPI documentation on Docker

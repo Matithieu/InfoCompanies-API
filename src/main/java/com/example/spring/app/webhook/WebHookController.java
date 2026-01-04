@@ -1,17 +1,16 @@
 package com.example.spring.app.webhook;
 
-import com.example.spring.common.enums.TierUser;
 import com.example.spring.app.user.UserDTO;
+import com.example.spring.common.enums.TierUser;
+import com.example.spring.common.utils.LogUtil;
 import com.example.spring.core.keycloakClient.RoleResource;
 import com.example.spring.core.keycloakClient.UserResource;
 import com.example.spring.core.userQuota.UserQuotaService;
-import com.example.spring.common.utils.LogUtil;
 import com.google.gson.JsonSyntaxException;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.*;
 import com.stripe.net.Webhook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,22 +23,23 @@ import static com.example.spring.core.userQuota.UserQuotaUtil.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/v1/stripe")
+@RequestMapping("/webhook")
 public class WebHookController {
 
-    @Autowired
-    private UserResource userResource;
-
-    @Autowired
-    RoleResource roleResource;
-
-    @Autowired
-    UserQuotaService userQuotaService;
+    private final UserResource userResource;
+    private final RoleResource roleResource;
+    private final UserQuotaService userQuotaService;
 
     @Value("${STRIPE_WEBHOOK_SECRET}")
     private String STRIPE_WEBHOOK_SECRET;
 
-    @PostMapping("/webhook")
+    public WebHookController(UserResource userResource, RoleResource roleResource, UserQuotaService userQuotaService) {
+        this.userResource = userResource;
+        this.roleResource = roleResource;
+        this.userQuotaService = userQuotaService;
+    }
+
+    @PostMapping("/stripe")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) throws StripeException {
         Event event;
 

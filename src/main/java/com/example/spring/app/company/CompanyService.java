@@ -9,7 +9,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -25,15 +24,17 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import static com.example.spring.app.company.CompanyUtil.setIfNotEmpty;
 
 @Service
 public class CompanyService {
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
+
+    public CompanyService(CompanyRepository companyRepository) {
+       this.companyRepository = companyRepository;
+    }
 
     public CompanyModel getCompanyById(Integer id) {
         return companyRepository.findCompanyById(id);
@@ -62,22 +63,6 @@ public class CompanyService {
                 .and(CompanySpecification.notSeenByUser(isCompanySeen, userId));
 
         return companyRepository.findAll(specification, pageable);
-    }
-
-    @Cacheable(value = "companyCounts", key = "#root.methodName + #regionNames + #cityNames + #industrySectorNames + #legalFormNames + #numberOfEmployeeFilter + #socials + #contacts")
-    public long countCompaniesByFilters(List<String> regionNames, List<String> cityNames, List<String> industrySectorNames, List<String> legalFormNames,
-                                        NumberOfEmployeeFilterDTO numberOfEmployeeFilter, SocialMediaDTO socials, ContactDTO contacts) {
-
-        Specification<CompanyModel> specification = Specification.where(CompanySpecification.regionsIn(regionNames))
-                .and(CompanySpecification.citiesIn(cityNames))
-                .and(CompanySpecification.industrySectorsIn(industrySectorNames))
-                .and(CompanySpecification.legalFormsIn(legalFormNames))
-                .and(CompanySpecification.employeeComparator(numberOfEmployeeFilter))
-                .and(CompanySpecification.socialMediaNotNull(socials))
-                .and(CompanySpecification.contactInfoNotNull(contacts));
-
-        // Run a custom count query that only calculates the total number of companies matching the filters
-        return companyRepository.count(specification);
     }
 
     public Page<CompanyModel> findRandomUnseenCompanies(String userId, Pageable pageable) {
@@ -120,7 +105,8 @@ public class CompanyService {
             setIfNotEmpty(jsonNode, "youtube", companyScrapped::setYoutube);
             setIfNotEmpty(jsonNode, "email", companyScrapped::setEmail);
             setIfNotEmpty(jsonNode, "scrapingDate", (value) -> companyScrapped.setScrapingDate(LocalDate.parse(value)));
-            setIfNotEmpty(jsonNode, "reviews", (value) -> companyScrapped.setReviews(new ObjectMapper().convertValue(jsonNode.get("reviews"), new TypeReference<Map<String, Object>>() {})));
+            setIfNotEmpty(jsonNode, "reviews", (value) -> companyScrapped.setReviews(new ObjectMapper().convertValue(jsonNode.get("reviews"), new TypeReference<>() {
+            })));
             setIfNotEmpty(jsonNode, "schedule", companyScrapped::setSchedule);
 
             return companyScrapped;
@@ -134,10 +120,5 @@ public class CompanyService {
     @CacheEvict(value = "companyCounts", allEntries = true)
     public void saveCompany(CompanyModel company) {
         companyRepository.save(company);
-    }
-
-    @CacheEvict(value = "companyCounts", allEntries = true)
-    public void deleteCompany(Integer id) {
-        companyRepository.deleteById(id);
     }
 }

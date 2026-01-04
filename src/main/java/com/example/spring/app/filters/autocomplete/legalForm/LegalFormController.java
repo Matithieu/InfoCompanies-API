@@ -1,32 +1,29 @@
 package com.example.spring.app.filters.autocomplete.legalForm;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/autocomplete")
+@RequestMapping("/v1/autocomplete/legal-forms")
 public class LegalFormController {
-    @Autowired
-    private LegalFormService legalFormService;
 
-    // Example: http://localhost:8080/api/v1/autocomplete/legalForm?query=New
-    @GetMapping("/legalForm")
-    public List<LegalForm> autocompleteLegalFormsByName(@RequestParam String query) {
-        return legalFormService.searchLegalFormsByName(query);
+    private final LegalFormService legalFormService;
+
+    public LegalFormController(LegalFormService legalFormService) {
+        this.legalFormService = legalFormService;
     }
 
-    @GetMapping("/legalForm/ids")
-    public List<LegalForm> autocompleteLegalFormsByIds(@RequestParam List<Integer> query) {
+    @PostMapping("/ids")
+    public List<LegalFormModel> autocompleteLegalFormsByIds(@RequestBody List<Integer> query) {
         return legalFormService.searchLegalFormsByIds(query);
     }
 
-    @GetMapping("/legalForms")
-    public List<LegalForm> autocompleteLegalFormsByNames(@RequestParam List<String> query) {
-        return legalFormService.searchLegalFormsByNames(query);
+    @PostMapping("/names")
+    public List<LegalFormModel> autocompleteLegalFormsByNames(@RequestBody List<String> query) {
+        return legalFormService.searchLegalFormsByNamesContainingIgnoreCase(query);
     }
 }

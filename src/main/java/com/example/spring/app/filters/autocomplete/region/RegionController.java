@@ -1,33 +1,29 @@
 package com.example.spring.app.filters.autocomplete.region;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/v1/autocomplete")
+@RequestMapping("/v1/autocomplete/regions")
 public class RegionController {
 
-    @Autowired
-    private RegionService regionService;
+    private final RegionService regionService;
 
-    // Example: http://localhost:8080/api/v1/autocomplete/region?query=New
-    @GetMapping("/region")
-    public List<Region> autocompleteRegionsByName(@RequestParam String query) {
-        return regionService.searchRegionsByName(query);
+    public RegionController(RegionService regionService) {
+        this.regionService = regionService;
     }
 
-    @GetMapping("/region/ids")
-    public List<Region> autocompleteRegionsByIds(@RequestParam List<Integer> query) {
+    @PostMapping("/ids")
+    public List<RegionModel> autocompleteRegionsByIds(@RequestBody List<Integer> query) {
         return regionService.searchRegionsByIds(query);
     }
 
-    @GetMapping("/regions")
-    public List<Region> autocompleteRegionsByNames(@RequestParam List<String> query) {
-        return regionService.searchRegionsByNames(query);
+    @PostMapping("/names")
+    public List<RegionModel> autocompleteRegionsByNames(@RequestBody List<String> query) {
+        return regionService.searchRegionsByNamesContainingIgnoreCase(query);
     }
 }
